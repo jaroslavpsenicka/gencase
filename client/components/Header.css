@@ -1,3 +1,20 @@
 nav.navbar {
     border-bottom: 1px solid lightgray;
 }
+
+a.navbar-brand {
+    padding-top: 0px;
+    margin-right: 2rem;
+}
+
+.toggle-nav {
+    float: left;
+    margin-left: 15px;
+    margin-right: 25px;
+}
+
+.toggle-nav .icon-reorder {
+    cursor: pointer;
+    display: inline-block;
+    font-size: 19px;
+}
