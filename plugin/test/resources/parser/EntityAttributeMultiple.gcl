@@ -1,0 +1,4 @@
+entity Model1 extends Model0 {
+    String id;
+    String name;
+}

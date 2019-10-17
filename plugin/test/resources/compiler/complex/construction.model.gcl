@@ -1,0 +1,5 @@
+entity ConstructionModel extends ModelingModel {
+
+    String name;
+
+}

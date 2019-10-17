@@ -1,0 +1,12 @@
+GenCase File(0,18)
+  GenCaseEntityImpl(ENTITY)(0,18)
+    GenCaseEntityDefinitionImpl(ENTITY_DEFINITION)(0,18)
+      PsiElement(GenCaseTokenType.ENTITY_KEYWORD)('entity')(0,6)
+      PsiWhiteSpace(' ')(6,7)
+      PsiElement(GenCaseTokenType.IDENTIFIER)('Model1')(7,13)
+      PsiWhiteSpace(' ')(13,14)
+      PsiElement(GenCaseTokenType.LEFT_CURLY)('{')(14,15)
+      PsiWhiteSpace('\n\n')(15,17)
+      GenCaseEntityBodyImpl(ENTITY_BODY)(17,17)
+        <empty list>
+      PsiElement(GenCaseTokenType.RIGHT_CURLY)('}')(17,18)

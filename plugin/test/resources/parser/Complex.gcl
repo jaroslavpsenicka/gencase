@@ -1,0 +1,28 @@
+case Mortgage {
+}
+
+@Model(name = "ModelingModel")
+phase Modeling {
+}
+
+@Model("ConstructionModel")
+phase Construction {
+}
+
+entity CaseModel {
+
+  @Id
+  @Generated("UUID")
+  String caseId;
+
+  @NotEmpty
+  String firstName;
+
+}
+
+entity ModelingModel extends CaseModel {
+
+  @NotEmpty("input not given")
+  MortgageInput input;
+
+}

@@ -1,0 +1,6 @@
+entity Model1 extends Model0 {
+
+  @NotNull("not given")
+  String id;
+
+}

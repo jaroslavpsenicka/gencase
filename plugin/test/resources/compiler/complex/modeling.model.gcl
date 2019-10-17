@@ -1,0 +1,6 @@
+entity ModelingModel extends CaseModel {
+
+  @NotEmpty("input not given")
+  Boolean input;
+
+}

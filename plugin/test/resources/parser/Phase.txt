@@ -1,0 +1,12 @@
+GenCase File(0,17)
+  GenCasePhaseImpl(PHASE)(0,17)
+    GenCasePhaseDefinitionImpl(PHASE_DEFINITION)(0,17)
+      PsiElement(GenCaseTokenType.PHASE_KEYWORD)('phase')(0,5)
+      PsiWhiteSpace(' ')(5,6)
+      PsiElement(GenCaseTokenType.IDENTIFIER)('Phase1')(6,12)
+      PsiWhiteSpace(' ')(12,13)
+      PsiElement(GenCaseTokenType.LEFT_CURLY)('{')(13,14)
+      PsiWhiteSpace('\n\n')(14,16)
+      GenCasePhaseBodyImpl(PHASE_BODY)(16,16)
+        <empty list>
+      PsiElement(GenCaseTokenType.RIGHT_CURLY)('}')(16,17)

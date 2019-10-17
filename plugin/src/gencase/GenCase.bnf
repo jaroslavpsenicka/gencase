@@ -1,0 +1,40 @@
+{
+  parserClass="gencase.parser.GenCaseParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="GenCase"
+  psiImplClassSuffix="Impl"
+  psiPackage="gencase.psi"
+  psiImplPackage="gencase.psi.impl"
+
+  elementTypeHolderClass="gencase.psi.Types"
+  elementTypeClass="gencase.psi.GenCaseElementType"
+  tokenTypeClass="gencase.psi.GenCaseTokenType"
+}
+
+file ::= item*
+
+private item ::= (case|phase|entity|comment|CRLF)
+
+comment ::= WHITESPACE? SINGLE_LINE_COMMENT (TEXT | WHITESPACE)* CRLF?
+
+case ::= WHITESPACE? CASE_KEYWORD WHITESPACE? IDENTIFIER caseDefinition
+caseDefinition ::= LEFT_CURLY caseBody RIGHT_CURLY
+caseBody ::= WHITESPACE?
+
+phase ::= phaseDefinition | (annotations phaseDefinition)
+phaseDefinition ::= WHITESPACE? PHASE_KEYWORD WHITESPACE? IDENTIFIER WHITESPACE? LEFT_CURLY phaseBody RIGHT_CURLY
+phaseBody ::= WHITESPACE?
+
+entity ::= entityDefinition | (annotations entityDefinition)
+entityDefinition ::= WHITESPACE? ENTITY_KEYWORD WHITESPACE? IDENTIFIER extends? LEFT_CURLY entityBody RIGHT_CURLY
+entityBody ::= attribute*
+extends ::= WHITESPACE? EXTENDS_KEYWORD WHITESPACE? IDENTIFIER
+attribute ::= attributeDefinition | (annotations WHITESPACE? attributeDefinition)
+attributeDefinition ::= WHITESPACE? IDENTIFIER WHITESPACE? IDENTIFIER SEMICOLON
+
+annotations ::= (WHITESPACE? annotation)*
+annotation ::= ATSIGN IDENTIFIER annotationParams?
+annotationParams ::= LEFT_BRACKET (annotationParam COMMA?)* RIGHT_BRACKET
+annotationParam ::= STRING_VALUE | (IDENTIFIER WHITESPACE? EQUALS WHITESPACE? STRING_VALUE)

@@ -1,0 +1,51 @@
+{
+  "name": "Mortgage",
+  "phases": [
+    {
+      "name": "Modeling",
+      "model": "ModelingModel"
+    },
+    {
+      "name": "Construction",
+      "model": "ConstructionModel"
+    }
+  ],
+  "entities": [
+    {
+      "name": "CaseModel",
+      "attributes": [
+        {
+          "type": "String",
+          "name": "caseId",
+          "id": true
+        },
+        {
+          "type": "String",
+          "name": "firstName",
+          "notEmpty": true
+        }
+      ]
+    },
+    {
+      "name": "ModelingModel",
+      "extends": "CaseModel",
+      "attributes": [
+        {
+          "type": "Boolean",
+          "name": "input",
+          "notEmpty": true
+        }
+      ]
+    },
+    {
+      "name": "ConstructionModel",
+      "extends": "ModelingModel",
+      "attributes": [
+        {
+          "type": "String",
+          "name": "name"
+        }
+      ]
+    }
+  ]
+}

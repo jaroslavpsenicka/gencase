@@ -1,0 +1,12 @@
+GenCase File(0,15)
+  GenCaseCaseImpl(CASE)(0,15)
+    PsiElement(GenCaseTokenType.CASE_KEYWORD)('case')(0,4)
+    PsiWhiteSpace(' ')(4,5)
+    PsiElement(GenCaseTokenType.IDENTIFIER)('Case1')(5,10)
+    PsiWhiteSpace(' ')(10,11)
+    GenCaseCaseDefinitionImpl(CASE_DEFINITION)(11,15)
+      PsiElement(GenCaseTokenType.LEFT_CURLY)('{')(11,12)
+      PsiWhiteSpace('\n\n')(12,14)
+      GenCaseCaseBodyImpl(CASE_BODY)(14,14)
+        <empty list>
+      PsiElement(GenCaseTokenType.RIGHT_CURLY)('}')(14,15)

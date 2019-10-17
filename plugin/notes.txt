@@ -1,0 +1,74 @@
+gencase.herokuap.com
+- manage projects, ~/projects
+- upload objects from zip file and/or IDE, ~/projects/{projectId}/upload
+- deploy case, ~/projects/{projectId}/deploy
+- migrate data from older version
+- start case, ~/projects/{projectId}/{caseId}/start
+- show case info, ~/projects/{projectId}/{caseId}
+- explore case data, ~/projects/{projectId}/{caseId}/data
+- manage codebooks, ~/projects/{projectId}/codebooks
+- 
+
+
+
+case Mortgage {
+}
+
+@Model(name = ModelingModel)
+phase Modeling {
+
+}
+
+@Model(ConstructionModel)
+phase Construction follows Modeling {
+
+}
+
+@Valid(when="firstName == 'blbec'", message="be nice!")
+entity CaseModel {
+
+  @Id
+  @Generated("UUID")
+  String caseId;
+
+  @NotEmpty
+  @Valid(when="value.length < 3", message="what a name!")
+  String firstName;
+
+  @Codebook("CB_CodebookName")
+  String type = "ABC";
+
+  @NotNull
+  @Enum("CaseStates")
+  String state = OPEN;
+
+  @Min(10)
+  @Max(value = 30, message = "be realistic, man")
+  Number value = 10;
+
+}
+
+entity ModelingModel extends CaseModel {
+
+    @NotNull("no input given")
+    MortgageInput input;
+
+}
+
+entity ConstrctionModel extends ModelingModel {
+
+    @NotNull
+    MortgageInput input;
+
+}
+
+entity MortgageInput {
+
+    @NotEmpty
+    String firstName;
+
+    @NotEmpty
+    String lastName;
+
+}
+

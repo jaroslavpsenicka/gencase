@@ -1,0 +1,9 @@
+entity CaseModel {
+
+  @Id
+  String caseId;
+
+  @NotEmpty
+  String firstName;
+
+}

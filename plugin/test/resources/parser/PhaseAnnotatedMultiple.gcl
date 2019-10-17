@@ -1,0 +1,4 @@
+@Model(name = "Model1", type="type1")
+phase Phase1 {
+
+}

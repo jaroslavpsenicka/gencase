@@ -1,0 +1,8 @@
+entity Model1 {
+
+  @Id
+  @Generated("UUID")
+  String id;
+
+  String name;
+}
