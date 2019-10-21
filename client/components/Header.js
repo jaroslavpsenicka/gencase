@@ -15,7 +15,7 @@ const Header = (props) => {
   }
 
   return (
-    <Navbar bg="white" expand="md" sticky="top">
+    <Navbar bg="white" sticky="top">
       <div className="toggle-nav" onClick={() => toggleNav()}>
         <div className="icon-reorder tooltips" data-original-title="Toggle" data-placement="bottom">
           <FontAwesomeIcon icon={faBars} />

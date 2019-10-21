@@ -2,11 +2,6 @@ nav.navbar {
     border-bottom: 1px solid lightgray;
 }
 
-a.navbar-brand {
-    padding-top: 0px;
-    margin-right: 2rem;
-}
-
 .toggle-nav {
     float: left;
     margin-left: 15px;

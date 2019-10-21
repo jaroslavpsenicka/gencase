@@ -16,7 +16,7 @@ const Sidebar = (props) => {
             <li><A className="nav-link-tight" href="/cases/mortgages">Mortgages</A></li>
             <li><A className="nav-link-tight" href="/cases/loans">Loans</A></li>
           </ul>
-          <A className="nav-link" href="/admin">Admin</A>
+          <A className="nav-link" href="/models">Models</A>
           <A className="nav-link" href="/about">About</A>
         </Nav>
       </Navbar.Collapse>

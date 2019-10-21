@@ -3,9 +3,8 @@
 }
 
 .navbar.sidebar {
-  margin: 10px;
   border-bottom: none;
-  width: 180px;
+  width: 200px;
   position: fixed;
 }
 
@@ -19,4 +18,9 @@
 
 .nav-link-tight {
   color: rgba(0,0,0,.5);
+}
+
+.nav-link-tight:hover {
+  color: rgba(0,0,0,.7);
+  text-decoration: none;
 }

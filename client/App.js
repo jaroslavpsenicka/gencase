@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { useRoutes, useRedirect } from 'hookrouter';
-import { Row, Col } from 'react-bootstrap';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import Contents from './components/Contents';
 
 import About from './pages/About';
-import Admin from './pages/Admin';
+import Models from './pages/Models';
 import Cases from './pages/Cases';
 import NotFound from './pages/NotFound';
 
@@ -17,21 +16,20 @@ const App = () => {
   const routes = {
     "/cases": () => <Cases/>,
     "/about": () => <About />,
-    "/admin": () => <Admin />
+    "/models": () => <Models />
   };
-
-  const sidebarState = { 
-    visible: true,
-    toggleVisible: toggleVisible
-  };
-
-  const [ visible, toggleVisible ] = useState(sidebarState);
 
   useRedirect('/', '/cases');
 
   const RouteContainer = () => {
     return useRoutes(routes) || <NotFound />;
   };
+
+  const sidebarState = { 
+    visible: true
+  };
+
+  const [ visible, toggleVisible ] = useState(sidebarState);
    
   return (
     <div>
