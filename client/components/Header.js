@@ -1,11 +1,14 @@
 import React, { useState, useContext } from 'react';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
+import Image from 'react-bootstrap/Image';
 import { A } from 'hookrouter';
-import { faBars } from '@fortawesome/free-solid-svg-icons'
+import { faBars, faSlidersH } from '@fortawesome/free-solid-svg-icons'
+import { faBell } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import './Header.css'
+import './Header.css';
+import photo from '../static/photo.jpg';
 
 const Header = (props) => {
 
@@ -22,6 +25,14 @@ const Header = (props) => {
         </div>
       </div>      
       <Navbar.Brand href="/cases">DataCase</Navbar.Brand>
+      <Nav className="ml-auto">
+        <A href="/models" className="mt-1 ml-4">
+          <FontAwesomeIcon icon={faSlidersH} size="lg"/></A>
+        <A href="/notifications" className="mt-1 ml-4">
+          <FontAwesomeIcon icon={faBell} size="lg"/></A>
+        <A href="/profile" className="ml-5 mr-3">
+          <Image src={photo} roundedCircle/></A>
+      </Nav>
     </Navbar>
   );
 }

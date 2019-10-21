@@ -4,7 +4,6 @@ import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import Contents from './components/Contents';
 
-import About from './pages/About';
 import Models from './pages/Models';
 import Cases from './pages/Cases';
 import NotFound from './pages/NotFound';
@@ -15,7 +14,6 @@ const App = () => {
  
   const routes = {
     "/cases": () => <Cases/>,
-    "/about": () => <About />,
     "/models": () => <Models />
   };
 

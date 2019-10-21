@@ -11,13 +11,11 @@ const Sidebar = (props) => {
     <Navbar className={ props.visible ? 'sidebar' : 'sidebar-hidden' }>
       <Navbar.Collapse>
         <Nav className="vertical">
-          <A className="nav-link" href="/cases">Cases</A>
+          <A className="pb-2 font-weight-bold" href="/cases">Cases</A>
           <ul>
             <li><A className="nav-link-tight" href="/cases/mortgages">Mortgages</A></li>
             <li><A className="nav-link-tight" href="/cases/loans">Loans</A></li>
           </ul>
-          <A className="nav-link" href="/models">Models</A>
-          <A className="nav-link" href="/about">About</A>
         </Nav>
       </Navbar.Collapse>
     </Navbar>

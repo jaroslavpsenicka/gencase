@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from 'react-dom';
 import App from './App';
-import './bootstrap-flatly.min.css';
+import './static/bootstrap-flatly.min.css';
 
 ReactDOM.render(<App />, document.body.appendChild(document.createElement('div')));
 

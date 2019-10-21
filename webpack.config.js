@@ -12,7 +12,8 @@ const options = {
   module: {
     rules: [
       { test: /\.css$/i, use: ['style-loader', 'css-loader']},
-      { test: /\.js$/, loader: 'babel-loader', exclude: /node_modules/ }
+      { test: /\.js$/, loader: 'babel-loader', exclude: /node_modules/ },
+      { test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192' }
     ]
   },
   plugins: [
