@@ -1,0 +1,13 @@
+#contents {
+  display: inline-block;
+  padding-top: 20px;
+  padding-left: 20px;
+}
+
+.with-sidebar {
+  margin-left: 180px;
+}
+
+.without-sidebar {
+  margin-left: 0px;
+}

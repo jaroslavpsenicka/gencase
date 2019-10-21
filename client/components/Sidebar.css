@@ -1,0 +1,22 @@
+.hdiv {
+  margin-left: 15px;
+}
+
+.navbar.sidebar {
+  margin: 10px;
+  border-bottom: none;
+  width: 180px;
+  position: fixed;
+}
+
+.navbar.sidebar-hidden {
+  display: none;
+}
+
+.navbar-expand .navbar-nav.vertical {
+  flex-direction: column;
+}
+
+.nav-link-tight {
+  color: rgba(0,0,0,.5);
+}
