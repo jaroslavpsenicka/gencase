@@ -4,7 +4,7 @@ import AddUserForm from '../forms/AddUserForm';
 import EditUserForm from '../forms/EditUserForm';
 import UserTable from '../tables/UserTable';
 
-const Cases = () => {
+const CasesPage = () => {
 
   const usersData = [ 
     { id: 1, name: 'Tania', username: 'floppydiskette' },
@@ -72,4 +72,4 @@ const Cases = () => {
 
 };
 
-export default Cases;
+export default CasesPage;

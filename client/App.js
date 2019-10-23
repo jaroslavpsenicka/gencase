@@ -4,30 +4,25 @@ import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import Contents from './components/Contents';
 
-import Models from './pages/Models';
-import Cases from './pages/Cases';
-import NotFound from './pages/NotFound';
+import ModelsPage from './pages/ModelsPage';
+import CasesPage from './pages/CasesPage';
+import NoPage from './pages/NoPage';
 
 import './App.css';
 
 const App = () => {
- 
+
+  const [ visible, toggleVisible ] = useState({ visible: true });
+
   const routes = {
-    "/cases": () => <Cases/>,
-    "/models": () => <Models />
+    "/cases": () => <CasesPage/>,
+    "/models": () => <ModelsPage />
   };
 
   useRedirect('/', '/cases');
-
   const RouteContainer = () => {
-    return useRoutes(routes) || <NotFound />;
+    return useRoutes(routes) || <NoPage />;
   };
-
-  const sidebarState = { 
-    visible: true
-  };
-
-  const [ visible, toggleVisible ] = useState(sidebarState);
    
   return (
     <div>
@@ -40,4 +35,4 @@ const App = () => {
   )
 }
 
-export default App
+export default App;
