@@ -13,6 +13,7 @@
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.6.4",
+    "@babel/plugin-transform-runtime": "^7.6.2",
     "@babel/preset-env": "^7.6.3",
     "@babel/preset-react": "^7.6.3",
     "babel-loader": "^8.0.6",
@@ -29,16 +30,17 @@
     "webpack-dev-server": "^3.8.2"
   },
   "dependencies": {
+    "@babel/runtime": "^7.6.3",
     "@fortawesome/fontawesome": "^1.1.8",
     "@fortawesome/fontawesome-svg-core": "^1.2.25",
     "@fortawesome/free-regular-svg-icons": "^5.11.2",
     "@fortawesome/free-solid-svg-icons": "^5.11.2",
     "@fortawesome/react-fontawesome": "^0.1.6",
     "add": "^2.0.6",
-    "babel-eslint": "^10.0.3",
     "body-parser": "^1.19.0",
     "bootstrap": "^4.3.1",
     "bootstrap-theme": "^5.0.0",
+    "core-js": "^3.3.3",
     "cross-env": "^6.0.3",
     "css-loader": "^3.2.0",
     "elasticsearch": "^16.4.0",
@@ -64,9 +66,11 @@
     "react-redux": "^7.1.0",
     "react-router-dom": "^5.1.2",
     "redux": "^4.0.1",
+    "regenerator-runtime": "^0.13.3",
     "style-loader": "^1.0.0",
     "url-loader": "^2.2.0",
-    "webpack": "^4.41.2"
+    "webpack": "^4.41.2",
+    "yarn": "^1.19.1"
   },
   "babel": {
     "presets": [
@@ -74,7 +78,8 @@
       "@babel/preset-react"
     ],
     "plugins": [
-      "react-hot-loader/babel"
+      "react-hot-loader/babel",
+      "@babel/plugin-transform-runtime"
     ]
   }
 }
