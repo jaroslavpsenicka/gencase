@@ -1,24 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { faStar, faAngleDown, faAngleUp, faPlus } from '@fortawesome/free-solid-svg-icons'
-import { faStar as faStarOutline, faComment } from '@fortawesome/free-regular-svg-icons'
+import axios from 'axios'
+import { faStar, faAngleDown, faAngleUp, faPlus, faComment } from '@fortawesome/free-solid-svg-icons'
+import { faStar as faStarOutline, faComment as faCommentOutline} from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const ModelsPage = () => {
 
-  const [ models, setModels ] = useState([]);
-  const [ loadingError, setLoadingError ] = useState();
+  const [ models, setModels ] = useState();
+  const [ filter, setFilter ] = useState({});
+  const [ loadingError, setLoadingError ] = useState({});
 
   useEffect(() => {
-    fetch('https://localhost:8080/api/cases')
-      .then(res => res.json())
-      .then(json => setModels(result.json()))
+    axios.get('http://localhost:8080/api/models')
+      .then(response => setModels(response.data))
       .catch(err => setLoadingError(err))
   }, []);
 
   const toggleStarred = (model) => {
-    setModels(prev => prev.map((row) => {
-      return row.id === model.id ? {...row, starred: !row.starred} : row
-    }));
+    axios.put('http://localhost:8080/api/models/' + model.id, { starred: !model.starred })
+      .then(resp => setModels(prev => prev.map(row => {
+        return row.id === model.id ? {...row, starred: !row.starred} : row })))
+      .catch(err => console.log('cannot toggle', model, err));
   }
 
   const toggleDetail = (model) => {
@@ -27,15 +29,35 @@ const ModelsPage = () => {
     }));
   }
 
+  const toggleCommentFilter = ()  => {
+    setFilter({ ...filter, commented: !filter.commented });
+  }
+
+  const toggleStarredFilter = ()  => {
+    setFilter({ ...filter, starred: !filter.starred });
+  }
+
   const uploadModel = () => {
   }
 
-  const LoadingError = (props) => (
+  const Loading = () => (
+    <div>Loading...</div>
+  )
+
+  const LoadingError = () => (
     <div>Oops, something went wrong.</div>
   )
 
+  const Models = () => {
+    const filtered = models
+      .filter(m => filter.starred ? m.starred : true)
+      .filter(m => filter.commented ? m.commented : true)
+      .map(m => <ModelRow model={m} key={m.id} />);
+    return filtered.length > 0 ? filtered : <NoModels />
+  }
+
   const NoModels = () => (
-    <div>No, there is no model.</div>
+    <div className="mt-5 text-center text-secondary">No, there is no such model.</div>
   );
 
   const ModelActions = props => (
@@ -72,15 +94,17 @@ const ModelsPage = () => {
   return (  
     <div>
       <h4 className="text-muted font-weight-light text-uppercase mb-4 mr-3">
-        <FontAwesomeIcon icon={faPlus} className="float-right cursor-pointer text-success"
+        <FontAwesomeIcon icon={faPlus} className="mr-2 float-right cursor-pointer text-success"
           onClick={() => uploadModel()}/>
-        <FontAwesomeIcon icon={faComment} className="mr-4 float-right"/>
-        <FontAwesomeIcon icon={faStarOutline} className="mr-4 float-right"/>
+        <FontAwesomeIcon icon={filter.commented ? faComment : faCommentOutline} 
+          className="mr-4 float-right"
+          onClick={() => toggleCommentFilter()} />
+        <FontAwesomeIcon icon={filter.starred ? faStar : faStarOutline} 
+          className="mr-4 float-right"
+          onClick={() => toggleStarredFilter()} />
         Models
       </h4>
-      { models.length > 0 ? models.map(m => <ModelRow model={m} key={m.id}/>) : 
-        loadingError ? <LoadingError error={loadingError}/> : 
-        <NoModels /> }
+      { models ? <Models /> : loadingError ? <LoadingError /> : <Loading /> }
     </div>
   )
 };

@@ -1,26 +1,20 @@
-var express = require('express');
-var mongoose = require('mongoose');
-var config = require('./config');
-var morgan = require('morgan');
-var bodyParser = require('body-parser');
-var methodOverride = require('method-override');
-var log4js = require('log4js');
-var mask = require('mongoosemask');
-var path = require('path');
-var elasticsearch = require('elasticsearch');
-
-var logger = log4js.getLogger('[app]');
+const express = require('express');
+const cors = require('cors')
+const mongoose = require('mongoose');
+const config = require('./config');
+const morgan = require('morgan');
+const bodyParser = require('body-parser');
+const methodOverride = require('method-override');
+const mask = require('mongoosemask');
+const path = require('path');
 
 const app = express();
 
-logger.info('Connecting to database', config.database.url);
 mongoose.connect(config.database.url, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.set('useFindAndModify', false);
 
-logger.info('Connecting to elasticsearch', config.elasticsearch.url);
-var esclient = new elasticsearch.Client({ host: config.elasticsearch.url });
-
-app.use(log4js.connectLogger(log4js.getLogger('[http]'), { level: log4js.levels.DEBUG }));
 app.use(express.static(__dirname + '/app'));
+app.use(cors());
 app.use(morgan('combined')); // log every request to the console
 app.use(bodyParser.urlencoded({ 'extended': 'true' })); // parse application/x-www-form-urlencoded
 app.use(bodyParser.json()); // parse application/json
