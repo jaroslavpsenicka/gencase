@@ -21,10 +21,6 @@ const ModelsPage = () => {
       .catch(err => setLoadingError(err))
   }, []);
 
-  const upload = () => {
-    inputFile.current.click();
-  }
-
   const onUpload = (event) => {
     if (event.target.name === "file") {
       const formData = new FormData();
@@ -81,7 +77,7 @@ const ModelsPage = () => {
   }
 
   const ModelRow = props => (
-    <div className="p-2 pl-3 mb-2 mr-3 bg-white text-dark">
+    <div className="p-2 pl-3 mb-1 mr-3 bg-white text-dark">
       <div className="col-md-12">
         <ModelActions model={props.model} />
         <h5 className="text-primary">{props.model.name}</h5>
@@ -93,9 +89,11 @@ const ModelsPage = () => {
 
   return (  
     <div>
+      <input type="file" name="file" id="file" ref={inputFile} className="d-none" 
+        onChange={(event) => onUpload(event)} />
       <h4 className="text-muted font-weight-light text-uppercase mb-4 mr-3">
         <FontAwesomeIcon icon={faPlus} className="mr-2 float-right cursor-pointer text-success"
-          onClick={() => upload()}/>
+          onClick={() => inputFile.current.click()}/>
         <FontAwesomeIcon icon={filter.commented ? faComment : faCommentOutline} 
           className="mr-4 float-right"
           onClick={() => setFilter({ ...filter, commented: !filter.commented })} />
@@ -105,8 +103,6 @@ const ModelsPage = () => {
         Models
       </h4>
       { models ? <Models /> : loadingError ? <LoadingError /> : <Loading /> }
-      <input type="file" name="file" id="file" ref={inputFile} className="invisible" 
-        onChange={(event) => onUpload(event)} />
     </div>
   )
 };
