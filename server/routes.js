@@ -18,7 +18,7 @@ Model.deleteMany({}, function(err) {
 		revision: 3, 
 		starred: true, 
 		createdBy: 'John Doe',
-		data: {}
+		model: {}
 	});	
 	const mary = new ObjectId();	
 	Model.create({ _id: mary, id: hash.encodeHex(mary.toHexString()),  
@@ -27,7 +27,7 @@ Model.deleteMany({}, function(err) {
 		revision: 1, 
 		starred: true, 
 		createdBy: 'Mary Doe',
-		data: {} 
+		model: {} 
 	});	
 	const jane = new ObjectId();	
 	Model.create({ _id: jane, id: hash.encodeHex(jane.toHexString()),  
@@ -35,7 +35,7 @@ Model.deleteMany({}, function(err) {
 		description: 'A brand new product for the rest of us.', 
 		revision: 1, 
 		createdBy: 'Jane Doe',
-		data: {} 
+		model: {} 
 	});	
 });
 
@@ -45,18 +45,22 @@ module.exports = function (app) {
 	app.post('/api/models', upload.single("file"), (req, res) => {
 		console.log("Uploading model", req.file.originalname);
 		const nid = new ObjectId();
-		const payload = JSON.parse(req.file.buffer);
-		Model.create({
-			_id: nid,
-			id: hash.encodeHex(nid.toHexString()), 			
-			name: payload.name,
-			revision: 1,
-			createdAt: new Date(),
-			data: payload
-		}, (err, model) => {
-			if (err) throw err;
-			res.status(201).send(model);
-		});
+		try {
+			const payload = JSON.parse(req.file.buffer);
+			Model.create({
+				_id: nid,
+				id: hash.encodeHex(nid.toHexString()), 			
+				name: payload.name,
+				revision: 1,
+				createdAt: new Date(),
+				model: payload
+			}, (err, model) => {
+				if (err) throw err;
+				res.status(201).send(model);
+			});
+		} catch (err) {
+			res.status(400).send('Error processing the file.');
+		}
 	});
 
 	// get models

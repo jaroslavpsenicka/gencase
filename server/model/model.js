@@ -5,7 +5,7 @@ module.exports = mongoose.model('Model', {
 	id: 					{ type: String, required: true },
 	name: 				{ type: String, required: true },
 	revision: 		{ type: Number, required: true },
-	data:					{ type: Object, required: true },
+	model:				{ type: Object, required: true },
 	createdBy:		{ type: String },
 	createdAt: 		{ type: Date },
 	updatedBy:		{ type: String },
