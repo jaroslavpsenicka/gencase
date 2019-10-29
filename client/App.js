@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useRoutes, useRedirect } from 'hookrouter';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import Contents from './components/Contents';
+import { ModelsProvider } from './ModelsContext';
 
 import ModelsPage from './pages/ModelsPage';
 import CasesPage from './pages/CasesPage';
@@ -23,15 +24,15 @@ const App = () => {
   const RouteContainer = () => {
     return useRoutes(routes) || <NoPage />;
   };
-   
+  
   return (
-    <div>
+    <ModelsProvider>
       <Header toggleSidebar={() => toggleVisible(!visible)}/>
       <Sidebar visible={visible}/>
       <Contents withSidebar={visible}>
         <RouteContainer />
       </Contents>
-    </div>
+    </ModelsProvider>
   )
 }
 

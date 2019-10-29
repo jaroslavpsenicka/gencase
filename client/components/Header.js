@@ -26,11 +26,11 @@ const Header = (props) => {
       </div>      
       <Navbar.Brand href="/cases">DataCase</Navbar.Brand>
       <Nav className="ml-auto">
-        <A href="/models" className="mt-1 ml-4">
+        <A href="/models" className="mt-1 ml-4 mr-2">
           <FontAwesomeIcon icon={faSlidersH} size="lg"/></A>
-        <A href="/notifications" className="mt-1 ml-4">
+        <A href="/notifications" className="mt-1 ml-4 mr-2">
           <FontAwesomeIcon icon={faBell} size="lg"/></A>
-        <A href="/profile" className="ml-5 mr-3">
+        <A href="/profile" className="ml-4 mr-2">
           <Image src={photo} roundedCircle/></A>
       </Nav>
     </Navbar>

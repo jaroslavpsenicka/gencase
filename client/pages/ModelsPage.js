@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useContext, useRef } from 'react';
 import axios from 'axios'
 import { faStar, faAngleDown, faAngleUp, faPlus, faComment } from '@fortawesome/free-solid-svg-icons'
 import { faStar as faStarOutline, faComment as faCommentOutline} from '@fortawesome/free-regular-svg-icons'
@@ -6,20 +6,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import Loading from '../components/Loading';
 import LoadingError from '../components/LoadingError';
+import { ModelsContext  } from '../ModelsContext';
 
 const ModelsPage = () => {
 
-  const [ models, setModels ] = useState();
+  const [ models, setModels ] = useContext(ModelsContext);
   const [ filter, setFilter ] = useState({ starred: false, commented: false });
-  const [ loadingError, setLoadingError ] = useState();
 
   const inputFile = useRef(null); 
-
-  useEffect(() => {
-    axios.get('http://localhost:8080/api/models')
-      .then(response => setModels(response.data))
-      .catch(err => setLoadingError(err))
-  }, []);
 
   const onUpload = (event) => {
     if (event.target.name === "file") {
@@ -44,8 +38,8 @@ const ModelsPage = () => {
     }));
   }
 
-  const Models = () => {
-    const filtered = models
+  const Models = (props) => {
+    const filtered = props.models
       .filter(m => filter.starred ? m.starred : true)
       .filter(m => filter.commented ? m.commented : true)
       .map(m => <ModelRow model={m} key={m.id} />);
@@ -102,7 +96,10 @@ const ModelsPage = () => {
           onClick={() => setFilter({ ...filter, starred: !filter.starred })} />
         Models
       </h4>
-      { models ? <Models /> : loadingError ? <LoadingError /> : <Loading /> }
+      { 
+        models && models.data ? <Models models = { models.data }/> : 
+        models && models.error ? <LoadingError error = { models.error }/> : <Loading /> 
+      }
     </div>
   )
 };
