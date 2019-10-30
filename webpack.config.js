@@ -7,7 +7,8 @@ const options = {
   mode: env.NODE_ENV,
   entry: './client/index.js',
   output: {
-    filename: '[name].js'
+    filename: '[name].js',
+    publicPath: '/'
   },
   module: {
     rules: [
