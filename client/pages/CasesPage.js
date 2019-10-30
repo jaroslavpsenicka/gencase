@@ -3,7 +3,7 @@ import React from 'react';
 const CasesPage = () => {
 
   return (
-    <div>Cases here</div>
+    <div>All cases will be shown here.</div>
   );
 
 };

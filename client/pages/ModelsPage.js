@@ -97,8 +97,9 @@ const ModelsPage = () => {
         Models
       </h4>
       { 
-        models && models.data ? <Models models = { models.data }/> : 
-        models && models.error ? <LoadingError error = { models.error }/> : <Loading /> 
+        models.loading ? <Loading /> : 
+        models.error ? <LoadingError error = { models.error }/> :  
+        models.data ? <Models models = { models.data }/> : <div />
       }
     </div>
   )

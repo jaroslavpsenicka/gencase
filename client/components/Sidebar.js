@@ -28,7 +28,7 @@ const Sidebar = (props) => {
       <Navbar.Collapse>
         <Nav className="vertical">
           <A className="pb-2 font-weight-bold" href="/cases">Cases</A>
-          <Cases models = { models && !models.error ? models.data : [] }/>
+          <Cases models = { models.data ? models.data : [] }/>
         </Nav>
       </Navbar.Collapse>
     </Navbar>

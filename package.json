@@ -4,7 +4,7 @@
   "description": "An app using React Redux hooks to increment and decrement a counter",
   "main": "index.js",
   "scripts": {
-    "server": "nodemon server/server.js --inspect=9229",
+    "server": "nodemon server/server.js",
     "client": "cross-env NODE_ENV=development webpack-dev-server --hot --history-api-fallback",
     "build": "cross-env NODE_ENV=production webpack",
     "lint": "eslint ./client",

@@ -7,6 +7,7 @@ import { ModelsProvider } from './ModelsContext';
 
 import ModelsPage from './pages/ModelsPage';
 import CasesPage from './pages/CasesPage';
+import CasePage from './pages/CasePage';
 import NoPage from './pages/NoPage';
 
 import './App.css';
@@ -17,6 +18,7 @@ const App = () => {
 
   const routes = {
     "/cases": () => <CasesPage/>,
+    "/cases/:id": ({id}) => <CasePage id={id} />,
     "/models": () => <ModelsPage />
   };
 
