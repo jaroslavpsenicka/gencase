@@ -32,15 +32,19 @@ const CasesPage = ({id}) => {
   }
 
   const toggleStarred = (thecase) => {
-    setCases(prev => prev.map((row) => {
-      return row.id === thecase.id ? {...row, starred: !row.starred} : row
-    }));
+    setCases(prev => {
+      return { ...prev, data: prev.data.map((row) => {
+        return row.id === thecase.id ? {...row, starred: !row.starred} : row
+      })}
+    });
   }
 
   const toggleDetail = (thecase) => {
-    setCases(prev => prev.map((row) => {
-      return row.id === thecase.id ? {...row, detailed: !row.detailed} : row
-    }));
+    setCases(prev => {
+      return { ...prev, data: prev.data.map((row) => {
+        return row.id === thecase.id ? {...row, detailed: !row.detailed} : row
+      })}
+    });
   }
 
   const NoCases = () => (

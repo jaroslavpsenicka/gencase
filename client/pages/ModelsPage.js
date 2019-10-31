@@ -25,17 +25,21 @@ const ModelsPage = () => {
       }
   }
 
-  const toggleModelStarred = (model) => {
+  const toggleStarred = (model) => {
     axios.put('http://localhost:8080/api/models/' + model.id, { starred: !model.starred })
-      .then(resp => setModels(prev => prev.map(row => {
-        return row.id === model.id ? {...row, starred: !row.starred} : row })))
-      .catch(err => console.log('cannot star', model, err));
+      .then(resp => setModels(prev => {
+        return { ...prev, data: prev.data.map(row => {
+          return row.id === model.id ? {...row, starred: !row.starred} : row 
+        })}
+      })).catch(err => console.log('cannot star', model, err));
   }
 
-  const toggleModelDetail = (model) => {
-    setModels(prev => prev.map((row) => {
-      return row.id === model.id ? {...row, detailed: !row.detailed} : row
-    }));
+  const toggleDetail = (model) => {
+    setModels(prev => {
+      return { ...prev, data: prev.data.map((row) => {
+        return row.id === model.id ? {...row, detailed: !row.detailed} : row
+      })}      
+    });  
   }
 
   const Models = (props) => {
@@ -54,10 +58,10 @@ const ModelsPage = () => {
     <div className="pt-2 float-right">
       <FontAwesomeIcon icon={props.model.starred ? faStar : faStarOutline} size="lg" 
         className={props.model.starred ? 'cursor-pointer text-success' : 'cursor-pointer'}
-        onClick={() => toggleModelStarred(props.model)}/>
+        onClick={() => toggleStarred(props.model)}/>
       <FontAwesomeIcon icon={props.model.detailed ? faAngleUp : faAngleDown} size="lg" 
         className="ml-3 cursor-pointer"
-        onClick={() => toggleModelDetail(props.model)}/>
+        onClick={() => toggleDetail(props.model)}/>
     </div>
   )
 
