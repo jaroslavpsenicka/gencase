@@ -7,7 +7,7 @@ import { ModelsProvider } from './ModelsContext';
 
 import ModelsPage from './pages/ModelsPage';
 import CasesPage from './pages/CasesPage';
-import CasePage from './pages/CasePage';
+import DashboardPage from './pages/DashboardPage';
 import NoPage from './pages/NoPage';
 
 import './App.css';
@@ -17,8 +17,8 @@ const App = () => {
   const [ visible, toggleVisible ] = useState({ visible: true });
 
   const routes = {
-    "/cases": () => <CasesPage/>,
-    "/cases/:id": ({id}) => <CasePage id={id} />,
+    "/cases": () => <DashboardPage/>,
+    "/cases/:id": ({id}) => <CasesPage id={id} />,
     "/models": () => <ModelsPage />
   };
 
