@@ -13,6 +13,7 @@ const mortgage = new ObjectId();
 const loan = new ObjectId();	
 const test = new ObjectId();	
 
+console.log("Creating test models");
 Model.deleteMany({}, (err) => {	
 	if (err) throw err;
 	Model.create({ _id: mortgage, id: hash.encodeHex(mortgage.toHexString()),  
@@ -40,6 +41,7 @@ Model.deleteMany({}, (err) => {
 	});	
 });
 
+console.log("Creating test cases");
 Case.deleteMany({}, (err) => {	
 	if (err) throw err;
 	const case1 = new ObjectId();	
@@ -99,7 +101,7 @@ module.exports = function (app) {
 
 	// get cases
 	app.get('/api/models/:id/cases', (req, res) => {
-		console.log("Querying cases of ", req.params.id, req.body);
+		console.log("Querying cases of", req.params.id);
 		Case.find({modelId: new ObjectId(hash.decodeHex(req.params.id))}, (err, data) => {
 			if (err) throw err;
 			res.status(200).send(data);

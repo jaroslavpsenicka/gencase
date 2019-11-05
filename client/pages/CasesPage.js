@@ -48,7 +48,11 @@ const CasesPage = ({id}) => {
   }
 
   const NoCases = () => (
-    <div>No, there are no cases of this kind.</div>
+    <div className="mt-5 text-center text-secondary">No, there are no cases of this kind.</div>
+  )
+
+  const FilteredOut = () => (
+    <div className="mt-5 text-center text-secondary">Filtered out, try tweaking the knobs.</div>
   )
 
   const CaseActions = (props) => (
@@ -87,7 +91,9 @@ const CasesPage = ({id}) => {
       .filter(c => filter.starred ? c.starred : true)
       .filter(c => filter.commented ? c.commented : true)
       .map(c => <CaseRow thecase={c} key={c.id} />);
-    return filtered.length > 0 ? filtered : <NoCases />
+    return filtered.length > 0 ? filtered : 
+      (props.cases.length != filtered.length) ? <FilteredOut /> : 
+      <NoCases />
   }
 
   return (
@@ -96,6 +102,12 @@ const CasesPage = ({id}) => {
         <FontAwesomeIcon icon={faPlus} className="mr-2 float-right cursor-pointer text-success"
           onClick={() => console.log("Add")}/>
         { models.data && models.byId[id] ? models.byId[id].name + 's' : '' }
+        <FontAwesomeIcon icon={filter.starred ? faStar : faStarOutline} 
+          className="mr-4 float-right"
+          onClick={() => setFilter({ ...filter, starred: !filter.starred })} />
+        <FontAwesomeIcon icon={filter.commented ? faComment : faCommentOutline} 
+          className="mr-4 float-right"
+          onClick={() => setFilter({ ...filter, commented: !filter.commented })} />
       </h4>
       {
         models.loading || cases.loading ? <Loading /> : 

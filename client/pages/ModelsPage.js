@@ -31,7 +31,8 @@ const ModelsPage = () => {
         return { ...prev, data: prev.data.map(row => {
           return row.id === model.id ? {...row, starred: !row.starred} : row 
         })}
-      })).catch(err => console.log('cannot star', model, err));
+      }))
+      .catch(err => console.log('cannot star', model, err));
   }
 
   const toggleDetail = (model) => {
@@ -92,12 +93,12 @@ const ModelsPage = () => {
       <h4 className="text-muted font-weight-light text-uppercase mb-4 mr-3">
         <FontAwesomeIcon icon={faPlus} className="mr-2 float-right cursor-pointer text-success"
           onClick={() => inputFile.current.click()}/>
-        <FontAwesomeIcon icon={filter.commented ? faComment : faCommentOutline} 
-          className="mr-4 float-right"
-          onClick={() => setFilter({ ...filter, commented: !filter.commented })} />
         <FontAwesomeIcon icon={filter.starred ? faStar : faStarOutline} 
           className="mr-4 float-right"
           onClick={() => setFilter({ ...filter, starred: !filter.starred })} />
+        <FontAwesomeIcon icon={filter.commented ? faComment : faCommentOutline} 
+          className="mr-4 float-right"
+          onClick={() => setFilter({ ...filter, commented: !filter.commented })} />
         Models
       </h4>
       { 
