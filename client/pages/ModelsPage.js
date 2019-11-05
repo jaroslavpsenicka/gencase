@@ -11,7 +11,7 @@ import { ModelsContext  } from '../ModelsContext';
 const ModelsPage = () => {
 
   const [ models, setModels ] = useContext(ModelsContext);
-  const [ filter, setFilter ] = useState({ starred: false, commented: false });
+  const [ filter, setFilter ] = useState({ starred: false });
 
   const inputFile = useRef(null); 
 
@@ -46,7 +46,6 @@ const ModelsPage = () => {
   const Models = (props) => {
     const filtered = props.models
       .filter(m => filter.starred ? m.starred : true)
-      .filter(m => filter.commented ? m.commented : true)
       .map(m => <ModelRow model={m} key={m.id} />);
     return filtered.length > 0 ? filtered : <NoModels />
   }
@@ -96,9 +95,6 @@ const ModelsPage = () => {
         <FontAwesomeIcon icon={filter.starred ? faStar : faStarOutline} 
           className="mr-4 float-right"
           onClick={() => setFilter({ ...filter, starred: !filter.starred })} />
-        <FontAwesomeIcon icon={filter.commented ? faComment : faCommentOutline} 
-          className="mr-4 float-right"
-          onClick={() => setFilter({ ...filter, commented: !filter.commented })} />
         Models
       </h4>
       { 
