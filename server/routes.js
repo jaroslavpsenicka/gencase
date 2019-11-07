@@ -23,7 +23,7 @@ Model.deleteMany({}, (err) => {
 		starred: true, 
 		createdBy: 'John Doe',
 		spec: {
-			nameFormat: '{{{name}}} - test'
+			descriptionFormat: '{{description}} {{id}}'
 		}
 	});	
 	Model.create({ _id: loan, 
@@ -59,20 +59,26 @@ Case.deleteMany({}, (err) => {
 	});	
 });
 
-const formatCaseOverviewData = (data, model) => {
-	console.log('model', model.nameFormat, 'data', data)
+const formatCaseListData = (data, model) => {
 	return {
-		name: model.nameFormat ? formatValue(data, model.nameFormat) : data.name,
-		description: data.description,
+		id: data.id,
+		name: model.nameFormat ? formatValue(model.nameFormat, data) : data.name,
+		description: model.descriptionFormat ? formatValue(model.descriptionFormat, data) : data.name,
 		revision: data.revision,
 		createdBy: data.createdBy,
 		createdAt: data.createdAt
 	}
 }
 
-const formatValue = (value, format) => {
-	const template = Handlebars.compile(format);
-	return template(value);
+const formatCaseDetailData = (data, model) => {
+	return {
+		...formatCaseListData(data, model),
+		xxx: 1
+	}
+}
+
+const formatValue = (format, value) => {
+	return Handlebars.compile(format)(value);
 }
 
 module.exports = function (app) {
@@ -131,7 +137,29 @@ module.exports = function (app) {
 			.populate("model")
 			.exec((err, data) => {
 				if (err) throw err;
-				res.status(200).send(data.map(m => formatCaseOverviewData(m, m.model.spec)));
+				res.status(200).send(data.map(m => formatCaseListData(m, m.model.spec)));
+			});
+	});
+
+	// get case data
+
+	app.get('/api/cases/:id', (req, res) => {
+		console.log("Getting case", req.params.id);
+		Case.find({model: new ObjectId(hash.decodeHex(req.params.id))}, (err, data) => {
+			if (err) throw err;
+			res.status(200).send(data);
+		});
+	});
+
+	// get case data
+
+	app.get('/api/cases/:id/detail', (req, res) => {
+		console.log("Getting overview of case", req.params.id);
+		Case.findOne({model: new ObjectId(hash.decodeHex(req.params.id))})
+			.populate("model")
+			.exec((err, data) => {
+				if (err) throw err;
+				res.status(200).send(formatCaseDetailData(data, data.model.spec));
 			});
 	});
 

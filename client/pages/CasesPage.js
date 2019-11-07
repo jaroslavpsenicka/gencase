@@ -1,5 +1,8 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import Container from 'react-bootstrap/Container'
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
 import { faStar, faAngleDown, faAngleUp, faPlus, faComment } from '@fortawesome/free-solid-svg-icons'
 import { faStar as faStarOutline, faComment as faCommentOutline} from '@fortawesome/free-regular-svg-icons'
 import axios from 'axios'
@@ -31,6 +34,14 @@ const CasesPage = ({id}) => {
     }, {});
   }
 
+  const setCaseDetail = (id, value) => {
+    setCases(prev => { 
+      return { ...prev, data: prev.data.map((row) => {
+        return row.id === id ? {...row, detail: value} : row
+      })}
+    });
+  }
+
   const toggleStarred = (thecase) => {
     setCases(prev => {
       return { ...prev, data: prev.data.map((row) => {
@@ -40,13 +51,16 @@ const CasesPage = ({id}) => {
   }
 
   const toggleDetail = (thecase) => {
-    setCases(prev => {
-      return { ...prev, data: prev.data.map((row) => {
-        return row.id === thecase.id ? {...row, detailed: !row.detailed} : row
-      })}
-    });
+    if (thecase.detail) {
+      setCaseDetail(thecase.id, null);
+    } else {
+      setCaseDetail(thecase.id, { loading: true });
+      axios.get('http://localhost:8080/api/cases/' + id + '/detail')
+        .then(response => setCaseDetail(thecase.id, { loading: false, data: response.data }))
+        .catch(err => setCaseDetail(thecase.id, { loading: false, error: err }));
+    }
   }
-
+      
   const NoCases = () => (
     <div className="mt-5 text-center text-secondary">No, there are no cases of this kind.</div>
   )
@@ -60,20 +74,29 @@ const CasesPage = ({id}) => {
       <FontAwesomeIcon icon={props.thecase.starred ? faStar : faStarOutline} size="lg" 
         className={props.thecase.starred ? 'cursor-pointer text-success' : 'cursor-pointer'}
         onClick={() => toggleStarred(props.thecase)}/>
-      <FontAwesomeIcon icon={props.thecase.detailed ? faAngleUp : faAngleDown} size="lg" 
+      <FontAwesomeIcon icon={props.thecase.detail ? faAngleUp : faAngleDown} size="lg" 
         className="ml-3 cursor-pointer"
         onClick={() => toggleDetail(props.thecase)}/>
     </div>
   )
 
   const CaseDetail = props => {
-    return !props.thecase.detailed ? null : (
+    return !props.thecase.detail ? null :
+      props.thecase.detail.loading ? <Loading /> :
+      props.thecase.detail.error ? <LoadingError /> : (
       <div className="col-md-12 pt-3 text-secondary">
-        Revision<span className="text-black ml-2 mr-2">{props.thecase.revision}</span>
-        created by<span className="text-black ml-2">{props.thecase.createdBy}</span>.
+        { Object.keys(props.thecase.detail.data).map(n => 
+          <CaseDetailProperty name={n} value={props.thecase.detail.data[n]} key={n} />) }
       </div>
     )
   }
+
+  const CaseDetailProperty = props => (
+    <Row>
+      <Col md={4}>{props.name}</Col>
+      <Col className="text-primary">{props.value}</Col>
+    </Row>
+  )
 
   const CaseRow = (props) => (
     <div className="p-2 pl-3 mb-1 mr-3 bg-white text-dark">
