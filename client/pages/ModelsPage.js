@@ -3,6 +3,10 @@ import axios from 'axios'
 import { faStar, faAngleDown, faAngleUp, faPlus, faComment } from '@fortawesome/free-solid-svg-icons'
 import { faStar as faStarOutline, faComment as faCommentOutline} from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import { navigate } from 'hookrouter';
 
 import Loading from '../components/Loading';
 import LoadingError from '../components/LoadingError';
@@ -35,18 +39,10 @@ const ModelsPage = () => {
       .catch(err => console.log('cannot star', model, err));
   }
 
-  const toggleDetail = (model) => {
-    setModels(prev => {
-      return { ...prev, data: prev.data.map((row) => {
-        return row.id === model.id ? {...row, detailed: !row.detailed} : row
-      })}      
-    });  
-  }
-
   const Models = (props) => {
     const filtered = props.models
       .filter(m => filter.starred ? m.starred : true)
-      .map(m => <ModelRow model={m} key={m.id} />);
+      .map(m => <ModelCard model={m} key={m.id} />);
     return filtered.length > 0 ? filtered : <NoModels />
   }
 
@@ -55,13 +51,10 @@ const ModelsPage = () => {
   );
 
   const ModelActions = props => (
-    <div className="pt-2 float-right">
+    <div className="pt-2 pr-3 float-right">
       <FontAwesomeIcon icon={props.model.starred ? faStar : faStarOutline} size="lg" 
         className={props.model.starred ? 'cursor-pointer text-success' : 'cursor-pointer'}
         onClick={() => toggleStarred(props.model)}/>
-      <FontAwesomeIcon icon={props.model.detailed ? faAngleUp : faAngleDown} size="lg" 
-        className="ml-3 cursor-pointer"
-        onClick={() => toggleDetail(props.model)}/>
     </div>
   )
 
@@ -74,22 +67,24 @@ const ModelsPage = () => {
     )
   }
 
-  const ModelRow = props => (
-    <div className="p-2 pl-3 mb-1 mr-3 bg-white text-dark">
-      <div className="col-md-12">
+  const ModelCard = props => (
+    <Col md={6} lg={4}>
+      <Col md={12} className="h-150 p-2 pl-3 mb-4 bg-white text-dark">
         <ModelActions model={props.model} />
-        <h5 className="text-primary">{props.model.name}</h5>
-        <div className="text-secondary">{props.model.description ? props.model.description : 'No description.'}</div>
-      </div>
-      <ModelDetail model={props.model} />
-    </div>
+        <div className="col-md-10 cursor-pointer" onClick={() => navigate('/models/' + props.model.id)}>
+          <h5 className="pt-2 text-primary">{props.model.name}</h5>
+          <div className="text-secondary">{props.model.description ? props.model.description : 'No description.'}</div>
+        </div>
+        <ModelDetail model={props.model} />
+      </Col>
+    </Col>
   )
 
   return (  
-    <div>
+    <Container>
       <input type="file" name="file" id="file" ref={inputFile} className="d-none" 
         onChange={(event) => onUpload(event)} />
-      <h4 className="text-muted font-weight-light text-uppercase mb-4 mr-3">
+      <h4 className="w-100 text-muted font-weight-light text-uppercase mb-4 mr-3">
         <FontAwesomeIcon icon={faPlus} className="mr-2 float-right cursor-pointer text-success"
           onClick={() => inputFile.current.click()}/>
         <FontAwesomeIcon icon={filter.starred ? faStar : faStarOutline} 
@@ -97,12 +92,14 @@ const ModelsPage = () => {
           onClick={() => setFilter({ ...filter, starred: !filter.starred })} />
         Models
       </h4>
-      { 
-        models.loading ? <Loading /> : 
-        models.error ? <LoadingError error = { models.error }/> :  
-        models.data ? <Models models = { models.data }/> : <div />
-      }
-    </div>
+      <Row>
+        { 
+          models.loading ? <Loading /> : 
+          models.error ? <LoadingError error = { models.error }/> :  
+          models.data ? <Models models = { models.data }/> : <div />
+        }
+      </Row>
+    </Container>
   )
 };
 

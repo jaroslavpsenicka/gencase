@@ -1,6 +1,7 @@
 const Hashids = require('hashids/cjs');
 const multer = require('multer');
 const Handlebars = require('handlebars');
+const HandlebarsDateFormat = require('handlebars-dateformat')
 const ObjectId = require('mongoose').Types.ObjectId; 
 const Model = require('./model/model');
 const Case = require('./model/case');
@@ -22,8 +23,15 @@ Model.deleteMany({}, (err) => {
 		revision: 3, 
 		starred: true, 
 		createdBy: 'John Doe',
+		createdAt: new Date(),
 		spec: {
-			descriptionFormat: '{{description}} {{id}}'
+//			nameFormat: "",
+//			descriptionFormat: '{{description}}',
+			detailFormat: [{
+				id: 'created',
+				name: 'Created',
+				value: '{{dateFormat createdAt "DD. MM YYYY"}} by {{createdBy}}' 
+			}]
 		}
 	});	
 	Model.create({ _id: loan, 
@@ -55,9 +63,12 @@ Case.deleteMany({}, (err) => {
 		description: 'Yeah, new house.', 
 		revision: 3, 
 		createdBy: 'Mary Doe',
+		createdAt: new Date(),
 		model: mortgage
 	});	
 });
+
+Handlebars.registerHelper('dateFormat', HandlebarsDateFormat);
 
 const formatCaseListData = (data, model) => {
 	return {
@@ -71,10 +82,15 @@ const formatCaseListData = (data, model) => {
 }
 
 const formatCaseDetailData = (data, model) => {
-	return {
-		...formatCaseListData(data, model),
-		xxx: 1
-	}
+	return model.detailFormat.map(f => {
+		return {
+			id: f.name,
+			name: f.name,
+			value: f.value && f.value.indexOf('{{') > -1 ? 
+				Handlebars.compile(f.value)(data) : 
+				data[f.value]
+		}
+	});
 }
 
 const formatValue = (format, value) => {

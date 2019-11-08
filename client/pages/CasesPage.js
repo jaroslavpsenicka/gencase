@@ -1,6 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import { faStar, faAngleDown, faAngleUp, faPlus, faComment } from '@fortawesome/free-solid-svg-icons'
@@ -85,8 +84,8 @@ const CasesPage = ({id}) => {
       props.thecase.detail.loading ? <Loading /> :
       props.thecase.detail.error ? <LoadingError /> : (
       <div className="col-md-12 pt-3 text-secondary">
-        { Object.keys(props.thecase.detail.data).map(n => 
-          <CaseDetailProperty name={n} value={props.thecase.detail.data[n]} key={n} />) }
+        { props.thecase.detail.data.map(n => 
+          <CaseDetailProperty name={n.name} value={n.value} key={n.id} />) }
       </div>
     )
   }

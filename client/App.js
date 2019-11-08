@@ -6,6 +6,7 @@ import Contents from './components/Contents';
 import { ModelsProvider } from './ModelsContext';
 
 import ModelsPage from './pages/ModelsPage';
+import ModelDetailPage from './pages/ModelDetailPage';
 import CasesPage from './pages/CasesPage';
 import DashboardPage from './pages/DashboardPage';
 import NoPage from './pages/NoPage';
@@ -19,7 +20,8 @@ const App = () => {
   const routes = {
     "/cases": () => <DashboardPage/>,
     "/cases/:id": ({id}) => <CasesPage id={id} />,
-    "/models": () => <ModelsPage />
+    "/models": () => <ModelsPage />,
+    "/models/:id": ({id}) => <ModelDetailPage id={id}/>
   };
 
   useRedirect('/', '/cases');
