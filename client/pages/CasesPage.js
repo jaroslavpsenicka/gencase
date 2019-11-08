@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import { faStar, faAngleDown, faAngleUp, faPlus, faComment } from '@fortawesome/free-solid-svg-icons'
@@ -98,7 +99,7 @@ const CasesPage = ({id}) => {
   )
 
   const CaseRow = (props) => (
-    <div className="p-2 pl-3 mb-1 mr-3 bg-white text-dark">
+    <div className="p-2 pl-3 mb-1 bg-white text-dark">
       <div className="col-md-12">
         <CaseActions thecase={props.thecase} />
         <h5 className="text-primary">{props.thecase.name}</h5>
@@ -119,8 +120,8 @@ const CasesPage = ({id}) => {
   }
 
   return (
-    <div>
-      <h4 className="text-muted font-weight-light text-uppercase mb-4 mr-3">
+    <Container className="pt-4">
+      <h4 className="text-muted font-weight-light text-uppercase mb-4">
         <FontAwesomeIcon icon={faPlus} className="mr-2 float-right cursor-pointer text-success"
           onClick={() => console.log("Add")}/>
         { models.data && models.byId[id] ? models.byId[id].name + 's' : '' }
@@ -137,7 +138,7 @@ const CasesPage = ({id}) => {
         models.byId[id] && cases.data ? <Cases cases={cases.data}/> : 
         <NoCases />
       }
-    </div>  
+    </Container>  
   )
 };
 
