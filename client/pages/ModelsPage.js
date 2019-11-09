@@ -10,7 +10,7 @@ import { navigate } from 'hookrouter';
 
 import Loading from '../components/Loading';
 import LoadingError from '../components/LoadingError';
-import { ModelsContext  } from '../ModelsContext';
+import { ModelsContext, byId  } from '../ModelsContext';
 
 const ModelsPage = () => {
 
@@ -29,14 +29,18 @@ const ModelsPage = () => {
       }
   }
 
+  const updateData = (prev, model) => {
+    return prev.data.map(row => {
+      return row.id === model.id ? {...row, starred: !row.starred} : row 
+    })
+  }
+
   const toggleStarred = (model) => {
     axios.put('http://localhost:8080/api/models/' + model.id, { starred: !model.starred })
-      .then(resp => setModels(prev => {
-        return { ...prev, data: prev.data.map(row => {
-          return row.id === model.id ? {...row, starred: !row.starred} : row 
-        })}
-      }))
-      .catch(err => console.log('cannot star', model, err));
+    .then(resp => setModels(prev => {
+      const data = updateData(prev, model);
+      return { ...prev, data: data, byId: byId(data)}}))
+    .catch(err => console.log('cannot star', model, err));
   }
 
   const Models = (props) => {
@@ -58,24 +62,14 @@ const ModelsPage = () => {
     </div>
   )
 
-  const ModelDetail = props => {
-    return !props.model.detailed ? null : (
-      <div className="col-md-12 pt-3 text-secondary">
-        Revision<span className="text-black ml-2 mr-2">{props.model.revision}</span>
-        created by<span className="text-black ml-2">{props.model.createdBy}</span>.
-      </div>
-    )
-  }
-
   const ModelCard = props => (
-    <Col md={6} lg={4}>
-      <Col md={12} className="h-150 p-2 pl-3 mb-4 bg-white text-dark">
+    <Col md={6} lg={4} xl={3}>
+      <Col md={12} className="h-150px b-2-ddd p-2 pl-3 mb-4 bg-white text-dark">
         <ModelActions model={props.model} />
         <div className="col-md-10 cursor-pointer" onClick={() => navigate('/models/' + props.model.id)}>
           <h5 className="pt-2 text-primary">{props.model.name}</h5>
-          <div className="text-secondary">{props.model.description ? props.model.description : 'No description.'}</div>
+          <div className="h-100px text-secondary">{props.model.description ? props.model.description : 'No description.'}</div>
         </div>
-        <ModelDetail model={props.model} />
       </Col>
     </Col>
   )

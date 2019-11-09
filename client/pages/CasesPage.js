@@ -6,26 +6,27 @@ import Col from 'react-bootstrap/Col'
 import { faStar, faAngleDown, faAngleUp, faPlus, faComment } from '@fortawesome/free-solid-svg-icons'
 import { faStar as faStarOutline, faComment as faCommentOutline} from '@fortawesome/free-regular-svg-icons'
 import axios from 'axios'
+import { navigate } from 'hookrouter';
 
 import { ModelsContext  } from '../ModelsContext';
 
 import Loading from '../components/Loading';
 import LoadingError from '../components/LoadingError';
 
-const CasesPage = ({id}) => {
+const CasesPage = ({modelId}) => {
 
   const [ models ] = useContext(ModelsContext);
   const [ cases, setCases ] = useState({ loading: true });
   const [ filter, setFilter ] = useState({ starred: false, commented: false });
 
   useEffect(() => {
-    axios.get('http://localhost:8080/api/models/' + id + '/cases')
+    axios.get('http://localhost:8080/api/models/' + modelId + '/cases')
       .then(response => setCases({ 
         loading: false, 
         data: response.data, 
         byId: byId(response.data) }))
       .catch(err => setCases({ loading: false, error: err }))
-  }, [id]);
+  }, [modelId]);
 
   const byId = (data) => {
     return data.reduce((obj, item) => {
@@ -55,7 +56,7 @@ const CasesPage = ({id}) => {
       setCaseDetail(thecase.id, null);
     } else {
       setCaseDetail(thecase.id, { loading: true });
-      axios.get('http://localhost:8080/api/cases/' + id + '/detail')
+      axios.get('http://localhost:8080/api/cases/' + thecase.id + '/detail')
         .then(response => setCaseDetail(thecase.id, { loading: false, data: response.data }))
         .catch(err => setCaseDetail(thecase.id, { loading: false, error: err }));
     }
@@ -70,7 +71,7 @@ const CasesPage = ({id}) => {
   )
 
   const CaseActions = (props) => (
-    <div className="pt-2 float-right">
+    <div className="pt-2 mr-3 float-right">
       <FontAwesomeIcon icon={props.thecase.starred ? faStar : faStarOutline} size="lg" 
         className={props.thecase.starred ? 'cursor-pointer text-success' : 'cursor-pointer'}
         onClick={() => toggleStarred(props.thecase)}/>
@@ -100,8 +101,9 @@ const CasesPage = ({id}) => {
 
   const CaseRow = (props) => (
     <div className="p-2 pl-3 mb-1 bg-white text-dark">
-      <div className="col-md-12">
-        <CaseActions thecase={props.thecase} />
+      <CaseActions thecase={props.thecase} />
+      <div className="cursor-pointer col-md-10" 
+        onClick={() => navigate('/cases/' + modelId + '/' + props.thecase.id)}>
         <h5 className="text-primary">{props.thecase.name}</h5>
         <div className="text-secondary">{props.thecase.description ? props.thecase.description : 'No description.'}</div>
       </div>
@@ -124,18 +126,18 @@ const CasesPage = ({id}) => {
       <h4 className="text-muted font-weight-light text-uppercase mb-4">
         <FontAwesomeIcon icon={faPlus} className="mr-2 float-right cursor-pointer text-success"
           onClick={() => console.log("Add")}/>
-        { models.data && models.byId[id] ? models.byId[id].name + 's' : '' }
         <FontAwesomeIcon icon={filter.starred ? faStar : faStarOutline} 
           className="mr-4 float-right"
           onClick={() => setFilter({ ...filter, starred: !filter.starred })} />
         <FontAwesomeIcon icon={filter.commented ? faComment : faCommentOutline} 
           className="mr-4 float-right"
           onClick={() => setFilter({ ...filter, commented: !filter.commented })} />
+        { models.data && models.byId[modelId] ? models.byId[modelId].name + 's' : '' }
       </h4>
       {
         models.loading || cases.loading ? <Loading /> : 
         models.error || cases.error ? <LoadingError error = { models.error }/> :  
-        models.byId[id] && cases.data ? <Cases cases={cases.data}/> : 
+        models.byId[modelId] && cases.data ? <Cases cases={cases.data}/> : 
         <NoCases />
       }
     </Container>  

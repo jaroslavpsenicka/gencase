@@ -8,6 +8,7 @@ import { ModelsProvider } from './ModelsContext';
 import ModelsPage from './pages/ModelsPage';
 import ModelDetailPage from './pages/ModelDetailPage';
 import CasesPage from './pages/CasesPage';
+import CaseDetailPage from './pages/CaseDetailPage';
 import DashboardPage from './pages/DashboardPage';
 import NoPage from './pages/NoPage';
 
@@ -19,7 +20,8 @@ const App = () => {
 
   const routes = {
     "/cases": () => <DashboardPage/>,
-    "/cases/:id": ({id}) => <CasesPage id={id} />,
+    "/cases/:modelId": ({modelId}) => <CasesPage modelId={modelId} />,
+    "/cases/:modelId/:id": ({modelId, id}) => <CaseDetailPage modelId={modelId} id={id} />,
     "/models": () => <ModelsPage />,
     "/models/:id": ({id}) => <ModelDetailPage id={id}/>
   };

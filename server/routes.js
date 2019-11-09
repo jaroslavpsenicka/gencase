@@ -161,17 +161,17 @@ module.exports = function (app) {
 
 	app.get('/api/cases/:id', (req, res) => {
 		console.log("Getting case", req.params.id);
-		Case.find({model: new ObjectId(hash.decodeHex(req.params.id))}, (err, data) => {
+		Case.findById(new ObjectId(hash.decodeHex(req.params.id)), (err, data) => {
 			if (err) throw err;
 			res.status(200).send(data);
 		});
 	});
 
-	// get case data
+	// get case detail data
 
 	app.get('/api/cases/:id/detail', (req, res) => {
 		console.log("Getting overview of case", req.params.id);
-		Case.findOne({model: new ObjectId(hash.decodeHex(req.params.id))})
+		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
 			.populate("model")
 			.exec((err, data) => {
 				if (err) throw err;

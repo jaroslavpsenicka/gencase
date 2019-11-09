@@ -10,8 +10,15 @@ body {
     color: black;
 }
 
-.h-150 {
+.h-100px {
+    height: 100px;
+}
+
+.h-150px {
     height: 150px;
 }
 
+.b-2-ddd {
+    border: 2px solid #ddd;
+}
   
