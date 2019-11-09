@@ -3,6 +3,13 @@ import axios from 'axios'
 
 const ModelsContext = createContext([{}, () => {}]);
 
+const byId = (data) => {
+  return data.reduce((obj, item) => {
+    obj[item.id] = item
+    return obj
+  }, {});
+};
+
 const ModelsProvider = (props) => {
 
   const [models, setModels] = useState({ loading: true });
@@ -16,12 +23,6 @@ const ModelsProvider = (props) => {
       .catch(err => setModels({ loading: false, error: err }))
   }, []);
 
-  const byId = (data) => {
-    return data.reduce((obj, item) => {
-      obj[item.id] = item
-      return obj
-    }, {});
-  }
 
   return (
     <ModelsContext.Provider value={[models, setModels]}>
@@ -30,4 +31,4 @@ const ModelsProvider = (props) => {
   );
 }
 
-export { ModelsContext, ModelsProvider };
+export { ModelsContext, ModelsProvider, byId };

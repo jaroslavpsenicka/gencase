@@ -9,9 +9,9 @@ const Case = require('./model/case');
 const hash = new Hashids();
 const upload = multer({ storage: multer.memoryStorage() });
 
-const mortgage = new ObjectId();	
-const loan = new ObjectId();	
-const test = new ObjectId();	
+const mortgage = new ObjectId('000000000001');	
+const loan = new ObjectId('000000000002');	
+const test = new ObjectId('000000000003');	
 
 console.log("Creating test models");
 Model.deleteMany({}, (err) => {	
@@ -56,7 +56,7 @@ Model.deleteMany({}, (err) => {
 console.log("Creating test cases");
 Case.deleteMany({}, (err) => {	
 	if (err) throw err;
-	const case1 = new ObjectId();	
+	const case1 = new ObjectId('000000000010');	
 	Case.create({ _id: case1, 
 		id: hash.encodeHex(case1.toHexString()),  
 		name: "John's Mortgage", 
