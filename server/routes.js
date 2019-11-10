@@ -167,6 +167,19 @@ module.exports = function (app) {
 		});
 	});
 
+	// update case
+
+	app.put('/api/cases/:id', (req, res) => {
+		console.log("Updating case", req.params.id, req.body);
+		Case.findOneAndUpdate({_id: hash.decodeHex(req.params.id)}, {
+			...req.body, 
+			updatedAt: new Date()
+		}, function(err) {
+			if (err) throw err;
+			res.status(204).send();
+		});
+	});
+
 	// get case detail data
 
 	app.get('/api/cases/:id/detail', (req, res) => {

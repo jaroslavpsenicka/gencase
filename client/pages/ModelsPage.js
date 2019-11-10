@@ -82,7 +82,7 @@ const ModelsPage = () => {
         <FontAwesomeIcon icon={faPlus} className="mr-2 float-right cursor-pointer text-success"
           onClick={() => inputFile.current.click()}/>
         <FontAwesomeIcon icon={filter.starred ? faStar : faStarOutline} 
-          className="mr-4 float-right"
+          className="mr-4 float-right cursor-pointer"
           onClick={() => setFilter({ ...filter, starred: !filter.starred })} />
         Models
       </h4>

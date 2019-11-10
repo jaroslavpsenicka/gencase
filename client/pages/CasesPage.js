@@ -8,7 +8,7 @@ import { faStar as faStarOutline, faComment as faCommentOutline} from '@fortawes
 import axios from 'axios'
 import { navigate } from 'hookrouter';
 
-import { ModelsContext  } from '../ModelsContext';
+import { ModelsContext, byId } from '../ModelsContext';
 
 import Loading from '../components/Loading';
 import LoadingError from '../components/LoadingError';
@@ -43,12 +43,18 @@ const CasesPage = ({modelId}) => {
     });
   }
 
+  const updateData = (prev, thecase) => {
+    return prev.data.map(row => {
+      return row.id === thecase.id ? {...row, starred: !row.starred} : row 
+    })
+  }
+
   const toggleStarred = (thecase) => {
-    setCases(prev => {
-      return { ...prev, data: prev.data.map((row) => {
-        return row.id === thecase.id ? {...row, starred: !row.starred} : row
-      })}
-    });
+    axios.put('http://localhost:8080/api/cases/' + thecase.id, { starred: !thecase.starred })
+    .then(resp => setCases(prev => {
+      const data = updateData(prev, thecase);
+      return { ...prev, data: data, byId: byId(data)}}))
+    .catch(err => console.log('cannot star', thecase, err));
   }
 
   const toggleDetail = (thecase) => {

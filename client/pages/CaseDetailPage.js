@@ -36,6 +36,13 @@ const CaseDetailPage = ({modelId, id}) => {
       .catch(err => setCase({ loading: false, error: err }))
   }, []);
 
+  const toggleStarred = (theCase) => {
+    Axios.put('http://localhost:8080/api/cases/' + theCase.id, { starred: !theCase.starred })
+      .then(resp => setCase(prev => {
+        return { ...prev, data: { ...prev.data, starred: !theCase.starred }}}))
+      .catch(err => console.log('cannot star', theCase, err));
+  }
+
   const onDocumentUpload = () => {
   }
 
@@ -118,7 +125,9 @@ const CaseDetailPage = ({modelId, id}) => {
       <div>
         <h4 className="text-muted font-weight-light text-uppercase mb-4">
           <FontAwesomeIcon icon={theCase.starred ? faStar : faStarOutline} 
-            className="mr-4 float-right cursor-pointer" />
+            className={ theCase.starred ? "text-success mr-4 float-right cursor-pointer" : 
+              "mr-4 float-right cursor-pointer" }
+            onClick={() => toggleStarred(theCase)}/>
           <FontAwesomeIcon icon={theCase.commented ? faComment : faCommentOutline} 
             className="mr-4 float-right cursor-pointer" 
             onClick={() => scrollToRef(commentsRef)}/>
