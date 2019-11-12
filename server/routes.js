@@ -26,7 +26,7 @@ Model.deleteMany({}, (err) => {
 		createdAt: new Date(),
 		spec: {
 //			nameFormat: "",
-//			descriptionFormat: '{{description}}',
+//			descriptionFormat: 'Ahoj {{description}}',
 			detailFormat: [{
 				id: 'created',
 				name: 'Created',
@@ -62,6 +62,7 @@ Case.deleteMany({}, (err) => {
 		name: "John's Mortgage", 
 		description: 'Yeah, new house.', 
 		revision: 3, 
+		starred: false,
 		createdBy: 'Mary Doe',
 		createdAt: new Date(),
 		model: mortgage
@@ -77,7 +78,8 @@ const formatCaseListData = (data, model) => {
 		description: model.descriptionFormat ? formatValue(model.descriptionFormat, data) : data.name,
 		revision: data.revision,
 		createdBy: data.createdBy,
-		createdAt: data.createdAt
+		createdAt: data.createdAt,
+		starred: data.starred
 	}
 }
 
@@ -136,7 +138,7 @@ module.exports = function (app) {
 	
 	app.put('/api/models/:id', (req, res) => {
 		console.log("Updating model", req.params.id, req.body);
-		Model.findOneAndUpdate({_id: hash.decodeHex(req.params.id)}, {
+		Model.findByIdAndUpdate(hash.decodeHex(req.params.id), {
 			...req.body, 
 			updatedAt: new Date()
 		}, function(err) {
@@ -171,10 +173,10 @@ module.exports = function (app) {
 
 	app.put('/api/cases/:id', (req, res) => {
 		console.log("Updating case", req.params.id, req.body);
-		Case.findOneAndUpdate({_id: hash.decodeHex(req.params.id)}, {
-			...req.body, 
+		Case.findByIdAndUpdate(hash.decodeHex(req.params.id), {
+			...req.body,
 			updatedAt: new Date()
-		}, function(err) {
+		}, err => {
 			if (err) throw err;
 			res.status(204).send();
 		});

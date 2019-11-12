@@ -1,21 +1,15 @@
 import React, { useState, useEffect, createContext } from 'react';
-import axios from 'axios'
+import { byId } from './ContextUtils';
+import Axios from 'axios'
 
 const ModelsContext = createContext([{}, () => {}]);
-
-const byId = (data) => {
-  return data.reduce((obj, item) => {
-    obj[item.id] = item
-    return obj
-  }, {});
-};
 
 const ModelsProvider = (props) => {
 
   const [models, setModels] = useState({ loading: true });
 
   useEffect(() => {
-    axios.get('http://localhost:8080/api/models')
+    Axios.get('http://localhost:8080/api/models')
       .then(response => setModels({ 
         loading: false, 
         data: response.data, 

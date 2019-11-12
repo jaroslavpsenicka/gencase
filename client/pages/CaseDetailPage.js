@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import ReactDOM from 'react-dom';
 import { faStar, faComment, faFile, faPlus, faFilePdf } from '@fortawesome/free-solid-svg-icons'
 import { 
@@ -16,31 +16,34 @@ import Form from 'react-bootstrap/Form';
 
 import Loading from '../components/Loading';
 import LoadingError from '../components/LoadingError'
+import { CasesContext } from '../CasesContext';
+import { byId } from './ContextUtils';
 
 const scrollToRef = (ref) => window.scrollTo(0, ref.current.offsetTop);   
 
 const CaseDetailPage = ({modelId, id}) => {
 
-  const [ theCase, setCase ] = useState({ loading: true });
+  const [ cases, setCases, loadCases, loadCase ] = useContext(CasesContext);
   const [ showCommentDialog, setShowCommentDialog ] = useState(false);
 
   const commentsRef = useRef(null);
   const documentsRef = useRef(null);
   const inputDocumentRef = useRef(null); 
 
-  useEffect(() => {
-    Axios.get('http://localhost:8080/api/cases/' + id)
-      .then(response => setCase({ 
-        loading: false, 
-        data: response.data }))
-      .catch(err => setCase({ loading: false, error: err }))
-  }, []);
+  useEffect(() => loadCase(id), [id]);
 
-  const toggleStarred = (theCase) => {
-    Axios.put('http://localhost:8080/api/cases/' + theCase.id, { starred: !theCase.starred })
-      .then(resp => setCase(prev => {
-        return { ...prev, data: { ...prev.data, starred: !theCase.starred }}}))
-      .catch(err => console.log('cannot star', theCase, err));
+  const updateData = (prev, thecase) => {
+    return prev.data.map(row => {
+      return row.id === thecase.id ? {...row, starred: !row.starred} : row 
+    })
+  }
+
+  const toggleStarred = (thecase) => {
+    Axios.put('http://localhost:8080/api/cases/' + thecase.id, { starred: !thecase.starred })
+      .then(resp => setCases(prev => {
+        const data = updateData(prev, thecase);
+        return { ...prev, data: data, byId: byId(data)}}))
+      .catch(err => console.log('cannot star', thecase, err));
   }
 
   const onDocumentUpload = () => {
@@ -147,9 +150,9 @@ const CaseDetailPage = ({modelId, id}) => {
   return (
     <Container className="pt-4">
       {
-        theCase.loading ? <Loading /> : 
-        theCase.error ? <LoadingError error = { theCase.error }/> :  
-        theCase.data ? <Case theCase={theCase.data}/> : 
+        cases.loading ? <Loading /> : 
+        cases.error ? <LoadingError error = { cases.error }/> :  
+        cases.data ? <Case theCase={cases.byId[id]}/> : 
         <div />
       }
     </Container>

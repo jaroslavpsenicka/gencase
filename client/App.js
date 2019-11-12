@@ -4,6 +4,7 @@ import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import Contents from './components/Contents';
 import { ModelsProvider } from './ModelsContext';
+import { CasesProvider } from './CasesContext';
 
 import ModelsPage from './pages/ModelsPage';
 import ModelDetailPage from './pages/ModelDetailPage';
@@ -33,11 +34,13 @@ const App = () => {
   
   return (
     <ModelsProvider>
+    <CasesProvider>
       <Header toggleSidebar={() => toggleVisible(!visible)}/>
       <Sidebar visible={visible}/>
       <Contents withSidebar={visible}>
         <RouteContainer />
       </Contents>
+    </CasesProvider>
     </ModelsProvider>
   )
 }

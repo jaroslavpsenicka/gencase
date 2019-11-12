@@ -5,8 +5,9 @@ import { faStar, faAngleDown, faAngleUp, faPlus, faComment } from '@fortawesome/
 import { faStar as faStarOutline } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Axios from 'axios';
+import { byId } from './ContextUtils';
 
-import { ModelsContext, byId  } from '../ModelsContext';
+import { ModelsContext } from '../ModelsContext';
 import Loading from '../components/Loading';
 import LoadingError from '../components/LoadingError'
 

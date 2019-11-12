@@ -5,10 +5,12 @@ import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import { faStar, faAngleDown, faAngleUp, faPlus, faComment } from '@fortawesome/free-solid-svg-icons'
 import { faStar as faStarOutline, faComment as faCommentOutline} from '@fortawesome/free-regular-svg-icons'
-import axios from 'axios'
+import Axios from 'axios'
 import { navigate } from 'hookrouter';
 
-import { ModelsContext, byId } from '../ModelsContext';
+import { ModelsContext } from '../ModelsContext';
+import { CasesContext } from '../CasesContext';
+import { byId } from './ContextUtils';
 
 import Loading from '../components/Loading';
 import LoadingError from '../components/LoadingError';
@@ -16,24 +18,10 @@ import LoadingError from '../components/LoadingError';
 const CasesPage = ({modelId}) => {
 
   const [ models ] = useContext(ModelsContext);
-  const [ cases, setCases ] = useState({ loading: true });
+  const [ cases, setCases, loadCases ] = useContext(CasesContext);
   const [ filter, setFilter ] = useState({ starred: false, commented: false });
 
-  useEffect(() => {
-    axios.get('http://localhost:8080/api/models/' + modelId + '/cases')
-      .then(response => setCases({ 
-        loading: false, 
-        data: response.data, 
-        byId: byId(response.data) }))
-      .catch(err => setCases({ loading: false, error: err }))
-  }, [modelId]);
-
-  const byId = (data) => {
-    return data.reduce((obj, item) => {
-      obj[item.id] = item
-      return obj
-    }, {});
-  }
+  useEffect(() => loadCases(modelId), [modelId]);
 
   const setCaseDetail = (id, value) => {
     setCases(prev => { 
@@ -50,7 +38,7 @@ const CasesPage = ({modelId}) => {
   }
 
   const toggleStarred = (thecase) => {
-    axios.put('http://localhost:8080/api/cases/' + thecase.id, { starred: !thecase.starred })
+    Axios.put('http://localhost:8080/api/cases/' + thecase.id, { starred: !thecase.starred })
     .then(resp => setCases(prev => {
       const data = updateData(prev, thecase);
       return { ...prev, data: data, byId: byId(data)}}))
@@ -62,7 +50,7 @@ const CasesPage = ({modelId}) => {
       setCaseDetail(thecase.id, null);
     } else {
       setCaseDetail(thecase.id, { loading: true });
-      axios.get('http://localhost:8080/api/cases/' + thecase.id + '/detail')
+      Axios.get('http://localhost:8080/api/cases/' + thecase.id + '/detail')
         .then(response => setCaseDetail(thecase.id, { loading: false, data: response.data }))
         .catch(err => setCaseDetail(thecase.id, { loading: false, error: err }));
     }

@@ -7,10 +7,11 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { navigate } from 'hookrouter';
+import { byId } from './ContextUtils';
 
 import Loading from '../components/Loading';
 import LoadingError from '../components/LoadingError';
-import { ModelsContext, byId  } from '../ModelsContext';
+import { ModelsContext  } from '../ModelsContext';
 
 const ModelsPage = () => {
 
