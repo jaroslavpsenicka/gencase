@@ -10,7 +10,7 @@ import { navigate } from 'hookrouter';
 
 import { ModelsContext } from '../ModelsContext';
 import { CasesContext } from '../CasesContext';
-import { byId } from './ContextUtils';
+import { byId } from '../ContextUtils';
 
 import Loading from '../components/Loading';
 import LoadingError from '../components/LoadingError';

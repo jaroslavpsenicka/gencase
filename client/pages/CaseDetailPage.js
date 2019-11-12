@@ -17,7 +17,7 @@ import Form from 'react-bootstrap/Form';
 import Loading from '../components/Loading';
 import LoadingError from '../components/LoadingError'
 import { CasesContext } from '../CasesContext';
-import { byId } from './ContextUtils';
+import { byId } from '../ContextUtils';
 
 const scrollToRef = (ref) => window.scrollTo(0, ref.current.offsetTop);   
 
