@@ -64,6 +64,14 @@ const CaseDetailPage = ({modelId, id}) => {
   const onDocumentUpload = () => {
   }
 
+  const NoDocuments = () => (
+    <div className="text-center text-secondary">No documents.</div>
+  )
+
+  const NoComments = () => (
+    <div className="text-center text-secondary">No comments.</div>
+  )
+
   const DocumentRow = ({document}) => (
     <Row className="p-2 mb-1 mr-2 bg-white text-dark">
       <Col md={6} className="pl-2">
@@ -122,6 +130,7 @@ const CaseDetailPage = ({modelId, id}) => {
         {
           documents.loading ? <Loading /> : 
           documents.error ? <LoadingError error = { documents.error }/> :  
+          documents.data && documents.data.size == 0 ? <NoDocuments /> :
           documents.data ? documents.data.map(d => <DocumentRow document={d} key={d.id}/>) : 
           <div />
         }
@@ -142,6 +151,7 @@ const CaseDetailPage = ({modelId, id}) => {
         {
           comments.loading ? <Loading /> : 
           comments.error ? <LoadingError error = { comments.error }/> :  
+          comments.data && comments.data.length == 0 ? <NoComments /> :
           comments.data ? comments.data.map(d => <CommentRow comment={d} key={d.id}/>) : 
           <div />
         }
