@@ -5,6 +5,8 @@ const HandlebarsDateFormat = require('handlebars-dateformat')
 const ObjectId = require('mongoose').Types.ObjectId; 
 const Model = require('./model/model');
 const Case = require('./model/case');
+const Document = require('./model/document');
+const Comment = require('./model/comment');
 
 const hash = new Hashids();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -67,6 +69,36 @@ Case.deleteMany({}, (err) => {
 		createdAt: new Date(),
 		model: mortgage
 	});	
+});
+
+console.log("Creating test documents");
+Document.deleteMany({}, (err) => {	
+	if (err) throw err;
+	const doc1 = new ObjectId('000000000100');	
+	Document.create({ _id: doc1, 
+		id: hash.encodeHex(doc1.toHexString()), 
+		name: "Document1.pdf", 
+		description: 'Almost genuine.', 
+		revision: 1, 
+		createdBy: 'Mary Doe',
+		createdAt: new Date(),
+		case: new ObjectId('000000000010'),
+		size: 100283
+	})
+});
+
+console.log("Creating test comments");
+Comment.deleteMany({}, (err) => {	
+	if (err) throw err;
+	const doc1 = new ObjectId('000000001000');	
+	Comment.create({ _id: doc1, 
+		id: hash.encodeHex(doc1.toHexString()), 
+		title: "Lorem", 
+		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer convallis consequat semper. Suspendisse a dolor quis neque placerat rhoncus. Sed eu risus suscipit, vulputate lorem sit amet, sodales orci. Ut vitae arcu quis enim interdum luctus. Nam sed mauris id ipsum rhoncus mattis in ut augue. Nam vehicula vitae orci at aliquam. In hac habitasse platea dictumst. In hac habitasse platea dictumst. Ut tristique dignissim lacinia. Donec consequat id neque vel pellentesque. Nam ornare nisl eget mi eleifend dignissim. Pellentesque sed mi a quam sagittis interdum sed ac orci.', 
+		createdBy: 'Mary Doe',
+		createdAt: new Date(),
+		case: new ObjectId('000000000010')
+	})
 });
 
 Handlebars.registerHelper('dateFormat', HandlebarsDateFormat);
@@ -192,6 +224,24 @@ module.exports = function (app) {
 				if (err) throw err;
 				res.status(200).send(formatCaseDetailData(data, data.model.spec));
 			});
+	});
+
+	// get case documents
+
+	app.get('/api/cases/:id/documents', (req, res) => {
+		console.log("Getting documents of case", req.params.id);
+		Document.find({ case: new ObjectId(hash.decodeHex(req.params.id))}, (err, data) => {
+			if (err) throw err;
+			res.status(200).send(data);
+		});
+	});
+
+	app.get('/api/cases/:id/comments', (req, res) => {
+		console.log("Getting comments of case", req.params.id);
+		Comment.find({ case: new ObjectId(hash.decodeHex(req.params.id))}, (err, data) => {
+			if (err) throw err;
+			res.status(200).send(data);
+		});
 	});
 
 };

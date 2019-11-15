@@ -6,18 +6,19 @@ import {
   faComment as faCommentOutline, 
   faFile as faFileOutline } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Axios from 'axios';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import Axios from 'axios';
 
 import Loading from '../components/Loading';
 import LoadingError from '../components/LoadingError'
 import { CasesContext } from '../CasesContext';
 import { byId } from '../ContextUtils';
+import { formatFileSize } from '../Formatters';
 
 const scrollToRef = (ref) => window.scrollTo(0, ref.current.offsetTop);   
 
@@ -25,12 +26,26 @@ const CaseDetailPage = ({modelId, id}) => {
 
   const [ cases, setCases, loadCases, loadCase ] = useContext(CasesContext);
   const [ showCommentDialog, setShowCommentDialog ] = useState(false);
+  const [ documents, setDocuments ] = useState({ loading: true });
+  const [ comments, setComments ] = useState({ loading: true });
 
   const commentsRef = useRef(null);
   const documentsRef = useRef(null);
   const inputDocumentRef = useRef(null); 
 
+  const DateFormat = Intl.DateTimeFormat({ dateStyle: 'short' });
+
   useEffect(() => loadCase(id), [id]);
+  useEffect(() => {
+    Axios.get('http://localhost:8080/api/cases/' + id + '/documents')
+      .then(response => setDocuments({ loading: false, data: response.data }))
+      .catch(err => setDocuments({ loading: false, error: err }))
+  }, [id]);
+  useEffect(() => {
+    Axios.get('http://localhost:8080/api/cases/' + id + '/comments')
+      .then(response => setComments({ loading: false, data: response.data }))
+      .catch(err => setComments({ loading: false, error: err }))
+  }, [id]);
 
   const updateData = (prev, thecase) => {
     return prev.data.map(row => {
@@ -49,23 +64,23 @@ const CaseDetailPage = ({modelId, id}) => {
   const onDocumentUpload = () => {
   }
 
-  const DocumentRow = (props) => (
+  const DocumentRow = ({document}) => (
     <Row className="p-2 mb-1 mr-2 bg-white text-dark">
-      <Col md={7} className="pl-2">
+      <Col md={6} className="pl-2">
         <FontAwesomeIcon icon={faFilePdf}></FontAwesomeIcon>
-        <span className="pl-2 text-primary font-weight-bold">Agreement.pdf</span>
+        <span className="pl-2 text-primary font-weight-bold">{document.name}</span>
       </Col>
-      <Col md={2} className="text-secondary">John Doe</Col>
-      <Col md={2} className="text-secondary text-right">10.7 2019</Col>
-      <Col md={1} className="text-secondary text-right pr-2">12K</Col>
+      <Col md={2} className="text-secondary">{document.createdBy}</Col>
+      <Col md={2} className="text-secondary text-right">{DateFormat.format(new Date(document.createdAt))}</Col>
+      <Col md={2} className="text-secondary text-right pr-2">{formatFileSize(document.size, 0)}</Col>
     </Row>
   )
 
-  const CommentRow = () => (
+  const CommentRow = ({comment}) => (
     <Row className="p-2 mb-1 mr-2 bg-white text-dark">
-      <Col md={6} className="pl-2 text-primary font-weight-bold">John Doe</Col>
-      <Col md={6} className="text-secondary text-right pr-2">13.6 2019</Col>
-      <Col md={12} className="pl-2 pt-2 text-primary">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer convallis consequat semper. Suspendisse a dolor quis neque placerat rhoncus. Sed eu risus suscipit, vulputate lorem sit amet, sodales orci. Ut vitae arcu quis enim interdum luctus. Nam sed mauris id ipsum rhoncus mattis in ut augue. Nam vehicula vitae orci at aliquam. In hac habitasse platea dictumst. In hac habitasse platea dictumst. Ut tristique dignissim lacinia. Donec consequat id neque vel pellentesque. Nam ornare nisl eget mi eleifend dignissim. Pellentesque sed mi a quam sagittis interdum sed ac orci.</Col>
+      <Col md={6} className="pl-2 text-primary font-weight-bold">{comment.createdBy}</Col>
+      <Col md={6} className="text-secondary text-right pr-2">{DateFormat.format(new Date(comment.createdAt))}</Col>
+      <Col md={12} className="pl-2 pt-2 text-primary">{comment.text}</Col>
     </Row>
   )
 
@@ -99,11 +114,17 @@ const CaseDetailPage = ({modelId, id}) => {
         <input type="file" name="file" id="file" ref={inputDocumentRef} className="d-none" 
           onChange={(event) => onDocumentUpload(event)} />
         <FontAwesomeIcon icon={faPlus} className="mr-4 float-right cursor-pointer text-success"
-          onClick={() => inputDocumentRef.current.click()}/>
+          disabled = {documents.loading || documents.error}
+          onClick = {() => inputDocumentRef.current.click()}/>
         Documents
       </h5>
       <Container>
-        <DocumentRow />
+        {
+          documents.loading ? <Loading /> : 
+          documents.error ? <LoadingError error = { documents.error }/> :  
+          documents.data ? documents.data.map(d => <DocumentRow document={d} key={d.id}/>) : 
+          <div />
+        }
       </Container>
     </div>  
   ) 
@@ -113,12 +134,17 @@ const CaseDetailPage = ({modelId, id}) => {
       <CommentDialog />
       <h5 className="pt-4" ref={commentsRef}>
         <FontAwesomeIcon icon={faPlus} className="mr-4 float-right cursor-pointer text-success"
+          disabled = {comments.loading || comments.error}
           onClick={() => setShowCommentDialog(true)}/>
         Comments
       </h5>
       <Container>
-        <CommentRow />
-        <CommentRow />
+        {
+          comments.loading ? <Loading /> : 
+          comments.error ? <LoadingError error = { comments.error }/> :  
+          comments.data ? comments.data.map(d => <CommentRow comment={d} key={d.id}/>) : 
+          <div />
+        }
       </Container>
     </div>
   )
