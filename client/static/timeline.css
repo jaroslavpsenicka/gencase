@@ -1,0 +1,30 @@
+div.timeline--wrapper {
+  padding: 0px;
+}
+
+div.phase.timeline {
+  margin: 20px auto;
+}
+
+div.phase.timeline:before {
+  left: calc(33% + 5px);
+  border: 1px solid;
+  top: 20px;
+  bottom: 50px;
+}
+
+div.phase .body {
+  margin-bottom: 2em;
+}
+
+div.phase .initial .timeline-item-dateinner {
+  background-color: #18BC9C;
+  color: white;
+  line-height: 50px;
+}
+
+div.phase .default .timeline-item-dateinner {
+  background-color: white;
+  color: gray;
+  line-height: 50px;
+}

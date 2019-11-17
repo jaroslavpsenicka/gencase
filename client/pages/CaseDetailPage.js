@@ -112,8 +112,8 @@ const CaseDetailPage = ({modelId, id}) => {
     </Modal>
   )
 
-  const Overview = () => (
-    <div className="pt-4">Here comes the case overview.</div>
+  const CaseDetail = () => (
+    <div className="pt-4">Here comes the case detail.</div>
   )
 
   const Documents = () => (
@@ -159,29 +159,27 @@ const CaseDetailPage = ({modelId, id}) => {
     </div>
   )
 
-  const Case = ({theCase}) => {
-    return (
-      <div>
-        <h4 className="text-muted font-weight-light text-uppercase mb-4">
-          <FontAwesomeIcon icon={theCase.starred ? faStar : faStarOutline} 
-            className={ theCase.starred ? "text-success mr-4 float-right cursor-pointer" : 
-              "mr-4 float-right cursor-pointer" }
-            onClick={() => toggleStarred(theCase)}/>
-          <FontAwesomeIcon icon={theCase.commented ? faComment : faCommentOutline} 
-            className="mr-4 float-right cursor-pointer" 
-            onClick={() => scrollToRef(commentsRef)}/>
-          <FontAwesomeIcon icon={theCase.documents ? faFile : faFileOutline} 
-            className="mr-4 float-right cursor-pointer" 
-            onClick={() => scrollToRef(documentsRef)}/>
-          { theCase.name }
-        </h4>
-        <div>{theCase.description}</div>
-        <Overview />
-        <Documents />
-        <Comments />
-      </div>    
-    )
-  }
+  const Case = ({theCase}) => (
+    <div>
+      <h4 className="text-muted font-weight-light text-uppercase mb-4">
+        <FontAwesomeIcon icon={theCase.starred ? faStar : faStarOutline} 
+          className={ theCase.starred ? "text-success mr-4 float-right cursor-pointer" : 
+            "mr-4 float-right cursor-pointer" }
+          onClick={() => toggleStarred(theCase)}/>
+        <FontAwesomeIcon icon={theCase.commented ? faComment : faCommentOutline} 
+          className="mr-4 float-right cursor-pointer" 
+          onClick={() => scrollToRef(commentsRef)}/>
+        <FontAwesomeIcon icon={theCase.documents ? faFile : faFileOutline} 
+          className="mr-4 float-right cursor-pointer" 
+          onClick={() => scrollToRef(documentsRef)}/>
+        { theCase.name }
+      </h4>
+      <div>{theCase.description}</div>
+      <CaseDetail />
+      <Documents />
+      <Comments />
+    </div>    
+  )
 
   return (
     <Container className="pt-4">

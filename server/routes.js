@@ -32,6 +32,17 @@ Model.deleteMany({}, (err) => {
 				id: 'created',
 				name: 'Created',
 				value: '{{dateFormat createdAt "DD. MM YYYY"}} by {{createdBy}}' 
+			}],
+			phases: [{
+				name: 'Construction',
+				description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vel massa tempor, eleifend erat non, euismod dolor. Cras non nibh mauris. In dapibus nunc in tortor vestibulum, nec fermentum nulla tincidunt. In et tincidunt erat, a laoreet mauris.',
+				initial: true 
+			}, {
+				name: 'Modeling',
+				description: 'In ac lobortis augue, eget dictum nisi. Morbi vitae iaculis mauris, viverra scelerisque lectus. Nam vulputate sit amet purus et facilisis.'
+			}, {
+				name: 'Approval',
+				description: 'In tristique diam quis dolor suscipit, nec commodo quam venenatis. Proin odio erat, blandit vitae est in, commodo vehicula odio. Integer fermentum cursus felis, vel ornare orci sodales et. Praesent condimentum ipsum tellus, non tristique tellus maximus in.'	
 			}]
 		}
 	});	
