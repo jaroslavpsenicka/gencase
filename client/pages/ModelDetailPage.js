@@ -62,7 +62,7 @@ const ModelDetailPage = ({id}) => {
       </h4>
       <div>{model.description}</div>
       <h5 className="pt-4">Phases</h5>
-      { model.spec.phases && model.spec.phases.length > 0 ? 
+      { model.spec && model.spec.phases && model.spec.phases.length > 0 ? 
         <Phases phases={model.spec.phases}/> : 
         <NoPhases /> }
     </div>
