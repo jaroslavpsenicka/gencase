@@ -8,6 +8,18 @@ const hash = new Hashids();
 
 Handlebars.registerHelper('dateFormat', HandlebarsDateFormat);
 
+const formatCaseListData = (data, model) => {
+	return {
+		id: data.id,
+		name: model.nameFormat ? formatValue(model.nameFormat, data) : data.name,
+		description: model.descriptionFormat ? formatValue(model.descriptionFormat, data) : data.name,
+		revision: data.revision,
+		createdBy: data.createdBy,
+		createdAt: data.createdAt,
+		starred: data.starred
+	}
+}
+
 const formatCaseDetailData = (data, model) => {
 	return model.detailFormat.map(f => {
 		return {
