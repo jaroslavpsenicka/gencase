@@ -35,10 +35,26 @@ Model.deleteMany({}, (err) => {
 			}],
 			entities: [{
 				name: 'Base',
-				description: 'Basic mortgage model.'
+				description: 'Basic mortgage model.',
+				attributes: [{
+					type: "String",
+					name: "caseId",
+					id: true
+				}, {
+					type: "String",
+					name: "firstName"
+				}, {
+					type: "String",
+					name: "lastName"
+				}]
 			}, {
 				name: 'Modeling',
-				description: 'Modeling mortgage model.'
+				description: 'Modeling mortgage model.',
+				extends: 'Base',
+				attributes: [{
+					"type": "String",
+					"name": "clientId"
+				}]
 			}, {
 				name: 'Approval',
 				description: 'Approval model.'

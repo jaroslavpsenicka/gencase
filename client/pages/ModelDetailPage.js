@@ -38,7 +38,7 @@ const ModelDetailPage = ({modelId}) => {
   )
 
   const Phase = ({model, phase, initial}) => {
-    const dataModelPage = '/models/' + model.id + '/data/' + phase.dataModel;
+    const dataModelPage = '/models/' + model.id + '/entity/' + phase.dataModel;
     return (
       <TimelineItem key={phase.id} dateText={phase.name} className={initial ? 'initial' : 'default'}>
         <p>{phase.description}</p>

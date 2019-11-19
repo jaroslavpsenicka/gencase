@@ -26,7 +26,7 @@ const App = () => {
     "/cases/:modelId/:id": ({modelId, id}) => <CaseDetailPage modelId={modelId} id={id} />,
     "/models": () => <ModelsPage />,
     "/models/:modelId": ({modelId}) => <ModelDetailPage modelId={modelId}/>,
-    "/models/:modelId/data/:entityName": ({modelId, entityName}) => <EntityPage modelId={modelId} entityName={entityName} />
+    "/models/:modelId/entity/:entityName": ({modelId, entityName}) => <EntityPage modelId={modelId} entityName={entityName} />
   };
 
   useRedirect('/', '/cases');
