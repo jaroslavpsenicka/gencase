@@ -17,6 +17,13 @@ div.phase .body {
   margin-bottom: 2em;
 }
 
+div.phase .timeline-item-dateinner {
+  text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    padding-right: 35px;
+}
+
 div.phase .initial .timeline-item-dateinner {
   background-color: #18BC9C;
   color: white;

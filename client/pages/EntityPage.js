@@ -3,6 +3,8 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Badge from 'react-bootstrap/Badge';
+import { faArrowRight, faExclamationCircle } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { ModelsContext } from '../ModelsContext';
 import Loading from '../components/Loading';
@@ -32,26 +34,35 @@ const EntityPage = ({modelId, entityName}) => {
   )
 
   const AttrList = ({attrs}) => (
-    <div>      
-      <Row className="p-2 ml-0 mr-1 text-dark font-weight-bold">
-        <Col md={1}></Col> 
-        <Col md={3}>Name</Col> 
-        <Col md={2}></Col> 
-      </Row>
+    <div className="mt-4">      
       { attrs.map(a => <Attr attr={a} key={a.name} />)}
     </div>
   )
 
   const IdBadge = () => (
-    <Badge variant="primary">ID</Badge> 
+    <Badge variant="danger">ID</Badge> 
+  )
+
+  const InputBadge = () => (
+    <Badge variant="success">IN</Badge> 
+  )
+
+  const RequiredBadge = () => (
+    <Badge variant="warning">REQUIRED</Badge> 
   )
 
   const Attr = ({attr}) => (
     <Row className="p-2 ml-0 mr-1 mb-1 bg-white text-dark">
-      <Col md={1} className="text-right">{ attr.id ? <IdBadge /> : ''}</Col>
+      <Col md={1} className="text-right">
+      { 
+        attr.id ? <IdBadge /> : 
+        attr.input ? <InputBadge /> : ''
+      }
+      </Col>
       <Col md={3}>{attr.name}</Col>
       <Col md={2}>{attr.type}</Col>
-      <Col md={6}></Col>
+      <Col md={2}>{ attr.notEmpty ? <RequiredBadge /> : '' }</Col>
+      <Col md={4}></Col>
     </Row>
   )
 
@@ -68,7 +79,7 @@ const EntityPage = ({modelId, entityName}) => {
         </h4>
         <div>{entity.description ? entity.description : 'No description.'}</div>
         { entity.extends ? <Extends entity={entity.extends}/> : '' }
-        <div className="mt-4">
+        <div className="mt-2">
           { entity.attributes && entity.attributes.length > 0 ? <AttrList attrs={entity.attributes} /> : 
             <NoAttrs /> } 
         </div>

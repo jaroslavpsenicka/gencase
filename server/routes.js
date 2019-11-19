@@ -35,41 +35,63 @@ Model.deleteMany({}, (err) => {
 			}],
 			entities: [{
 				name: 'Base',
-				description: 'Basic mortgage model.',
+				description: 'Basic loan model.',
 				attributes: [{
 					type: "String",
 					name: "caseId",
 					id: true
 				}, {
 					type: "String",
-					name: "firstName"
+					name: "firstName",
+					input: true,
+					notEmpty: true
 				}, {
 					type: "String",
-					name: "lastName"
+					name: "lastName",
+					input: true,
+					notEmpty: true
+				}, {
+					type: "PersonalId",
+					name: "personalId",
+					input: true,
+					notEmpty: true
+				}, {
+					type: "Number",
+					name: "loanAmount",
+					input: true,
+					notEmpty: true,
+					min: 1000,
+					max: 1000000
+				}, {
+					type: "String",
+					name: "clientId"
 				}]
 			}, {
-				name: 'Modeling',
+				name: 'Approval',
 				description: 'Modeling mortgage model.',
 				extends: 'Base',
 				attributes: [{
 					"type": "String",
-					"name": "clientId"
+					"name": "approvedBy"
+				}, {
+					"type": "Date",
+					"name": "approvedAt"
+				}, {
+					"type": "Boolean",
+					"name": "approved"
 				}]
-			}, {
-				name: 'Approval',
-				description: 'Approval model.'
 			}],
 			phases: [{
-				name: 'Construction',
+				name: 'Request and identification',
 				description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vel massa tempor, eleifend erat non, euismod dolor. Cras non nibh mauris. In dapibus nunc in tortor vestibulum, nec fermentum nulla tincidunt. In et tincidunt erat, a laoreet mauris.',
 				initial: true,
 				dataModel: 'Base' 
 			}, {
-				name: 'Modeling',
-				description: 'In ac lobortis augue, eget dictum nisi. Morbi vitae iaculis mauris, viverra scelerisque lectus. Nam vulputate sit amet purus et facilisis.',
-				dataModel: 'Modeling' 
-			}, {
 				name: 'Approval',
+				description: 'In ac lobortis augue, eget dictum nisi. Morbi vitae iaculis mauris, viverra scelerisque lectus. Nam vulputate sit amet purus et facilisis.',
+				dataModel: 'Approval' 
+			}, {
+				name: 'Completion',
 				description: 'In tristique diam quis dolor suscipit, nec commodo quam venenatis. Proin odio erat, blandit vitae est in, commodo vehicula odio. Integer fermentum cursus felis, vel ornare orci sodales et. Praesent condimentum ipsum tellus, non tristique tellus maximus in.',
 				dataModel: 'Approval' 
 			}]
