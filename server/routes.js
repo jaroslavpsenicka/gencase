@@ -34,11 +34,14 @@ Model.deleteMany({}, (err) => {
 				value: '{{dateFormat createdAt "DD. MM YYYY"}} by {{createdBy}}' 
 			}],
 			entities: [{
-				name: 'Base'
+				name: 'Base',
+				description: 'Basic mortgage model.'
 			}, {
-				name: 'Constuction'
+				name: 'Modeling',
+				description: 'Modeling mortgage model.'
 			}, {
-				name: 'Approval'
+				name: 'Approval',
+				description: 'Approval model.'
 			}],
 			phases: [{
 				name: 'Construction',
