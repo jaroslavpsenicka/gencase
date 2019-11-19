@@ -8,6 +8,7 @@ import { CasesProvider } from './CasesContext';
 
 import ModelsPage from './pages/ModelsPage';
 import ModelDetailPage from './pages/ModelDetailPage';
+import ModelDataPage from './pages/ModelDataPage';
 import CasesPage from './pages/CasesPage';
 import CaseDetailPage from './pages/CaseDetailPage';
 import DashboardPage from './pages/DashboardPage';
@@ -24,7 +25,8 @@ const App = () => {
     "/cases/:modelId": ({modelId}) => <CasesPage modelId={modelId} />,
     "/cases/:modelId/:id": ({modelId, id}) => <CaseDetailPage modelId={modelId} id={id} />,
     "/models": () => <ModelsPage />,
-    "/models/:id": ({id}) => <ModelDetailPage id={id}/>
+    "/models/:modelId": ({modelId}) => <ModelDetailPage modelId={modelId}/>,
+    "/models/:modelId/data/:dataId": ({modelId, dataId}) => <ModelDataPage modelId={modelId} dataId={dataId} />
   };
 
   useRedirect('/', '/cases');

@@ -14,7 +14,7 @@ import LoadingError from '../components/LoadingError'
 
 import '../static/timeline.css';
 
-const ModelDetailPage = ({id}) => {
+const ModelDetailPage = ({modelId}) => {
 
   const [ models, setModels ] = useContext(ModelsContext);
 
@@ -37,16 +37,20 @@ const ModelDetailPage = ({id}) => {
     find out what case phase means and why it is important.</div>
   )
 
-  const Phase = ({phase, initial}) => (
-    <TimelineItem key={phase.id} dateText={phase.name} className={initial ? 'initial' : 'default'}>
-      <p>{phase.description}</p>
-      <p className="font-weight-bold">Data Model: <A href="">{phase.name}</A></p>
-    </TimelineItem>
-  )
+  const Phase = ({model, phase, initial}) => {
+    const dataModelPage = '/models/' + model.id + '/data/' + phase.dataModel;
+    return (
+      <TimelineItem key={phase.id} dateText={phase.name} className={initial ? 'initial' : 'default'}>
+        <p>{phase.description}</p>
+        <p className="font-weight-bold">Data Model: <A href={dataModelPage}>{phase.dataModel}</A>
+        </p>
+      </TimelineItem>
+    )
+  }
 
-  const Phases = ({phases}) => (
+  const Phases = ({model, phases}) => (
     <Timeline animate={false} className="phase" lineColor="lightgrey">
-      { phases.map(ph => <Phase phase={ph} initial={ph.initial} key={ph.name}/>) }
+      { phases.map(ph => <Phase model={model} phase={ph} initial={ph.initial} key={ph.name}/>) }
     </Timeline>
   )
 
@@ -63,7 +67,7 @@ const ModelDetailPage = ({id}) => {
       <div>{model.description}</div>
       <h5 className="pt-4">Phases</h5>
       { model.spec && model.spec.phases && model.spec.phases.length > 0 ? 
-        <Phases phases={model.spec.phases}/> : 
+        <Phases model={model} phases={model.spec.phases}/> : 
         <NoPhases /> }
     </div>
   )
@@ -71,9 +75,9 @@ const ModelDetailPage = ({id}) => {
   return (
     <Container className="pt-4">
       {
-        models.loading ? <Loading text={'Loading model ' + id }/> : 
+        models.loading ? <Loading text={'Loading model ' + modelId }/> : 
         models.error ? <LoadingError error = { models.error }/> :  
-        models.data ? <Model model = { models.byId[id] }/> : <div />
+        models.data ? <Model model = { models.byId[modelId] }/> : <div />
       }
     </Container>
   )
