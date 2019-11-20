@@ -47,9 +47,14 @@ const EntityPage = ({modelId, entityName}) => {
     <Badge variant="success">IN</Badge> 
   )
 
-  const RequiredBadge = () => (
-    <Badge variant="warning">REQUIRED</Badge> 
-  )
+  const additionals = (attr) => {
+    var result = [];
+    if (attr.notEmpty) result.push('Required');
+    if (attr.min && !attr.max) result.push('Min ' + attr.min)
+    if (!attr.min && attr.max) result.push('Max ' + attr.max)
+    if (attr.min && attr.max) result.push('Range ' + attr.min + ' to ' + attr.max)
+    return result;
+  }
 
   const Attr = ({attr}) => (
     <Row className="p-2 ml-0 mr-1 mb-1 bg-white text-dark">
@@ -61,8 +66,11 @@ const EntityPage = ({modelId, entityName}) => {
       </Col>
       <Col md={3}>{attr.name}</Col>
       <Col md={2}>{attr.type}</Col>
-      <Col md={2}>{ attr.notEmpty ? <RequiredBadge /> : '' }</Col>
-      <Col md={4}></Col>
+      <Col md={6}>
+        <ul className="mb-0">
+          { additionals(attr).map(a => <li key={a}>{a}</li>) }
+        </ul>
+      </Col>
     </Row>
   )
 
