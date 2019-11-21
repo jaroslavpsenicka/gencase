@@ -2,10 +2,7 @@ import React, { forwardRef, useState } from 'react';
 import Container from 'react-bootstrap/Container';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
-import Modal from 'react-bootstrap/Modal';
 import Dropdown from 'react-bootstrap/Dropdown';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
 import { faAngleDown, faPlus, faStar, faSignal } from '@fortawesome/free-solid-svg-icons'
 import { faStar as faStarOutline, faCheckCircle } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -59,7 +56,7 @@ const DashboardPage = () => {
   )
 
   const Charts = () => (
-    <Row className="mr-0">
+    <Row>
       <Chart title="Cases today" width="4">
         <h4 className="text-center text-dark pt-4 cursor-move">174/137</h4>
       </Chart>  
