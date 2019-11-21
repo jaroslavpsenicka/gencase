@@ -1,7 +1,4 @@
 const Hashids = require('hashids/cjs');
-const multer = require('multer');
-const Handlebars = require('handlebars');
-const HandlebarsDateFormat = require('handlebars-dateformat')
 const ObjectId = require('mongoose').Types.ObjectId; 
 const Model = require('./model/model');
 const Case = require('./model/case');
@@ -14,93 +11,54 @@ const mortgage = new ObjectId('000000000001');
 const loan = new ObjectId('000000000002');	
 const test = new ObjectId('000000000003');	
 
+const loanSpec = require('./data/loan.spec.js');
+
+/*
+	Loan model
+
+		States:
+
+		| request   				| approval		| completion	 		|
+		| ------------------+-------------+---------------- |
+		| - new	<n>						- basic				- approved <f>	|
+		| - identification		- 4eyes				- rejected <f>	|
+
+		- request phase
+			- new state (initial, created via REST)
+				- unconditional transition to identification [human task] 
+			- identification state (triggered by event)
+				- transition to approval phase when identified [human task] 
+				- transition to completion phase when cannot be identified [email task]
+		- approval phase
+			- basic approval state (inital)
+				- transition to 4eyes state when approved [human task]
+				- transition to completion phase when rejected [email]
+			- 4eyes state	
+				- transition to completion phase when approved [email]	
+				- transition to completion phase when rejected [email]	
+		- completion phase
+			- approved state (final)
+			- rejected state (final)
+
+*/
+
 console.log("Creating test models");
 Model.deleteMany({}, (err) => {	
 	if (err) throw err;
 	Model.create({ _id: mortgage, 
 		id: hash.encodeHex(mortgage.toHexString()),  
-		name: 'Mortgage', 
-		description: 'Simple mortgage case.', 
+		name: 'Loan', 
+		description: 'Simple loan case.', 
 		revision: 3, 
 		starred: true, 
 		createdBy: 'John Doe',
 		createdAt: new Date(),
-		spec: {
-//			nameFormat: "",
-//			descriptionFormat: 'Ahoj {{description}}',
-			detailFormat: [{
-				id: 'created',
-				name: 'Created',
-				value: '{{dateFormat createdAt "DD. MM YYYY"}} by {{createdBy}}' 
-			}],
-			entities: [{
-				name: 'Base',
-				description: 'Basic loan model.',
-				attributes: [{
-					type: "String",
-					name: "caseId",
-					id: true
-				}, {
-					type: "String",
-					name: "firstName",
-					input: true,
-					notEmpty: true
-				}, {
-					type: "String",
-					name: "lastName",
-					input: true,
-					notEmpty: true
-				}, {
-					type: "PersonalId",
-					name: "personalId",
-					input: true,
-					notEmpty: true
-				}, {
-					type: "Number",
-					name: "loanAmount",
-					input: true,
-					notEmpty: true,
-					min: 1000,
-					max: 1000000
-				}, {
-					type: "String",
-					name: "clientId"
-				}]
-			}, {
-				name: 'Approval',
-				description: 'Modeling mortgage model.',
-				extends: 'Base',
-				attributes: [{
-					"type": "String",
-					"name": "approvedBy"
-				}, {
-					"type": "Date",
-					"name": "approvedAt"
-				}, {
-					"type": "Boolean",
-					"name": "approved"
-				}]
-			}],
-			phases: [{
-				name: 'Request and identification',
-				description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vel massa tempor, eleifend erat non, euismod dolor. Cras non nibh mauris. In dapibus nunc in tortor vestibulum, nec fermentum nulla tincidunt. In et tincidunt erat, a laoreet mauris.',
-				initial: true,
-				dataModel: 'Base' 
-			}, {
-				name: 'Approval',
-				description: 'In ac lobortis augue, eget dictum nisi. Morbi vitae iaculis mauris, viverra scelerisque lectus. Nam vulputate sit amet purus et facilisis.',
-				dataModel: 'Approval' 
-			}, {
-				name: 'Completion',
-				description: 'In tristique diam quis dolor suscipit, nec commodo quam venenatis. Proin odio erat, blandit vitae est in, commodo vehicula odio. Integer fermentum cursus felis, vel ornare orci sodales et. Praesent condimentum ipsum tellus, non tristique tellus maximus in.',
-				dataModel: 'Approval' 
-			}]
-		}
+		spec: loanSpec
 	});	
 	Model.create({ _id: loan, 
 		id: hash.encodeHex(loan.toHexString()),  
-		name: 'Loan', 
-		description: 'Customer loan as we love it.', 
+		name: 'Mortgage', 
+		description: 'Customer mortgage as we love it.', 
 		revision: 1, 
 		starred: true, 
 		createdBy: 'Mary Doe',
@@ -122,8 +80,8 @@ Case.deleteMany({}, (err) => {
 	const case1 = new ObjectId('000000000010');	
 	Case.create({ _id: case1, 
 		id: hash.encodeHex(case1.toHexString()),  
-		name: "John's Mortgage", 
-		description: 'Yeah, new house.', 
+		name: "John's loan", 
+		description: 'Sure, new iphone.', 
 		revision: 3, 
 		starred: false,
 		createdBy: 'Mary Doe',

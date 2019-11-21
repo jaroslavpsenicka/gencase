@@ -17,6 +17,12 @@ const findEntity = (model, entityName) => {
   });
 }
 
+const findExtendedBy = (model, entityName) => {
+  return model.spec.entities.find(e => {
+    return e.extends === entityName;
+  });
+}
+
 const EntityPage = ({modelId, entityName}) => {
 
   const [ models, setModels ] = useContext(ModelsContext);
@@ -53,6 +59,7 @@ const EntityPage = ({modelId, entityName}) => {
     if (attr.min && !attr.max) result.push('Min ' + attr.min)
     if (!attr.min && attr.max) result.push('Max ' + attr.max)
     if (attr.min && attr.max) result.push('Range ' + attr.min + ' to ' + attr.max)
+    if (attr.options) result.push(attr.options.length + ' options available')
     return result;
   }
 
@@ -64,9 +71,9 @@ const EntityPage = ({modelId, entityName}) => {
         attr.input ? <InputBadge /> : ''
       }
       </Col>
-      <Col md={3}>{attr.name}</Col>
-      <Col md={2}>{attr.type}</Col>
-      <Col md={6}>
+      <Col md={3} className="text-ellipsis">{attr.name}</Col>
+      <Col md={2} className="text-ellipsis">{attr.type}</Col>
+      <Col md={6} className="text-ellipsis">
         <ul className="mb-0">
           { additionals(attr).map(a => <li key={a}>{a}</li>) }
         </ul>
@@ -75,18 +82,24 @@ const EntityPage = ({modelId, entityName}) => {
   )
 
   const Extends = ({entity}) => (
-    <div>Extends: <A href={'/models/' + modelId + '/entity/' + entity}>{entity}</A></div>
+    <div>Previous: <A href={'/models/' + modelId + '/entity/' + entity}>{entity}</A></div>
+  )
+
+  const ExtendedBy = ({entity}) => (
+    <div>Next: <A href={'/models/' + modelId + '/entity/' + entity}>{entity}</A></div>
   )
 
   const DataModel = ({model}) => {
     const entity = findEntity(model, entityName);
+    const extendedBy = findExtendedBy(model, entityName);
     return (
       <div>
         <h4 className="w-100 text-muted font-weight-light text-uppercase mb-4 mr-3">
           { model.name } / { entityName }
         </h4>
         <div>{entity.description ? entity.description : 'No description.'}</div>
-        { entity.extends ? <Extends entity={entity.extends}/> : '' }
+        { entity.extends ? <Extends entity={entity.extends}/> : <div/> }
+        { extendedBy ? <ExtendedBy entity={extendedBy.name} /> : <div/> }
         <div className="mt-2">
           { entity.attributes && entity.attributes.length > 0 ? <AttrList attrs={entity.attributes} /> : 
             <NoAttrs /> } 

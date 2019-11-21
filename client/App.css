@@ -10,6 +10,12 @@ body {
     color: black;
 }
 
+.text-ellipsis {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;  
+}
+
 .h-100px {
     height: 100px;
 }

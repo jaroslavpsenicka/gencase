@@ -12,7 +12,7 @@ const formatCaseListData = (data, model) => {
 	return {
 		id: data.id,
 		name: model.nameFormat ? formatValue(model.nameFormat, data) : data.name,
-		description: model.descriptionFormat ? formatValue(model.descriptionFormat, data) : data.name,
+		description: model.descriptionFormat ? formatValue(model.descriptionFormat, data) : data.description,
 		revision: data.revision,
 		createdBy: data.createdBy,
 		createdAt: data.createdAt,
