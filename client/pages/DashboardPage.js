@@ -90,20 +90,20 @@ const DashboardPage = () => {
 
   return (
     <Container className="pt-4">
+      <h4 className="text-muted font-weight-light text-uppercase mb-4">
+        <FontAwesomeIcon icon={faPlus} 
+          className="mr-2 cursor-pointer text-success float-right"
+          onClick={() => setShowAddChartDialog(true)}/>
+        <FontAwesomeIcon icon={faStarOutline} 
+          className="mr-4 cursor-pointer float-right"/>
+        <FontAwesomeIcon icon={faSignal} 
+          className={ showCharts ? "mr-4 float-right cursor-pointer text-success" : "mr-4 float-right cursor-pointer" }
+          onClick={() => setShowCharts(!showCharts)} />
+        Dashboard
+      </h4>
       <AddChartDialog show={showAddChartDialog} 
         onAdd={() => addGadget()} 
         onCancel={() => setShowAddChartDialog(false)}/>
-      <h4 className="w-100 text-muted font-weight-light text-uppercase mb-4 mr-3">
-        <div className="float-right">
-          <FontAwesomeIcon icon={faSignal} 
-            className={ showCharts ? "mr-4 cursor-pointer text-success" : "mr-4 cursor-pointer" }
-            onClick={() => setShowCharts(!showCharts)} />
-          <FontAwesomeIcon icon={faStarOutline} className="mr-4 cursor-pointer"/>
-          <FontAwesomeIcon icon={faPlus} className="mr-4 cursor-pointer text-success"
-            onClick={() => setShowAddChartDialog(true)}/>
-        </div>
-        Dashboard
-      </h4>
       <Search />
       { showCharts ? <Charts /> : <div />}
     </Container>
