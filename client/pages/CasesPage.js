@@ -14,6 +14,7 @@ import { byId } from '../ContextUtils';
 
 import Loading from '../components/Loading';
 import LoadingError from '../components/LoadingError';
+import Search from '../components/Search';
 
 const CasesPage = ({modelId}) => {
 
@@ -128,6 +129,7 @@ const CasesPage = ({modelId}) => {
           onClick={() => setFilter({ ...filter, commented: !filter.commented })} />
         { models.data && models.byId[modelId] ? models.byId[modelId].name + 's' : '' }
       </h4>
+      <Search/>
       {
         models.loading || cases.loading ? <Loading /> : 
         models.error || cases.error ? <LoadingError error = { models.error }/> :  
