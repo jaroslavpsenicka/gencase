@@ -15,12 +15,14 @@ import { byId } from '../ContextUtils';
 import Loading from '../components/Loading';
 import LoadingError from '../components/LoadingError';
 import Search from '../components/Search';
+import CreateCaseDialog from '../components/CreateCaseDialog'
 
 const CasesPage = ({modelId}) => {
 
   const [ models ] = useContext(ModelsContext);
   const [ cases, setCases, loadCases ] = useContext(CasesContext);
   const [ filter, setFilter ] = useState({ starred: false, commented: false });
+  const [ showCreateCaseDialog, setShowCreateCaseDialog] = useState(false);
 
   useEffect(() => loadCases(modelId), [modelId]);
 
@@ -115,12 +117,12 @@ const CasesPage = ({modelId}) => {
       (props.cases.length != filtered.length) ? <FilteredOut /> : 
       <NoCases />
   }
-
+  
   return (
     <Container className="pt-4">
       <h4 className="text-muted font-weight-light text-uppercase mb-4">
         <FontAwesomeIcon icon={faPlus} className="mr-2 float-right cursor-pointer text-success"
-          onClick={() => console.log("Add")}/>
+          onClick={() => setShowCreateCaseDialog(true)}/>
         <FontAwesomeIcon icon={filter.starred ? faStar : faStarOutline} 
           className="mr-4 float-right"
           onClick={() => setFilter({ ...filter, starred: !filter.starred })} />
@@ -130,6 +132,9 @@ const CasesPage = ({modelId}) => {
         { models.data && models.byId[modelId] ? models.byId[modelId].name + 's' : '' }
       </h4>
       <Search/>
+      <CreateCaseDialog serviceUrl={window.location.href} show={showCreateCaseDialog}   
+        onSubmit={() => setShowCreateCaseDialog(false)}
+        onCancel={() => setShowCreateCaseDialog(false)}/>
       {
         models.loading || cases.loading ? <Loading /> : 
         models.error || cases.error ? <LoadingError error = { models.error }/> :  
