@@ -3,7 +3,7 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
-const CreateCaseDialog = ({serviceUrl, show, onSubmit, onCancel}) => {
+const CreateCaseDialog = ({serviceUrl, model, show, onSubmit, onCancel}) => {
 
   const createServiceUrl = () => {
     return serviceUrl
@@ -12,7 +12,24 @@ const CreateCaseDialog = ({serviceUrl, show, onSubmit, onCancel}) => {
   }
 
   const createCurl = () => {
-    return 'curl -X POST ' + createServiceUrl() + ' -H "Content-Type: application/json" -d {}';
+    const data = {};
+    listRequiredAttributes().forEach(a => data[a.name] = a.name);
+    return "curl -X POST " + createServiceUrl() + " -H \"Content-Type: application/json\" -d '" + 
+      JSON.stringify(data) + "'";
+  }
+
+  const listRequiredAttributes = () => {
+    if (model) {
+      const initialPhase = model.spec.phases.find(p => p.initial);			
+      if (initialPhase) {
+        const entity = model.spec.entities.find(e => e.name == initialPhase.dataModel);
+        if (entity) {
+          return entity.attributes.filter(a => a.notEmpty);
+        }
+      }
+    }
+
+    return [];
   }
 
   return (
@@ -22,8 +39,10 @@ const CreateCaseDialog = ({serviceUrl, show, onSubmit, onCancel}) => {
       </Modal.Header>
       <Modal.Body>
         <p>This is mostly backend service, to create a case, you need to issue a REST 
-          request containing all mandatory fields to the following URL:</p>
+          call to the following URL:</p>
         <pre>   {createServiceUrl()}</pre>  
+        <p>with JSON-encoded values:</p>
+        <ul>{ listRequiredAttributes().map(a => <li key={a.name}>{a.name}</li>) }</ul>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onCancel}>Cancel</Button>

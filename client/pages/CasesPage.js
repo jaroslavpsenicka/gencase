@@ -132,7 +132,10 @@ const CasesPage = ({modelId}) => {
         { models.data && models.byId[modelId] ? models.byId[modelId].name + 's' : '' }
       </h4>
       <Search/>
-      <CreateCaseDialog serviceUrl={window.location.href} show={showCreateCaseDialog}   
+      <CreateCaseDialog 
+        serviceUrl={window.location.href} 
+        show={showCreateCaseDialog}  
+        model={models.data ? models.byId[modelId] : undefined} 
         onSubmit={() => setShowCreateCaseDialog(false)}
         onCancel={() => setShowCreateCaseDialog(false)}/>
       {
