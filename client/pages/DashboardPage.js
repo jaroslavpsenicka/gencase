@@ -3,7 +3,7 @@ import Container from 'react-bootstrap/Container';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import Dropdown from 'react-bootstrap/Dropdown';
-import { faAngleDown, faPlus, faStar, faSignal } from '@fortawesome/free-solid-svg-icons'
+import { faAngleDown, faPlus, faGripHorizontal } from '@fortawesome/free-solid-svg-icons'
 import { faStar as faStarOutline, faCheckCircle } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
@@ -93,7 +93,7 @@ const DashboardPage = () => {
           onClick={() => setShowAddChartDialog(true)}/>
         <FontAwesomeIcon icon={faStarOutline} 
           className="mr-4 cursor-pointer float-right"/>
-        <FontAwesomeIcon icon={faSignal} 
+        <FontAwesomeIcon icon={faGripHorizontal} 
           className={ showCharts ? "mr-4 float-right cursor-pointer text-success" : "mr-4 float-right cursor-pointer" }
           onClick={() => setShowCharts(!showCharts)} />
         Dashboard
