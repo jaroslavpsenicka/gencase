@@ -33,7 +33,6 @@ module.exports = {
     }, {
       type: "Number",
       name: "clientIdentificationStatus",
-      notEmpty: true,
       options: [{ 
         key: 0, value: "Not idenfified"
       }, {
