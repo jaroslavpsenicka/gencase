@@ -13,7 +13,6 @@ const app = express();
 mongoose.connect(config.database.url, { useNewUrlParser: true, useUnifiedTopology: true });
 mongoose.set('useFindAndModify', false);
 
-app.use(express.static(__dirname + '/app'));
 app.use(cors());
 app.use(morgan('combined')); // log every request to the console
 app.use(bodyParser.urlencoded({ 'extended': 'true' })); // parse application/x-www-form-urlencoded
@@ -26,12 +25,12 @@ app.use(function(err, req, res, next) {
   res.render('error', { error: err });
 });
 
-app.use(express.static(path.join(__dirname, '../client')));
+app.use(express.static(path.join(__dirname, '../dist')));
 
 require('./routes.js')(app);
 app.get('*', function(req, res) {
-    console.log(path.resolve(__dirname, '../client/index.html'));
-    res.sendFile(path.resolve(__dirname, '../client/index.html'));                               
+    console.log(path.resolve(__dirname, '../dist/index.html'));
+    res.sendFile(path.resolve(__dirname, '../dist/index.html'));                               
 });
 
 app.listen(process.env.PORT || 8080);
