@@ -7,16 +7,16 @@ const CreateCaseDialog = ({serviceUrl, show, onSubmit, onCancel}) => {
 
   const createServiceUrl = () => {
     return serviceUrl
-      .replace("/cases", "/api/cases")
-      .replace("8081", "8080");
+      .replace("/cases", "/api/models")
+      .replace("8081", "8080") + "/cases";      
   }
 
   const createCurl = () => {
-    return 'curl -X POST ' + createServiceUrl() + ' -d {}';
+    return 'curl -X POST ' + createServiceUrl() + ' -H "Content-Type: application/json" -d {}';
   }
 
   return (
-    <Modal show={show} onHide={onCancel}>
+    <Modal size="lg" show={show} onHide={onCancel}>
       <Modal.Header closeButton>
         <Modal.Title>Create Case</Modal.Title>
       </Modal.Header>
