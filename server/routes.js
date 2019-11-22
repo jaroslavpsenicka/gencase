@@ -80,13 +80,16 @@ Case.deleteMany({}, (err) => {
 	const case1 = new ObjectId('000000000010');	
 	Case.create({ _id: case1, 
 		id: hash.encodeHex(case1.toHexString()),  
-		name: "John's loan", 
-		description: 'Sure, new iphone.', 
+		name: "Case " + case1, 
 		revision: 3, 
 		starred: false,
 		createdBy: 'Mary Doe',
 		createdAt: new Date(),
-		model: mortgage
+		model: mortgage,
+		data: new Map([
+			['clientName', 'Jean-Luc Picard'],
+			['loanAmount', 50000]
+		])
 	});	
 });
 

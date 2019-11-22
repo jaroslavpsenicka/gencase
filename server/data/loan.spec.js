@@ -1,6 +1,6 @@
 module.exports = {  
-//	nameFormat: "",
-//	descriptionFormat: 'Ahoj {{description}}',
+  nameFormat: "{{clientName}}'s loan",
+	descriptionFormat: '{{loanAmount}} CZK',
   detailFormat: [{
     id: 'created',
     name: 'Created',
