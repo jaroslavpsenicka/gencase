@@ -15,23 +15,20 @@ import Axios from 'axios';
 
 import Loading from '../components/Loading';
 import LoadingError from '../components/LoadingError'
-import { CasesContext } from '../CasesContext';
 import { byId } from '../ContextUtils';
-import { formatFileSize } from '../Formatters';
+import Documents from '../components/Documents';
+import Comments from '../components/Comments';
 
 const scrollToRef = (ref) => window.scrollTo(0, ref.current.offsetTop);   
 
 const CaseDetailPage = ({modelId, id}) => {
 
   const [ theCase, setTheCase ] = useState({ loading: true });
-  const [ showCommentDialog, setShowCommentDialog ] = useState(false);
   const [ documents, setDocuments ] = useState({ loading: true });
   const [ comments, setComments ] = useState({ loading: true });
 
   const commentsRef = useRef(null);
   const documentsRef = useRef(null);
-  const inputDocumentRef = useRef(null); 
-
   const DateFormat = Intl.DateTimeFormat({ dateStyle: 'short' });
 
   useEffect(() => {
@@ -64,57 +61,6 @@ const CaseDetailPage = ({modelId, id}) => {
       .catch(err => console.log('cannot star', thecase, err));
   }
 
-  const onDocumentUpload = () => {
-  }
-
-  const NoDocuments = () => (
-    <div className="text-center text-secondary">No documents.</div>
-  )
-
-  const NoComments = () => (
-    <div className="text-center text-secondary">No comments.</div>
-  )
-
-  const DocumentRow = ({document}) => (
-    <Row className="p-2 mb-1 mr-2 bg-white text-dark">
-      <Col md={6} className="pl-2">
-        <FontAwesomeIcon icon={faFilePdf}></FontAwesomeIcon>
-        <span className="pl-2 text-primary font-weight-bold">{document.name}</span>
-      </Col>
-      <Col md={2} className="text-secondary">{document.createdBy}</Col>
-      <Col md={2} className="text-secondary text-right">{DateFormat.format(new Date(document.createdAt))}</Col>
-      <Col md={2} className="text-secondary text-right pr-2">{formatFileSize(document.size, 0)}</Col>
-    </Row>
-  )
-
-  const CommentRow = ({comment}) => (
-    <Row className="p-2 mb-1 mr-2 bg-white text-dark">
-      <Col md={6} className="pl-2 text-primary font-weight-bold">{comment.createdBy}</Col>
-      <Col md={6} className="text-secondary text-right pr-2">{DateFormat.format(new Date(comment.createdAt))}</Col>
-      <Col md={12} className="pl-2 pt-2 text-primary">{comment.text}</Col>
-    </Row>
-  )
-
-  const CommentDialog = () => (
-    <Modal show={showCommentDialog} onHide={() => setShowCommentDialog(false)}>
-      <Modal.Header closeButton>
-        <Modal.Title>Comment</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form>
-          <Form.Group controlId="exampleForm.ControlTextarea1">
-            <Form.Control as="textarea" rows="3" autoFocus />
-          </Form.Group>
-        </Form>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="primary" onClick={() => setShowCommentDialog(false)}>
-          Add Comment
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  )
-
   const CaseDetail = () => {
     return theCase.data.detail.map(k => 
       <CaseDetailProperty name={k.name} key={k.name} value={k.value}/>)
@@ -125,49 +71,6 @@ const CaseDetailPage = ({modelId, id}) => {
       <Col md={4} lg={2} className="p-0 text-secondary">{name}:</Col>
       <Col md={8} lg={4} className="p-0 text-primary">{value}</Col>
     </>
-  )
-
-  const Documents = () => (
-    <div>
-      <h5 className="pt-4" ref={documentsRef}>
-        <input type="file" name="file" id="file" ref={inputDocumentRef} className="d-none" 
-          onChange={(event) => onDocumentUpload(event)} />
-        <FontAwesomeIcon icon={faPlus} className="mr-4 float-right cursor-pointer text-success"
-          disabled = {documents.loading || documents.error}
-          onClick = {() => inputDocumentRef.current.click()}/>
-        Documents
-      </h5>
-      <Container>
-        {
-          documents.loading ? <Loading /> : 
-          documents.error ? <LoadingError error = { documents.error }/> :  
-          documents.data && documents.data.size == 0 ? <NoDocuments /> :
-          documents.data ? documents.data.map(d => <DocumentRow document={d} key={d.id}/>) : 
-          <div />
-        }
-      </Container>
-    </div>  
-  ) 
-
-  const Comments = () => (
-    <div>
-      <CommentDialog />
-      <h5 className="pt-4" ref={commentsRef}>
-        <FontAwesomeIcon icon={faPlus} className="mr-4 float-right cursor-pointer text-success"
-          disabled = {comments.loading || comments.error}
-          onClick={() => setShowCommentDialog(true)}/>
-        Comments
-      </h5>
-      <Container>
-        {
-          comments.loading ? <Loading /> : 
-          comments.error ? <LoadingError error = { comments.error }/> :  
-          comments.data && comments.data.length == 0 ? <NoComments /> :
-          comments.data ? comments.data.map(d => <CommentRow comment={d} key={d.id}/>) : 
-          <div />
-        }
-      </Container>
-    </div>
   )
 
   const Case = () => (
@@ -189,8 +92,12 @@ const CaseDetailPage = ({modelId, id}) => {
       <Row className="p-2 pl-3 mb-1 ml-0 mr-4 mt-3 bg-white text-dark">
         <CaseDetail />
       </Row>
-      <Documents />
-      <Comments />
+      <Documents documents={documents} 
+        documentsRef={documentsRef} 
+        dateFormat={DateFormat} />
+      <Comments comments={comments} 
+        commentsRef={documentsRef} 
+        dateFormat={DateFormat} />
     </div>    
   )
 
