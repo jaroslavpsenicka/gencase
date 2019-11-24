@@ -17,7 +17,6 @@ const toObject = (map) => {
 
 const formatCaseList = (caseObject, model) => {
 	const data = toObject(caseObject.data);
-	console.log('formatting', data);
 	return {
 		id: caseObject.id,
 		name: model.nameFormat ? formatValue(model.nameFormat, data) : caseObject.name,
@@ -42,7 +41,7 @@ const formatCaseOverview = (caseObject, model) => {
 			id: f.name,
 			name: f.name,
 			value: f.value && f.value.indexOf('{{') > -1 ? 
-				Handlebars.compile(f.value)(caseObject) : 
+				Handlebars.compile(f.value)({...caseObject._doc, data: toObject(caseObject.data)}) : 
 				caseObject[f.value]
 		}
 	});

@@ -4,7 +4,7 @@ module.exports = {
   overviewFormat: [{
     id: 'loanAmount',
     name: 'Loan amount',
-    value: '{{loanAmount}} CZK' 
+    value: '{{data.loanAmount}} CZK' 
   }, {
     id: 'created',
     name: 'Created',
