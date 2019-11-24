@@ -68,7 +68,7 @@ const CasesPage = ({modelId}) => {
     <div className="mt-5 text-center text-secondary">Filtered out, try tweaking the knobs.</div>
   )
 
-  const CaseActions = ({theCase}) => (
+  const CaseStateAndActions = ({theCase}) => (
     <Row className="mr-2 float-right">
       <h5 className="ml-3"><Badge variant="secondary">{theCase.state}</Badge></h5>
       <FontAwesomeIcon icon={theCase.starred ? faStar : faStarOutline} size="lg" 
@@ -100,7 +100,7 @@ const CasesPage = ({modelId}) => {
 
   const CaseRow = ({theCase}) => (
     <div className="p-2 pl-3 mb-1 bg-white text-dark">
-      <CaseActions theCase={theCase} />
+      <CaseStateAndActions theCase={theCase} />
       <div className="cursor-pointer" 
         onClick={() => navigate('/cases/' + modelId + '/' + theCase.id)}>
         <h5 className="text-primary text-ellipsis pr-3 mr-5">{theCase.name}</h5>

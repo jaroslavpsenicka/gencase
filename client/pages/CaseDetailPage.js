@@ -8,9 +8,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Modal from 'react-bootstrap/Modal';
+import Badge from 'react-bootstrap/Badge';
 import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
 import Axios from 'axios';
 
 import Loading from '../components/Loading';
@@ -85,7 +84,7 @@ const CaseDetailPage = ({modelId, id}) => {
 
   const Case = () => (
     <div>
-      <h4 className="text-muted font-weight-light text-uppercase mb-4">
+      <h4 className="text-muted font-weight-light text-uppercase">
         <FontAwesomeIcon icon={theCase.data.starred ? faStar : faStarOutline} 
           className={ theCase.data.starred ? "text-success mr-4 float-right cursor-pointer" : 
             "mr-4 float-right cursor-pointer" }
@@ -98,6 +97,9 @@ const CaseDetailPage = ({modelId, id}) => {
           onClick={() => scrollToRef(documentsRef)}/>
         { theCase.data.name }
       </h4>
+      <h5 className="mb-4">
+        <Badge variant="secondary">{theCase.data.state}</Badge>
+      </h5>
       <div>{theCase.data.description}</div>
       <CaseActions />
       <Row className="p-2 pl-3 mb-1 ml-0 mr-4 mt-3 bg-white text-dark">
