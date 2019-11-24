@@ -1,7 +1,7 @@
 module.exports = {  
   nameFormat: "{{clientName}}'s loan",
 	descriptionFormat: '{{loanAmount}} CZK',
-  detailFormat: [{
+  overviewFormat: [{
     id: 'created',
     name: 'Created',
     value: '{{dateFormat createdAt "DD. MM YYYY"}} by {{createdBy}}' 

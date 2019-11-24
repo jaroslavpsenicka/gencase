@@ -48,12 +48,12 @@ const CasesPage = ({modelId}) => {
     .catch(err => console.log('cannot star', thecase, err));
   }
 
-  const toggleDetail = (thecase) => {
+  const toggleOverview = (thecase) => {
     if (thecase.detail) {
       setCaseDetail(thecase.id, null);
     } else {
       setCaseDetail(thecase.id, { loading: true });
-      Axios.get('http://localhost:8080/api/cases/' + thecase.id + '/detail')
+      Axios.get('http://localhost:8080/api/cases/' + thecase.id + '/overview')
         .then(response => setCaseDetail(thecase.id, { loading: false, data: response.data }))
         .catch(err => setCaseDetail(thecase.id, { loading: false, error: err }));
     }
@@ -74,7 +74,7 @@ const CasesPage = ({modelId}) => {
         onClick={() => toggleStarred(props.thecase)}/>
       <FontAwesomeIcon icon={props.thecase.detail ? faAngleUp : faAngleDown} size="lg" 
         className="ml-3 cursor-pointer"
-        onClick={() => toggleDetail(props.thecase)}/>
+        onClick={() => toggleOverview(props.thecase)}/>
     </div>
   )
 

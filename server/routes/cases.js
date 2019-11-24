@@ -15,7 +15,7 @@ const toObject = (map) => {
 	return obj;
 }
 
-const formatCaseListData = (caseObject, model) => {
+const formatCaseList = (caseObject, model) => {
 	const data = toObject(caseObject.data);
 	console.log('formatting', data);
 	return {
@@ -29,8 +29,12 @@ const formatCaseListData = (caseObject, model) => {
 	}
 }
 
-const formatCaseDetailData = (data, model) => {
-	return model.detailFormat.map(f => {
+const formatCase = (caseObject, model) => {
+	return formatCaseList(caseObject, model);
+}
+
+const formatCaseOverview = (data, model) => {
+	return model.overviewFormat.map(f => {
 		return {
 			id: f.name,
 			name: f.name,
@@ -55,7 +59,7 @@ module.exports = function (app) {
 			.populate("model")
 			.exec((err, data) => {
 				if (err) throw err;
-				res.status(200).send(data.map(m => formatCaseListData(m, m.model.spec)));
+				res.status(200).send(data.map(m => formatCaseList(m, m.model.spec)));
 			});
 	});
 
@@ -111,10 +115,12 @@ module.exports = function (app) {
 
 	app.get('/api/cases/:id', (req, res) => {
 		console.log("Getting case", req.params.id);
-		Case.findById(new ObjectId(hash.decodeHex(req.params.id)), (err, data) => {
-			if (err) throw err;
-			res.status(200).send(data);
-		});
+		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
+			.populate("model")
+			.exec((err, data) => {
+				if (err) throw err;
+				res.status(200).send(formatCase(data, data.model.spec));
+			});
 	});
 
 	// update case
@@ -132,13 +138,13 @@ module.exports = function (app) {
 
 	// get case detail data
 
-	app.get('/api/cases/:id/detail', (req, res) => {
+	app.get('/api/cases/:id/overview', (req, res) => {
 		console.log("Getting overview of case", req.params.id);
 		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
 			.populate("model")
 			.exec((err, data) => {
 				if (err) throw err;
-				res.status(200).send(formatCaseDetailData(data, data.model.spec));
+				res.status(200).send(formatCaseOverview(data, data.model.spec));
 			});
 	});
 

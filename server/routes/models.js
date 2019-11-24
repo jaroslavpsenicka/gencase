@@ -7,18 +7,6 @@ const Case = require('../model/case');
 const hash = new Hashids();
 const upload = multer({ storage: multer.memoryStorage() });
 
-const formatCaseListData = (data, model) => {
-	return {
-		id: data.id,
-		name: model.nameFormat ? formatValue(model.nameFormat, data) : data.name,
-		description: model.descriptionFormat ? formatValue(model.descriptionFormat, data) : data.name,
-		revision: data.revision,
-		createdBy: data.createdBy,
-		createdAt: data.createdAt,
-		starred: data.starred
-	}
-}
-
 module.exports = function (app) {
 
 	// upload model
@@ -67,18 +55,6 @@ module.exports = function (app) {
 			if (err) throw err;
 			res.status(204).send();
 		});
-	});
-
-	// get cases belonging to a model	
-	
-	app.get('/api/models/:id/cases', (req, res) => {
-		console.log("Querying cases of", req.params.id);
-		Case.find({model: new ObjectId(hash.decodeHex(req.params.id))})
-			.populate("model")
-			.exec((err, data) => {
-				if (err) throw err;
-				res.status(200).send(data.map(m => formatCaseListData(m, m.model.spec)));
-			});
 	});
 
 };
