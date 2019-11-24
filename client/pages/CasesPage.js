@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
+import Badge from 'react-bootstrap/Badge';
 import { faStar, faAngleDown, faAngleUp, faPlus, faComment } from '@fortawesome/free-solid-svg-icons'
 import { faStar as faStarOutline, faComment as faCommentOutline} from '@fortawesome/free-regular-svg-icons'
 import Axios from 'axios'
@@ -67,44 +68,45 @@ const CasesPage = ({modelId}) => {
     <div className="mt-5 text-center text-secondary">Filtered out, try tweaking the knobs.</div>
   )
 
-  const CaseActions = (props) => (
-    <div className="pt-2 mr-3 float-right">
-      <FontAwesomeIcon icon={props.thecase.starred ? faStar : faStarOutline} size="lg" 
-        className={props.thecase.starred ? 'cursor-pointer text-success' : 'cursor-pointer'}
-        onClick={() => toggleStarred(props.thecase)}/>
-      <FontAwesomeIcon icon={props.thecase.overview ? faAngleUp : faAngleDown} size="lg" 
+  const CaseActions = ({theCase}) => (
+    <Row className="mr-2 float-right">
+      <h5 className="ml-3"><Badge variant="secondary">{theCase.state}</Badge></h5>
+      <FontAwesomeIcon icon={theCase.starred ? faStar : faStarOutline} size="lg" 
+        className={theCase.starred ? 'cursor-pointer ml-3 text-success' : 'cursor-pointer ml-3'}
+        onClick={() => toggleStarred(theCase)}/>
+      <FontAwesomeIcon icon={theCase.overview ? faAngleUp : faAngleDown} size="lg" 
         className="ml-3 cursor-pointer"
-        onClick={() => toggleOverview(props.thecase)}/>
-    </div>
+        onClick={() => toggleOverview(theCase)}/>
+    </Row>
   )
 
-  const CaseOverview = props => {
-    return !props.thecase.overview ? null :
-      props.thecase.overview.loading ? <Loading /> :
-      props.thecase.overview.error ? <LoadingError /> : (
+  const CaseOverview = ({theCase}) => {
+    return !theCase.overview ? null :
+      theCase.overview.loading ? <Loading /> :
+      theCase.overview.error ? <LoadingError /> : (
       <div className="col-md-12 pt-3 text-secondary">
-        { props.thecase.overview.data.map(n => 
+        { theCase.overview.data.map(n => 
           <CaseOverviewProperty name={n.name} value={n.value} key={n.name} />) }
       </div>
     )
   }
 
-  const CaseOverviewProperty = props => (
+  const CaseOverviewProperty = ({name, value}) => (
     <Row>
-      <Col md={4}>{props.name}</Col>
-      <Col className="text-primary">{props.value}</Col>
+      <Col md={4}>{name}</Col>
+      <Col className="text-primary">{value}</Col>
     </Row>
   )
 
-  const CaseRow = (props) => (
+  const CaseRow = ({theCase}) => (
     <div className="p-2 pl-3 mb-1 bg-white text-dark">
-      <CaseActions thecase={props.thecase} />
-      <div className="cursor-pointer col-md-10" 
-        onClick={() => navigate('/cases/' + modelId + '/' + props.thecase.id)}>
-        <h5 className="text-primary">{props.thecase.name}</h5>
-        <div className="text-secondary">{props.thecase.description ? props.thecase.description : 'No description.'}</div>
+      <CaseActions theCase={theCase} />
+      <div className="cursor-pointer" 
+        onClick={() => navigate('/cases/' + modelId + '/' + theCase.id)}>
+        <h5 className="text-primary text-ellipsis pr-3 mr-5">{theCase.name}</h5>
+        <div className="text-secondary">{theCase.description ? theCase.description : 'No description.'}</div>
       </div>
-      <CaseOverview thecase={props.thecase} />
+      <CaseOverview theCase={theCase} />
     </div>
   )
 
@@ -112,7 +114,7 @@ const CasesPage = ({modelId}) => {
     const filtered = props.cases
       .filter(c => filter.starred ? c.starred : true)
       .filter(c => filter.commented ? c.commented : true)
-      .map(c => <CaseRow thecase={c} key={c.id} />);
+      .map(c => <CaseRow theCase={c} key={c.id} />);
     return filtered.length > 0 ? filtered : 
       (props.cases.length != filtered.length) ? <FilteredOut /> : 
       <NoCases />

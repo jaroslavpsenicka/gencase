@@ -23,13 +23,9 @@ const toArray = (obj) => {
 
 const formatCaseList = (caseObject, model) => {
 	return {
-		id: caseObject.id,
+		...caseObject._doc,
 		name: model.nameFormat ? formatValue(model.nameFormat, caseObject) : caseObject.name,
-		description: model.descriptionFormat ? formatValue(model.descriptionFormat, caseObject) : caseObject.description,
-		revision: caseObject.revision,
-		createdBy: caseObject.createdBy,
-		createdAt: caseObject.createdAt,
-		starred: caseObject.starred
+		description: model.descriptionFormat ? formatValue(model.descriptionFormat, caseObject) : caseObject.description
 	}
 }
 

@@ -13,35 +13,6 @@ const test = new ObjectId('000000000003');
 
 const loanSpec = require('./data/loan.spec.js');
 
-/*
-	Loan model
-
-		States:
-
-		| request   				| approval		| completion	 		|
-		| ------------------+-------------+---------------- |
-		| - new	<n>						- basic				- approved <f>	|
-		| - identification		- 4eyes				- rejected <f>	|
-
-		- request phase
-			- new state (initial, created via REST)
-				- unconditional transition to identification [human task] 
-			- identification state (triggered by event)
-				- transition to approval phase when identified [human task] 
-				- transition to completion phase when cannot be identified [email task]
-		- approval phase
-			- basic approval state (inital)
-				- transition to 4eyes state when approved [human task]
-				- transition to completion phase when rejected [email]
-			- 4eyes state	
-				- transition to completion phase when approved [email]	
-				- transition to completion phase when rejected [email]	
-		- completion phase
-			- approved state (final)
-			- rejected state (final)
-
-*/
-
 console.log("Creating test models");
 Model.deleteMany({}, (err) => {	
 	if (err) throw err;
@@ -89,6 +60,7 @@ Case.deleteMany({}, (err) => {
 		name: "Case " + case1, 
 		revision: 3, 
 		starred: false,
+		state: 'identification',
 		createdBy: 'Mary Doe',
 		createdAt: new Date(),
 		model: mortgage,

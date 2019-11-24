@@ -73,6 +73,16 @@ const CaseDetailPage = ({modelId, id}) => {
     </>
   )
 
+  const CaseActions = () => (
+    <Container>
+      <Row className="mt-1 mb-1 mr-0">
+        <Col md={12} className="pr-2">
+          <Button className="float-right">Action</Button>
+        </Col>
+      </Row>
+    </Container>
+  );
+
   const Case = () => (
     <div>
       <h4 className="text-muted font-weight-light text-uppercase mb-4">
@@ -89,6 +99,7 @@ const CaseDetailPage = ({modelId, id}) => {
         { theCase.data.name }
       </h4>
       <div>{theCase.data.description}</div>
+      <CaseActions />
       <Row className="p-2 pl-3 mb-1 ml-0 mr-4 mt-3 bg-white text-dark">
         <CaseDetail />
       </Row>

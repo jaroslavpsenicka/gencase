@@ -1,3 +1,32 @@
+/*
+	Loan model
+
+		States:
+
+		| request   				| approval		| completion	 		|
+		| ------------------+-------------+---------------- |
+		| - new	<n>						- basic				- approved <f>	|
+		| - identification		- 4eyes				- rejected <f>	|
+
+		- request phase
+			- new state (initial, created via REST)
+				- unconditional transition to identification [human task] 
+			- identification state (triggered by event)
+				- transition to approval phase when identified [human task] 
+				- transition to completion phase when cannot be identified [email task]
+		- approval phase
+			- basic approval state (inital)
+				- transition to 4eyes state when approved [human task]
+				- transition to completion phase when rejected [email]
+			- 4eyes state	
+				- transition to completion phase when approved [email]	
+				- transition to completion phase when rejected [email]	
+		- completion phase
+			- approved state (final)
+			- rejected state (final)
+
+*/
+
 module.exports = {  
   nameFormat: "{{data.clientName}}'s loan",
 	descriptionFormat: 'Lovely {{data.loanAmount}} CZK',

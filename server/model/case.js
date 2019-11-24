@@ -12,5 +12,6 @@ module.exports = mongoose.model('Case', {
 	updatedBy:		{ type: String },
 	updatedAt: 		{ type: Date },
   description: 	{ type: String },
-	starred: 			{ type: Boolean, value: false }
+	starred: 			{ type: Boolean, value: false },
+	state:				{ type: String }
 });
