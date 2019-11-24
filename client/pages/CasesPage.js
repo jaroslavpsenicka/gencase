@@ -26,10 +26,10 @@ const CasesPage = ({modelId}) => {
 
   useEffect(() => loadCases(modelId), [modelId]);
 
-  const setCaseDetail = (id, value) => {
+  const setCaseOverview = (id, value) => {
     setCases(prev => { 
       return { ...prev, data: prev.data.map((row) => {
-        return row.id === id ? {...row, detail: value} : row
+        return row.id === id ? {...row, overview: value} : row
       })}
     });
   }
@@ -49,13 +49,13 @@ const CasesPage = ({modelId}) => {
   }
 
   const toggleOverview = (thecase) => {
-    if (thecase.detail) {
-      setCaseDetail(thecase.id, null);
+    if (thecase.overview) {
+      setCaseOverview(thecase.id, null);
     } else {
-      setCaseDetail(thecase.id, { loading: true });
+      setCaseOverview(thecase.id, { loading: true });
       Axios.get('http://localhost:8080/api/cases/' + thecase.id + '/overview')
-        .then(response => setCaseDetail(thecase.id, { loading: false, data: response.data }))
-        .catch(err => setCaseDetail(thecase.id, { loading: false, error: err }));
+        .then(response => setCaseOverview(thecase.id, { loading: false, data: response.data }))
+        .catch(err => setCaseOverview(thecase.id, { loading: false, error: err }));
     }
   }
       
@@ -72,24 +72,24 @@ const CasesPage = ({modelId}) => {
       <FontAwesomeIcon icon={props.thecase.starred ? faStar : faStarOutline} size="lg" 
         className={props.thecase.starred ? 'cursor-pointer text-success' : 'cursor-pointer'}
         onClick={() => toggleStarred(props.thecase)}/>
-      <FontAwesomeIcon icon={props.thecase.detail ? faAngleUp : faAngleDown} size="lg" 
+      <FontAwesomeIcon icon={props.thecase.overview ? faAngleUp : faAngleDown} size="lg" 
         className="ml-3 cursor-pointer"
         onClick={() => toggleOverview(props.thecase)}/>
     </div>
   )
 
-  const CaseDetail = props => {
-    return !props.thecase.detail ? null :
-      props.thecase.detail.loading ? <Loading /> :
-      props.thecase.detail.error ? <LoadingError /> : (
+  const CaseOverview = props => {
+    return !props.thecase.overview ? null :
+      props.thecase.overview.loading ? <Loading /> :
+      props.thecase.overview.error ? <LoadingError /> : (
       <div className="col-md-12 pt-3 text-secondary">
-        { props.thecase.detail.data.map(n => 
-          <CaseDetailProperty name={n.name} value={n.value} key={n.id} />) }
+        { props.thecase.overview.data.map(n => 
+          <CaseOverviewProperty name={n.name} value={n.value} key={n.id} />) }
       </div>
     )
   }
 
-  const CaseDetailProperty = props => (
+  const CaseOverviewProperty = props => (
     <Row>
       <Col md={4}>{props.name}</Col>
       <Col className="text-primary">{props.value}</Col>
@@ -104,7 +104,7 @@ const CasesPage = ({modelId}) => {
         <h5 className="text-primary">{props.thecase.name}</h5>
         <div className="text-secondary">{props.thecase.description ? props.thecase.description : 'No description.'}</div>
       </div>
-      <CaseDetail thecase={props.thecase} />
+      <CaseOverview thecase={props.thecase} />
     </div>
   )
 

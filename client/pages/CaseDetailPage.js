@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import ReactDOM from 'react-dom';
 import { faStar, faComment, faFile, faPlus, faFilePdf } from '@fortawesome/free-solid-svg-icons'
 import { 
   faStar as faStarOutline, 
@@ -24,7 +23,7 @@ const scrollToRef = (ref) => window.scrollTo(0, ref.current.offsetTop);
 
 const CaseDetailPage = ({modelId, id}) => {
 
-  const [ cases, setCases, loadCases, loadCase ] = useContext(CasesContext);
+  const [ theCase, setTheCase ] = useState({ loading: true });
   const [ showCommentDialog, setShowCommentDialog ] = useState(false);
   const [ documents, setDocuments ] = useState({ loading: true });
   const [ comments, setComments ] = useState({ loading: true });
@@ -35,7 +34,11 @@ const CaseDetailPage = ({modelId, id}) => {
 
   const DateFormat = Intl.DateTimeFormat({ dateStyle: 'short' });
 
-  useEffect(() => loadCase(id), [id]);
+  useEffect(() => {
+    Axios.get('http://localhost:8080/api/cases/' + id)
+      .then(response => setTheCase({ loading: false, data: response.data }))
+      .catch(err => setTheCase({ loading: false, error: err }))
+  }, [id]);
   useEffect(() => {
     Axios.get('http://localhost:8080/api/cases/' + id + '/documents')
       .then(response => setDocuments({ loading: false, data: response.data }))
@@ -112,8 +115,16 @@ const CaseDetailPage = ({modelId, id}) => {
     </Modal>
   )
 
-  const CaseDetail = () => (
-    <div className="pt-4">Here comes the case detail.</div>
+  const CaseDetail = () => {
+    const keys = Object.keys(theCase.data.data);
+    return keys.map(k => <CaseDetailProperty name={k} key={k} value={theCase.data.data[k]}/>)
+  }
+
+  const CaseDetailProperty = ({name, value}) => (
+    <>
+      <Col md={4} lg={2} className="p-0 text-secondary">{name}:</Col>
+      <Col md={8} lg={4} className="p-0 text-primary">{value}</Col>
+    </>
   )
 
   const Documents = () => (
@@ -159,23 +170,25 @@ const CaseDetailPage = ({modelId, id}) => {
     </div>
   )
 
-  const Case = ({theCase}) => (
+  const Case = () => (
     <div>
       <h4 className="text-muted font-weight-light text-uppercase mb-4">
-        <FontAwesomeIcon icon={theCase.starred ? faStar : faStarOutline} 
-          className={ theCase.starred ? "text-success mr-4 float-right cursor-pointer" : 
+        <FontAwesomeIcon icon={theCase.data.starred ? faStar : faStarOutline} 
+          className={ theCase.data.starred ? "text-success mr-4 float-right cursor-pointer" : 
             "mr-4 float-right cursor-pointer" }
           onClick={() => toggleStarred(theCase)}/>
-        <FontAwesomeIcon icon={theCase.commented ? faComment : faCommentOutline} 
+        <FontAwesomeIcon icon={theCase.data.commented ? faComment : faCommentOutline} 
           className="mr-4 float-right cursor-pointer" 
           onClick={() => scrollToRef(commentsRef)}/>
-        <FontAwesomeIcon icon={theCase.documents ? faFile : faFileOutline} 
+        <FontAwesomeIcon icon={theCase.data.documents ? faFile : faFileOutline} 
           className="mr-4 float-right cursor-pointer" 
           onClick={() => scrollToRef(documentsRef)}/>
-        { theCase.name }
+        { theCase.data.name }
       </h4>
-      <div>{theCase.description}</div>
-      <CaseDetail />
+      <div>{theCase.data.description}</div>
+      <Row className="p-2 pl-3 mb-1 ml-0 mr-4 mt-3 bg-white text-dark">
+        <CaseDetail />
+      </Row>
       <Documents />
       <Comments />
     </div>    
@@ -184,9 +197,9 @@ const CaseDetailPage = ({modelId, id}) => {
   return (
     <Container className="pt-4">
       {
-        cases.loading ? <Loading /> : 
-        cases.error ? <LoadingError error = { cases.error }/> :  
-        cases.data ? <Case theCase={cases.byId[id]}/> : 
+        theCase.loading ? <Loading /> : 
+        theCase.error ? <LoadingError error = { theCase.error }/> :  
+        theCase.data ? <Case /> : 
         <div />
       }
     </Container>

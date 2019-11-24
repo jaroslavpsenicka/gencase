@@ -30,17 +30,20 @@ const formatCaseList = (caseObject, model) => {
 }
 
 const formatCase = (caseObject, model) => {
-	return formatCaseList(caseObject, model);
+	return {
+		...formatCaseList(caseObject, model),
+		data: toObject(caseObject.data)
+	}
 }
 
-const formatCaseOverview = (data, model) => {
+const formatCaseOverview = (caseObject, model) => {
 	return model.overviewFormat.map(f => {
 		return {
 			id: f.name,
 			name: f.name,
 			value: f.value && f.value.indexOf('{{') > -1 ? 
-				Handlebars.compile(f.value)(data) : 
-				data[f.value]
+				Handlebars.compile(f.value)(caseObject) : 
+				caseObject[f.value]
 		}
 	});
 }

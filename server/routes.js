@@ -94,6 +94,7 @@ Case.deleteMany({}, (err) => {
 		model: mortgage,
 		data: new Map([
 			['clientName', 'Jean-Luc Picard'],
+			['personalId', 'AB123456'],
 			['loanAmount', 50000]
 		])
 	});	
