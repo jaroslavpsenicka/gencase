@@ -22,7 +22,7 @@ const CreateCaseDialog = ({serviceUrl, model, show, onSubmit, onCancel}) => {
     if (model) {
       const initialPhase = model.spec.phases.find(p => p.initial);			
       if (initialPhase) {
-        const entity = model.spec.entities.find(e => e.name == initialPhase.dataModel);
+        const entity = model.spec.entities.find(e => e.name == "");
         if (entity) {
           return entity.attributes.filter(a => a.notEmpty);
         }
@@ -41,8 +41,6 @@ const CreateCaseDialog = ({serviceUrl, model, show, onSubmit, onCancel}) => {
         <p>This is mostly backend service, to create a case, you need to issue a REST 
           call to the following URL:</p>
         <pre>   {createServiceUrl()}</pre>  
-        <p>with JSON-encoded values:</p>
-        <ul>{ listRequiredAttributes().map(a => <li key={a.name}>{a.name}</li>) }</ul>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onCancel}>Cancel</Button>

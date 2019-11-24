@@ -62,7 +62,10 @@ Model.deleteMany({}, (err) => {
 		revision: 1, 
 		starred: true, 
 		createdBy: 'Mary Doe',
-		spec: {} 
+		spec: {
+			phases: [],
+			entities: []
+		} 
 	});	
 	Model.create({ _id: test, 
 		id: hash.encodeHex(test.toHexString()),  
@@ -70,7 +73,10 @@ Model.deleteMany({}, (err) => {
 		description: 'A brand new product for the rest of us.', 
 		revision: 1, 
 		createdBy: 'Jane Doe',
-		spec: {} 
+		spec: {
+			phases: [],
+			entities: []
+		} 
 	});	
 });
 
