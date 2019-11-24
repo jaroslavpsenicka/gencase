@@ -116,8 +116,8 @@ const CaseDetailPage = ({modelId, id}) => {
   )
 
   const CaseDetail = () => {
-    const keys = Object.keys(theCase.data.data);
-    return keys.map(k => <CaseDetailProperty name={k} key={k} value={theCase.data.data[k]}/>)
+    return theCase.data.data.map(k => 
+      <CaseDetailProperty name={k.name} key={k.name} value={k.value}/>)
   }
 
   const CaseDetailProperty = ({name, value}) => (

@@ -84,7 +84,7 @@ const CasesPage = ({modelId}) => {
       props.thecase.overview.error ? <LoadingError /> : (
       <div className="col-md-12 pt-3 text-secondary">
         { props.thecase.overview.data.map(n => 
-          <CaseOverviewProperty name={n.name} value={n.value} key={n.id} />) }
+          <CaseOverviewProperty name={n.name} value={n.value} key={n.name} />) }
       </div>
     )
   }

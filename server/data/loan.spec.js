@@ -2,13 +2,18 @@ module.exports = {
   nameFormat: "{{clientName}}'s loan",
 	descriptionFormat: '{{clientName}}, {{loanAmount}} CZK',
   overviewFormat: [{
-    id: 'loanAmount',
     name: 'Loan amount',
     value: '{{data.loanAmount}} CZK' 
   }, {
-    id: 'created',
     name: 'Created',
     value: '{{dateFormat createdAt "DD. MM YYYY"}} by {{createdBy}}' 
+  }],
+  detailFormat: [{
+    name: 'Client',
+    value: '{{data.clientName}}, {{data.personalId}}'
+  }, {
+    name: 'Loan amount',
+    value: '{{data.loanAmount}} CZK'
   }],
   entities: [{
     name: 'Base',

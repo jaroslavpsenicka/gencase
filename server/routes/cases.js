@@ -15,6 +15,12 @@ const toObject = (map) => {
 	return obj;
 }
 
+const toArray = (obj) => {
+	const arr = [];
+	Object.keys(obj).forEach(k => arr[k] = obj[k]);
+	return arr;
+}
+
 const formatCaseList = (caseObject, model) => {
 	const data = toObject(caseObject.data);
 	return {
@@ -31,14 +37,24 @@ const formatCaseList = (caseObject, model) => {
 const formatCase = (caseObject, model) => {
 	return {
 		...formatCaseList(caseObject, model),
-		data: toObject(caseObject.data)
+		data: model.detailFormat ? formatCaseDetail(caseObject, model) : toArray(toObject(caseObject.data))
 	}
 }
 
 const formatCaseOverview = (caseObject, model) => {
 	return model.overviewFormat.map(f => {
 		return {
-			id: f.name,
+			name: f.name,
+			value: f.value && f.value.indexOf('{{') > -1 ? 
+				Handlebars.compile(f.value)({...caseObject._doc, data: toObject(caseObject.data)}) : 
+				caseObject[f.value]
+		}
+	});
+}
+
+const formatCaseDetail = (caseObject, model) => {
+	return model.detailFormat.map(f => {
+		return {
 			name: f.name,
 			value: f.value && f.value.indexOf('{{') > -1 ? 
 				Handlebars.compile(f.value)({...caseObject._doc, data: toObject(caseObject.data)}) : 
