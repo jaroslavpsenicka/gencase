@@ -22,11 +22,10 @@ const toArray = (obj) => {
 }
 
 const formatCaseList = (caseObject, model) => {
-	const data = toObject(caseObject.data);
 	return {
 		id: caseObject.id,
-		name: model.nameFormat ? formatValue(model.nameFormat, data) : caseObject.name,
-		description: model.descriptionFormat ? formatValue(model.descriptionFormat, data) : caseObject.description,
+		name: model.nameFormat ? formatValue(model.nameFormat, caseObject) : caseObject.name,
+		description: model.descriptionFormat ? formatValue(model.descriptionFormat, caseObject) : caseObject.description,
 		revision: caseObject.revision,
 		createdBy: caseObject.createdBy,
 		createdAt: caseObject.createdAt,
@@ -37,7 +36,7 @@ const formatCaseList = (caseObject, model) => {
 const formatCase = (caseObject, model) => {
 	return {
 		...formatCaseList(caseObject, model),
-		data: model.detailFormat ? formatCaseDetail(caseObject, model) : toArray(toObject(caseObject.data))
+		detail: model.detailFormat ? formatCaseDetail(caseObject, model) : toArray(toObject(caseObject.data))
 	}
 }
 
@@ -63,8 +62,8 @@ const formatCaseDetail = (caseObject, model) => {
 	});
 }
 
-const formatValue = (format, value) => {
-	return Handlebars.compile(format)(value);
+const formatValue = (format, caseObject) => {
+	return Handlebars.compile(format)({...caseObject._doc, data: toObject(caseObject.data)});
 }
 
 module.exports = function (app) {
