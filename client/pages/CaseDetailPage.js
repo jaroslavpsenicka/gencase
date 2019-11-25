@@ -109,7 +109,7 @@ const CaseDetailPage = ({modelId, id}) => {
         documentsRef={documentsRef} 
         dateFormat={DateFormat} />
       <Comments comments={comments} 
-        commentsRef={documentsRef} 
+        commentsRef={commentsRef} 
         dateFormat={DateFormat} />
     </div>    
   )

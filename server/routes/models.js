@@ -2,10 +2,20 @@ const Hashids = require('hashids/cjs');
 const multer = require('multer');
 const ObjectId = require('mongoose').Types.ObjectId; 
 const Model = require('../model/model');
-const Case = require('../model/case');
+const { ModelValidationError } = require('../errors');
+const Ajv = require('ajv');
 
 const hash = new Hashids();
 const upload = multer({ storage: multer.memoryStorage() });
+const ajv = Ajv({ allErrors: true, removeAdditional: 'all' });
+ajv.addSchema(require('../model/model.schema'), 'model');
+
+const parseAndValidate = (payload) => {
+	const json = JSON.parse(payload);
+	if (!ajv.validate('model', json)) {
+		throw new ModelValidationError(ajv.errors[0].message);
+	}
+}
 
 module.exports = function (app) {
 
@@ -15,7 +25,7 @@ module.exports = function (app) {
 		console.log("Uploading model", req.file.originalname);
 		const nid = new ObjectId();
 		try {
-			const payload = JSON.parse(req.file.buffer);
+			const payload = parseAndValidate(req.file.buffer);
 			Model.create({
 				_id: nid,
 				id: hash.encodeHex(nid.toHexString()), 			
@@ -28,7 +38,9 @@ module.exports = function (app) {
 				res.status(201).send(model);
 			});
 		} catch (err) {
-			res.status(400).send('Error processing the file.');
+			if (err instanceof ModelValidationError) {
+				res.status(400).json({error: err.message});
+			} else res.status(500).json({error: err.message});
 		}
 	});
 
