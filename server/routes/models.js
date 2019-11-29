@@ -4,16 +4,31 @@ const ObjectId = require('mongoose').Types.ObjectId;
 const Model = require('../model/model');
 const { ModelValidationError } = require('../errors');
 const Ajv = require('ajv');
+const fs = require('fs');
 
 const hash = new Hashids();
 const upload = multer({ storage: multer.memoryStorage() });
 const ajv = Ajv({ allErrors: true, removeAdditional: 'all' });
-ajv.addSchema(require('../model/model.schema'), 'model');
+
+const schemaFileExt = '.schema.json'
+
+fs.readdir('./server/model', (err, files) => {
+	if (err) throw err;
+  files.forEach(file => {
+    if (file.endsWith(schemaFileExt)) {
+			const schemaName = file.substring(0, file.length - schemaFileExt.length);
+			console.log('registering', schemaName, 'schema');
+			ajv.addSchema(require('../model/' + file), schemaName);
+		}
+  });
+});
+
 
 const parseAndValidate = (payload) => {
 	const json = JSON.parse(payload);
 	if (!ajv.validate('model', json)) {
-		throw new ModelValidationError(ajv.errors[0].message);
+		const path = ajv.errors[0].dataPath ? ajv.errors[0].dataPath.substring(1) + ": " : "";
+		throw new ModelValidationError(path + ajv.errors[0].message);
 	}
 }
 

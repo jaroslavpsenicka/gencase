@@ -1,6 +1,21 @@
 const expect  = require('chai').expect;
 const request = require('request');
 
+const file = (value) => {
+  return {
+    url: 'http://localhost:8080/api/models', 
+    formData: {
+      file: {
+        value: JSON.stringify(value),
+        options: {
+          filename: 'file.json',
+          contentType: 'application/json'
+        }
+      }
+    }
+  }
+}
+
 describe('Model', () => {
 
   var model = undefined;
@@ -24,18 +39,7 @@ describe('Model', () => {
   });
 
   it('upload model, empty', (done) => {
-    request.post({
-      url: 'http://localhost:8080/api/models', 
-      formData: {
-        file: {
-          value: '{}',
-          options: {
-            filename: 'file.json',
-            contentType: 'application/json'
-          }
-        }
-      }
-    }, (error, response, body) => {
+    request.post(file({}), (error, response, body) => {
       expect(response.statusCode).to.equal(400);
       expect(JSON.parse(body).error).to.equal("should have required property \'entities\'");
       done();
@@ -43,18 +47,8 @@ describe('Model', () => {
   });
 
   it('upload model, no entities', (done) => {
-    request.post({
-      url: 'http://localhost:8080/api/models', 
-      formData: {
-        file: {
-          value: JSON.stringify({ phases: [] }),
-          options: {
-            filename: 'file.json',
-            contentType: 'application/json'
-          }
-        }
-      }
-    }, (error, response, body) => {
+    const contents = { phases: [] };
+    request.post(file(contents), (error, response, body) => {
       expect(response.statusCode).to.equal(400);
       expect(JSON.parse(body).error).to.equal("should have required property \'entities\'");
       done();
@@ -62,20 +56,19 @@ describe('Model', () => {
   });
 
   it('upload model, no phases', (done) => {
-    request.post({
-      url: 'http://localhost:8080/api/models', 
-      formData: {
-        file: {
-          value: JSON.stringify({ entities: [] }),
-          options: {
-            filename: 'file.json',
-            contentType: 'application/json'
-          }
-        }
-      }
-    }, (error, response, body) => {
+    const contents = { entities: [] };
+    request.post(file(contents), (error, response, body) => {
       expect(response.statusCode).to.equal(400);
       expect(JSON.parse(body).error).to.equal("should have required property \'phases\'");
+      done();
+    });
+  });
+
+  it('upload model, empty entity', (done) => {
+    const contents = { phases: [{ name: "P1"}], entities: [{ name: "E1"}] };
+    request.post(file(contents), (error, response, body) => {
+      expect(response.statusCode).to.equal(400);
+      expect(JSON.parse(body).error).to.equal("entities[0]: should have required property \'attributes\'");
       done();
     });
   });
