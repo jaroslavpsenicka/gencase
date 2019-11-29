@@ -84,7 +84,7 @@ const CasesPage = ({modelId}) => {
     return !theCase.overview ? null :
       theCase.overview.loading ? <Loading /> :
       theCase.overview.error ? <LoadingError /> : (
-      <div className="col-md-12 pt-3 text-secondary">
+      <div className="pt-3 text-secondary">
         { theCase.overview.data.map(n => 
           <CaseOverviewProperty name={n.name} value={n.value} key={n.name} />) }
       </div>

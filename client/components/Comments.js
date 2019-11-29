@@ -22,7 +22,7 @@ const Comments = ({comments, commentsRef, dateFormat}) => {
   const [ showCommentDialog, setShowCommentDialog ] = useState(false);
 
   const CommentRow = ({comment}) => (
-    <Row className="p-2 mb-1 mr-2 bg-white text-dark">
+    <Row className="p-2 mb-1 bg-white text-dark">
       <Col md={6} className="pl-2 text-primary font-weight-bold">{comment.createdBy}</Col>
       <Col md={6} className="text-secondary text-right pr-2">{dateFormat.format(new Date(comment.createdAt))}</Col>
       <Col md={12} className="pl-2 pt-2 text-primary">{comment.text}</Col>
@@ -57,7 +57,7 @@ const Comments = ({comments, commentsRef, dateFormat}) => {
     <div>
       <CommentDialog />
       <h5 className="pt-4" ref={commentsRef}>
-        <FontAwesomeIcon icon={faPlus} className="mr-4 float-right cursor-pointer text-success"
+        <FontAwesomeIcon icon={faPlus} className="mr-2 float-right cursor-pointer text-success"
           disabled = {comments.loading || comments.error}
           onClick={() => setShowCommentDialog(true)}/>
         Comments

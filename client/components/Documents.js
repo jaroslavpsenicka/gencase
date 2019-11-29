@@ -14,7 +14,7 @@ const Documents = ({documents, documentsRef, dateFormat}) => {
   const inputDocumentRef = useRef(null); 
 
   const DocumentRow = ({document}) => (
-    <Row className="p-2 mb-1 mr-2 bg-white text-dark">
+    <Row className="p-2 mb-1 bg-white text-dark">
       <Col md={6} className="pl-2">
         <FontAwesomeIcon icon={faFilePdf}></FontAwesomeIcon>
         <span className="pl-2 text-primary font-weight-bold">{document.name}</span>
@@ -37,7 +37,7 @@ const Documents = ({documents, documentsRef, dateFormat}) => {
       <h5 className="pt-4" ref={documentsRef}>
         <input type="file" name="file" id="file" ref={inputDocumentRef} className="d-none" 
           onChange={(event) => onDocumentUpload(event)} />
-        <FontAwesomeIcon icon={faPlus} className="mr-4 float-right cursor-pointer text-success"
+        <FontAwesomeIcon icon={faPlus} className="mr-2 float-right cursor-pointer text-success"
           disabled = {documents.loading || documents.error}
           onClick = {() => inputDocumentRef.current.click()}/>
         Documents

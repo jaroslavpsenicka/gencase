@@ -46,18 +46,18 @@ const CaseDetailPage = ({modelId, id}) => {
       .catch(err => setComments({ loading: false, error: err }))
   }, [id]);
 
-  const updateData = (prev, thecase) => {
+  const updateData = (prev, id) => {
     return prev.data.map(row => {
-      return row.id === thecase.id ? {...row, starred: !row.starred} : row 
+      return row.id === id ? {...row, starred: !row.starred} : row 
     })
   }
 
-  const toggleStarred = (thecase) => {
-    Axios.put('http://localhost:8080/api/cases/' + thecase.id, { starred: !thecase.starred })
-      .then(resp => setCases(prev => {
-        const data = updateData(prev, thecase);
-        return { ...prev, data: data, byId: byId(data)}}))
-      .catch(err => console.log('cannot star', thecase, err));
+  const toggleStarred = (toggledCase) => {
+    Axios.put('http://localhost:8080/api/cases/' + theCase.data.id, { starred: !theCase.data.starred })
+      .then(resp => setTheCase(prev => {
+        return { ...prev, data: {...prev.data, starred: !prev.data.starred }}
+      }))
+      .catch(err => console.log('cannot star', toggledCase, err));
   }
 
   const CaseDetail = () => {
@@ -73,36 +73,36 @@ const CaseDetailPage = ({modelId, id}) => {
   )
 
   const CaseActions = () => (
-    <Container>
-      <Row className="mt-1 mb-1 mr-0">
-        <Col md={12} className="pr-2">
-          <Button className="float-right">Action</Button>
-        </Col>
-      </Row>
-    </Container>
+    <div className="ml-4 mb-2 float-right">
+      <Button className="ml-2">Action</Button>
+      <Button className="ml-2">Action</Button>
+      <Button className="ml-2">Action</Button>
+    </div>
   );
 
   const Case = () => (
     <div>
       <h4 className="text-muted font-weight-light text-uppercase">
         <FontAwesomeIcon icon={theCase.data.starred ? faStar : faStarOutline} 
-          className={ theCase.data.starred ? "text-success mr-4 float-right cursor-pointer" : 
-            "mr-4 float-right cursor-pointer" }
-          onClick={() => toggleStarred(theCase)}/>
+          className={ theCase.data.starred ? "text-success ml-4 float-right cursor-pointer" : 
+            "ml-4 float-right cursor-pointer" }
+          onClick={() => toggleStarred()}/>
         <FontAwesomeIcon icon={theCase.data.commented ? faComment : faCommentOutline} 
-          className="mr-4 float-right cursor-pointer" 
+          className="ml-4 float-right cursor-pointer text-success" 
           onClick={() => scrollToRef(commentsRef)}/>
         <FontAwesomeIcon icon={theCase.data.documents ? faFile : faFileOutline} 
-          className="mr-4 float-right cursor-pointer" 
+          className="ml-4 float-right cursor-pointer text-success" 
           onClick={() => scrollToRef(documentsRef)}/>
         { theCase.data.name }
       </h4>
       <h5 className="mb-4">
         <Badge variant="secondary">{theCase.data.state}</Badge>
       </h5>
-      <div>{theCase.data.description}</div>
-      <CaseActions />
-      <Row className="p-2 pl-3 mb-1 ml-0 mr-4 mt-3 bg-white text-dark">
+      <div className="mb-2 mh-50px">
+        <CaseActions />
+        <div>{theCase.data.description}</div>
+      </div>
+      <Row className="p-2 pl-3 mb-1 ml-0 mr-0 mt-3 bg-white text-dark">
         <CaseDetail />
       </Row>
       <Documents documents={documents} 
@@ -115,7 +115,7 @@ const CaseDetailPage = ({modelId, id}) => {
   )
 
   return (
-    <Container className="pt-4">
+    <Container className="pt-4 mr-4">
       {
         theCase.loading ? <Loading /> : 
         theCase.error ? <LoadingError error = { theCase.error }/> :  

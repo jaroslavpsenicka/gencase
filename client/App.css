@@ -20,12 +20,28 @@ body {
     overflow: hidden;  
 }
 
+.h-50px {
+    height: 50px;
+}
+
 .h-100px {
     height: 100px;
 }
 
 .h-150px {
     height: 150px;
+}
+
+.mh-50px {
+    min-height: 50px;
+}
+
+.mh-100px {
+    min-height: 100px;
+}
+
+.mh-150px {
+    min-height: 150px;
 }
 
 .b-2-ddd {
