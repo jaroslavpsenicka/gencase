@@ -1,0 +1,44 @@
+{
+  "$id": "common",
+  "definitions" : {
+
+    "FormatItem": {
+      "type": "object",
+      "required": ["name", "value"],
+      "properties": {
+        "name":         { "type": "string" },
+        "value":        { "type": "string" }
+      }
+    },
+
+    "Phase": {
+      "type": "object",
+      "required": ["name", "dataModel"],
+      "properties": {
+        "name":         { "type": "string" },
+        "description":  { "type": "string" },
+        "initial":      { "type": "boolean" },
+        "dataModel":    { "type": "string" }
+      }
+    },
+
+    "Entity": {
+      "type": "object",
+      "required": ["name", "description", "extends", "attributes"],
+      "properties": {
+        "name":         { "type": "string" },
+        "description":  { "type": "string" },
+        "extends":      { "type": "string" },
+        "attributes": {
+          "type": "array",
+          "items": [{ "$ref": "common/Attribute" }]
+        }      
+      }
+    },
+
+    "Attribute": {
+
+    }
+    
+  }
+}
