@@ -20,17 +20,20 @@ app.use(bodyParser.json()); // parse application/json
 app.use(bodyParser.json({ type: 'application/vnd.api+json' })); // parse application/vnd.api+json as json
 app.use(methodOverride('X-HTTP-Method-Override')); // override with the X-HTTP-Method-Override header in the request
 app.use(mask(['_id', '__v']));
-app.use(function(err, req, res, next) {
-  res.status(500);
-  res.render('error', { error: err });
-});
 
 app.use(express.static(path.join(__dirname, '../dist')));
 
 require('./routes.js')(app);
+
 app.get('*', function(req, res) {
     console.log(path.resolve(__dirname, '../dist/index.html'));
     res.sendFile(path.resolve(__dirname, '../dist/index.html'));                               
+});
+
+app.use((err, req, res, next) => {
+  console.log(err);
+  res.status(500);
+  res.json({ error: err.message ? err.message : err });
 });
 
 app.listen(process.env.PORT || 8080);
