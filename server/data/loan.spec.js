@@ -130,6 +130,25 @@ module.exports = {
       }]
     }]
   }],
+  states: {
+    init: 'new',
+    transitions: [{ 
+      name: 'toIdentification', 
+      label: 'Identify client',
+      from: 'new', 
+      to: 'identification' 
+    }, { 
+      name: 'toBasicApproval',
+      label: 'Start approval',
+      style: 'warning', 
+      from: 'identification', 
+      to: 'basicApproval' 
+    }, { 
+      name: 'cancelBasicApproval', 
+      from: 'basicApproval', 
+      to: 'identification' 
+    }]
+  },
   phases: [{
     name: 'Request and identification',
     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vel massa tempor, eleifend erat non, euismod dolor. Cras non nibh mauris. In dapibus nunc in tortor vestibulum, nec fermentum nulla tincidunt. In et tincidunt erat, a laoreet mauris.',

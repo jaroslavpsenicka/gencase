@@ -4,6 +4,7 @@ const HandlebarsDateFormat = require('handlebars-dateformat')
 const ObjectId = require('mongoose').Types.ObjectId;
 const Case = require('../model/case');
 const Model = require('../model/model');
+const StateMachine = require('javascript-state-machine');
 
 const hash = new Hashids();
 
@@ -161,4 +162,91 @@ module.exports = function (app) {
 			});
 	});
 
-};
+	// get case actions
+	
+	app.get('/api/cases/:id/actions', (req, res) => {
+		console.log("Getting actions of case", req.params.id);
+		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
+			.populate("model")
+			.exec((err, data) => {
+				if (err) throw err;
+
+				// if the transition is running, allow cancelling only
+				// otherwise list all transitions and show them as actions
+
+				if (data.transition) {
+					const tspec = data.model.spec.states.transitions.find(t => t.name === data.transition)
+					res.status(200).json([{
+						name: data.transition,
+						label: 'Cancel ' + tspec.to,
+						to: tspec.to,
+						cancel: true 
+					}]);
+				} else {
+					const sm = new StateMachine({
+						init: data.state,
+						transitions: data.model.spec.states.transitions
+					});	
+					const transitions = sm.transitions() || [];
+					res.status(200).json(transitions.map(tn => {
+						return data.model.spec.states.transitions.find(t => {
+							return t.name === tn;
+						});
+					}));
+				}
+			});
+	});	
+
+	// perform case action
+	
+	app.post('/api/cases/:id/actions/:action', (req, res) => {
+		console.log("Performing action", req.params.action, 'on case', req.params.id);
+		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
+			.populate("model")
+			.exec((err, data) => {
+				if (err) throw err;
+
+				// verify the action is valid first, then perform transition
+
+				const sm = new StateMachine({
+					init: data.state,
+					transitions: data.model.spec.states.transitions
+				});	
+				const transitions = sm.transitions() || [];
+				if (!transitions.find(t => t === req.params.action)) {
+					res.status(400).json({ error: 'illegal action ' + req.params.action });
+				}
+
+				data.transition = req.params.action;
+				data.save();
+				res.status(204).send();
+			});
+	});
+
+	// cancel transition
+
+	app.delete('/api/cases/:id/transitions/:transition', (req, res) => {
+		console.log("Cancelling transition", req.params.transition, 'on case', req.params.id);
+		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
+			.populate("model")
+			.exec((err, data) => {
+				if (err) throw err;
+
+					// verify the transition is valid first, then reset the transition
+
+				const sm = new StateMachine({
+					init: data.state,
+					transitions: data.model.spec.states.transitions
+				});	
+				const transitions = sm.transitions() || [];
+				if (!transitions.find(t => t === req.params.transition)) {
+					res.status(400).json({ error: 'illegal transition ' + req.params.transition });
+				}
+			
+				data.transition = undefined;
+				data.save();
+				res.status(204).send();
+			});
+	});
+
+}

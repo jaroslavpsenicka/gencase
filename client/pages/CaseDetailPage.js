@@ -14,9 +14,9 @@ import Axios from 'axios';
 
 import Loading from '../components/Loading';
 import LoadingError from '../components/LoadingError'
-import { byId } from '../ContextUtils';
 import Documents from '../components/Documents';
 import Comments from '../components/Comments';
+import CaseActions from '../components/CaseActions';
 
 const scrollToRef = (ref) => window.scrollTo(0, ref.current.offsetTop);   
 
@@ -25,6 +25,7 @@ const CaseDetailPage = ({modelId, id}) => {
   const [ theCase, setTheCase ] = useState({ loading: true });
   const [ documents, setDocuments ] = useState({ loading: true });
   const [ comments, setComments ] = useState({ loading: true });
+  const [ actions, setActions ] = useState({ loading: true });
 
   const commentsRef = useRef(null);
   const documentsRef = useRef(null);
@@ -44,6 +45,11 @@ const CaseDetailPage = ({modelId, id}) => {
     Axios.get('http://localhost:8080/api/cases/' + id + '/comments')
       .then(response => setComments({ loading: false, data: response.data }))
       .catch(err => setComments({ loading: false, error: err }))
+  }, [id]);
+  useEffect(() => {
+    Axios.get('http://localhost:8080/api/cases/' + id + '/actions')
+      .then(response => setActions({ loading: false, data: response.data }))
+      .catch(err => setActions({ loading: false, error: err }))
   }, [id]);
 
   const updateData = (prev, id) => {
@@ -72,14 +78,6 @@ const CaseDetailPage = ({modelId, id}) => {
     </>
   )
 
-  const CaseActions = () => (
-    <div className="ml-4 mb-2 float-right">
-      <Button className="ml-2">Action</Button>
-      <Button className="ml-2">Action</Button>
-      <Button className="ml-2">Action</Button>
-    </div>
-  );
-
   const Case = () => (
     <div>
       <h4 className="text-muted font-weight-light text-uppercase">
@@ -99,7 +97,7 @@ const CaseDetailPage = ({modelId, id}) => {
         <Badge variant="secondary">{theCase.data.state}</Badge>
       </h5>
       <div className="mb-2 mh-50px">
-        <CaseActions />
+        <CaseActions caseId={id} actions={actions} setActions={setActions}/>
         <div>{theCase.data.description}</div>
       </div>
       <Row className="p-2 pl-3 mb-1 ml-0 mr-0 mt-3 bg-white text-dark">

@@ -13,5 +13,6 @@ module.exports = mongoose.model('Case', {
 	updatedAt: 		{ type: Date },
   description: 	{ type: String },
 	starred: 			{ type: Boolean, value: false },
-	state:				{ type: String }
+	state:				{ type: String },
+	transition:		{ type: String }
 });
