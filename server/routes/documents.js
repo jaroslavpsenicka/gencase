@@ -2,7 +2,9 @@ const Hashids = require('hashids/cjs');
 const multer = require('multer');
 const ObjectId = require('mongoose').Types.ObjectId; 
 const Document = require('../model/document');
+const log4js = require('log4js');
 
+const logger = log4js.getLogger();
 const hash = new Hashids();
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -11,7 +13,7 @@ module.exports = function (app) {
 	// get case documents
 
 	app.get('/api/cases/:id/documents', (req, res) => {
-		console.log("Getting documents of case", req.params.id);
+		logger.info(req.params.id, "- reading documents");
 		Document.find({ case: new ObjectId(hash.decodeHex(req.params.id))})
 			.select('-_id -contents') 
 			.exec((err, data) => {
@@ -23,7 +25,7 @@ module.exports = function (app) {
 	// upload new document
 
 	app.post('/api/cases/:id/documents', upload.single("file"), (req, res) => {
-		console.log("Uploading document", req.file.originalname, "to", req.params.id);
+		logger.info(req.params.id, "uploading document", req.file.originalname);
 		const nid = new ObjectId();
 		try {
 			Document.create({

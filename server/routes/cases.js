@@ -1,66 +1,34 @@
 const Hashids = require('hashids/cjs');
-const Handlebars = require('handlebars');
-const HandlebarsDateFormat = require('handlebars-dateformat')
 const ObjectId = require('mongoose').Types.ObjectId;
 const Case = require('../model/case');
 const Model = require('../model/model');
 const StateMachine = require('javascript-state-machine');
+const Axios = require('axios');
+const log4js = require('log4js');
 
+const logger = log4js.getLogger();
 const hash = new Hashids();
+const Formatter = require('../formatters');
 
-Handlebars.registerHelper('dateFormat', HandlebarsDateFormat);
-
-const toObject = (map) => {
-	const obj = {};
-	map.forEach ((v,k) => { obj[k] = v });
-	return obj;
-}
-
-const toArray = (obj) => {
-	const arr = [];
-	Object.keys(obj).forEach(k => arr[k] = obj[k]);
-	return arr;
-}
-
-const formatCaseList = (caseObject, model) => {
-	return {
-		...caseObject._doc,
-		name: model.nameFormat ? formatValue(model.nameFormat, caseObject) : caseObject.name,
-		description: model.descriptionFormat ? formatValue(model.descriptionFormat, caseObject) : caseObject.description
+const HTTP_CONFIG = {
+	headers: {
+		'Content-Type': 'application/json'
 	}
-}
+};
 
-const formatCase = (caseObject, model) => {
-	return {
-		...formatCaseList(caseObject, model),
-		detail: model.detailFormat ? formatCaseDetail(caseObject, model) : toArray(toObject(caseObject.data))
-	}
-}
+const validateModel = (model) => {
+	const initialPhase = model.spec.phases.find(p => p.initial);			
+	if (!initialPhase) throw "no initial phase defined for " + model.name;
 
-const formatCaseOverview = (caseObject, model) => {
-	return model.overviewFormat.map(f => {
-		return {
-			name: f.name,
-			value: f.value && f.value.indexOf('{{') > -1 ? 
-				Handlebars.compile(f.value)({...caseObject._doc, data: toObject(caseObject.data)}) : 
-				caseObject[f.value]
-		}
+	const entity = model.spec.entities.find(e => e.name == initialPhase.dataModel);
+	if (!entity) throw "entity '" + initialPhase.dataModel + "' not defined"
+
+	const requiredAttributes = entity.attributes.filter(a => a.notEmpty);
+	requiredAttributes.forEach(a => {
+		const value = req.body[a.name];
+		if (value) data.set(a.name, value);	
+		else throw "required attribute '" + a.name + "' not given";
 	});
-}
-
-const formatCaseDetail = (caseObject, model) => {
-	return model.detailFormat.map(f => {
-		return {
-			name: f.name,
-			value: f.value && f.value.indexOf('{{') > -1 ? 
-				Handlebars.compile(f.value)({...caseObject._doc, data: toObject(caseObject.data)}) : 
-				caseObject[f.value]
-		}
-	});
-}
-
-const formatValue = (format, caseObject) => {
-	return Handlebars.compile(format)({...caseObject._doc, data: toObject(caseObject.data)});
 }
 
 module.exports = function (app) {
@@ -68,12 +36,12 @@ module.exports = function (app) {
 	// get cases	
 	
 	app.get('/api/models/:id/cases', (req, res) => {
-		console.log("Querying cases of", req.params.id);
+		logger.info(req.params.id, "- querying cases");
 		Case.find({model: new ObjectId(hash.decodeHex(req.params.id))})
 			.populate("model")
 			.exec((err, data) => {
 				if (err) throw err;
-				res.status(200).send(data.map(m => formatCaseList(m, m.model.spec)));
+				res.status(200).send(data.map(m => Formatter.formatCaseList(m, m.model.spec)));
 			});
 	});
 
@@ -83,29 +51,16 @@ module.exports = function (app) {
 		console.log("Create case of", req.params.id);
 		Model.findById(new ObjectId(hash.decodeHex(req.params.id)), (err, model) => {
 			if (err) throw err;
-			const data = new Map([]);
 
 			try {
-
-				const initialPhase = model.spec.phases.find(p => p.initial);			
-				if (!initialPhase) throw "no initial phase defined for " + model.name;
-			
-				const entity = model.spec.entities.find(e => e.name == initialPhase.dataModel);
-				if (!entity) throw "entity '" + initialPhase.dataModel + "' not defined"
-
-				const requiredAttributes = entity.attributes.filter(a => a.notEmpty);
-				requiredAttributes.forEach(a => {
-					const value = req.body[a.name];
-					if (value) data.set(a.name, value);	
-					else throw "required attribute '" + a.name + "' not given";
-				});
-
+				validateModel(model);
 			} catch (error) {
 				return res.status(400).json({
 					error: error
 				});
 			} 
 
+			const data = new Map([]);
 			const caseId = new ObjectId();	
 			console.log('Creating case', caseId, data);
 			Case.create({ _id: caseId, 
@@ -128,19 +83,19 @@ module.exports = function (app) {
 	// get case data
 
 	app.get('/api/cases/:id', (req, res) => {
-		console.log("Getting case", req.params.id);
+		logger.info(req.params.id, "- reading case");
 		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
 			.populate("model")
 			.exec((err, data) => {
 				if (err) throw err;
-				res.status(200).send(formatCase(data, data.model.spec));
+				res.status(200).send(Formatter.formatCase(data, data.model.spec));
 			});
 	});
 
 	// update case
 
 	app.put('/api/cases/:id', (req, res) => {
-		console.log("Updating case", req.params.id, req.body);
+		logger.info(req.params.id, "- updating case:", req.body);
 		Case.findByIdAndUpdate(hash.decodeHex(req.params.id), {
 			...req.body,
 			updatedAt: new Date()
@@ -153,19 +108,19 @@ module.exports = function (app) {
 	// get case detail data
 
 	app.get('/api/cases/:id/overview', (req, res) => {
-		console.log("Getting overview of case", req.params.id);
+		logger.info(req.params.id, "- reading overview");
 		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
 			.populate("model")
 			.exec((err, data) => {
 				if (err) throw err;
-				res.status(200).send(formatCaseOverview(data, data.model.spec));
+				res.status(200).send(Formatter.formatCaseOverview(data, data.model.spec));
 			});
 	});
 
 	// get case actions
 	
 	app.get('/api/cases/:id/actions', (req, res) => {
-		console.log("Getting actions of case", req.params.id);
+		logger.info(req.params.id, "- reading actions");
 		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
 			.populate("model")
 			.exec((err, data) => {
@@ -200,13 +155,13 @@ module.exports = function (app) {
 	// perform case action
 	
 	app.post('/api/cases/:id/actions/:action', (req, res) => {
-		console.log("Performing action", req.params.action, 'on case', req.params.id);
+		logger.info(req.params.id, "- performing action", req.params.action);
 		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
 			.populate("model")
 			.exec((err, data) => {
 				if (err) throw err;
 
-				// verify the action is valid first, then perform transition
+				// verify the action is valid first
 
 				const sm = new StateMachine({
 					init: data.state,
@@ -215,18 +170,57 @@ module.exports = function (app) {
 				const transitions = sm.transitions() || [];
 				if (!transitions.find(t => t === req.params.action)) {
 					res.status(400).json({ error: 'illegal action ' + req.params.action });
+					return;
 				}
 
-				data.transition = req.params.action;
-				data.save();
-				res.status(204).send();
+				// then perform transition
+
+				const transition = data.model.spec.states.transitions.find(t => t.name === req.params.action);
+				const url = Formatter.formatProcessUrl(data, transition.url);
+				const payload = Formatter.formatProcessBody(data, transition.payload);
+				Axios.post(url, payload, HTTP_CONFIG)
+					.then(() => {
+						data.transition = req.params.action;
+						data.save(err => {
+							if (err) throw err;
+							res.status(204).send()});
+						})
+					.catch(err => res.status(500).json({ error: err.message ? err.message : err }));
 			});
 	});
 
-	// cancel transition
+	// receive action callback
 
-	app.delete('/api/cases/:id/transitions/:transition', (req, res) => {
-		console.log("Cancelling transition", req.params.transition, 'on case', req.params.id);
+	app.post('/api/cases/:id/actions/:action/callback', (req, res) => {
+		logger.info(req.params.id, "- action callback", req.params.action);
+		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
+			.populate("model")
+			.exec((err, data) => {
+				if (err) throw err;
+
+				// verify the action is valid first
+
+				if (data.transition !== req.params.action) {
+					res.status(400).json({ error: 'illegal action ' + req.params.action });
+					return;
+				}
+
+				// then switch to new state
+
+				const transition = data.model.spec.states.transitions.find(t => t.name === req.params.action);
+				data.transition = undefined;
+				data.state = transition.to;
+				data.save(err => {
+					if (err) throw err;
+					res.status(204).send();
+				});
+			})
+	});
+
+	// cancel action
+
+	app.delete('/api/cases/:id/actions/:action', (req, res) => {
+		logger.info(req.params.id, "- cancelling action", req.params.action);
 		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
 			.populate("model")
 			.exec((err, data) => {
@@ -234,18 +228,18 @@ module.exports = function (app) {
 
 					// verify the transition is valid first, then reset the transition
 
-				const sm = new StateMachine({
-					init: data.state,
-					transitions: data.model.spec.states.transitions
-				});	
-				const transitions = sm.transitions() || [];
-				if (!transitions.find(t => t === req.params.transition)) {
-					res.status(400).json({ error: 'illegal transition ' + req.params.transition });
+				if (data.transition !== req.params.action) {
+					res.status(400).json({ error: 'illegal action ' + req.params.action });
+					return;
 				}
-			
+				
+				// then simply reset the transition
+
 				data.transition = undefined;
-				data.save();
-				res.status(204).send();
+				data.save(err => {
+					if (err) throw err;
+					res.status(204).send();
+				});
 			});
 	});
 

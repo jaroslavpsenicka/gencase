@@ -1,22 +1,15 @@
 const express = require('express');
 const cors = require('cors')
-const mongoose = require('mongoose');
-const config = require('./config');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 const mask = require('mongoosemask');
 const path = require('path');
-const log4js = require('log4js');
+const sleep = require('sleep'); 
+const Axios = require('axios');
 
 const app = express();
-const logger = log4js.getLogger();
 
-log4js.configure(config.log4js);
-mongoose.connect(config.database.url, { useNewUrlParser: true, useUnifiedTopology: true });
-mongoose.set('useFindAndModify', false);
-
-app.use(log4js.connectLogger(log4js.getLogger('access')));
 app.use(cors());
 app.use(morgan('combined')); // log every request to the console
 app.use(bodyParser.urlencoded({ 'extended': 'true' })); // parse application/x-www-form-urlencoded
@@ -27,17 +20,21 @@ app.use(mask(['_id', '__v']));
 
 app.use(express.static(path.join(__dirname, '../dist')));
 
-require('./routes.js')(app);
-
-app.get('*', function(req, res) {
-    console.log(path.resolve(__dirname, '../dist/index.html'));
-    res.sendFile(path.resolve(__dirname, '../dist/index.html'));                               
+app.post('/identify', (req, res) => {
+  console.log("Identification", req.body);
+  sleep.sleep(3);
+  setTimeout(() => {
+    Axios.post(req.body.callbackUrl, {
+      cid: Math.floor(Math.random())
+    })
+  }, 5000);
+  res.status(204).send();
 });
 
 app.use((err, req, res, next) => {
-  logger.error('root error handler', err);
+  console.log(err);
   res.status(500);
   res.json({ error: err.message ? err.message : err });
 });
 
-app.listen(process.env.PORT || 8080);
+app.listen(process.env.PORT || 8082);
