@@ -136,7 +136,14 @@ module.exports = {
       name: 'toIdentification', 
       label: 'Identify client',
       from: 'new', 
-      to: 'identification' 
+      to: 'identification',
+      url: 'http://localhost:8082/identify',
+      payload: {
+        'caseId': '{{id}}',
+        'callbackUrl': 'http://localhost:8080/api/cases/{{id}}/actions/toIdentification/callback',
+        'client': '{{data.clientName}}',
+        'pid': '{{data.personalId}}'
+      } 
     }, { 
       name: 'toBasicApproval',
       label: 'Start approval',
