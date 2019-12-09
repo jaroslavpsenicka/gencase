@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "server": "nodemon server/server.js",
+    "bpmsim": "nodemon bpmsim/server.js",
     "client": "cross-env NODE_ENV=development webpack-dev-server --hot --history-api-fallback",
     "build": "cross-env NODE_ENV=production webpack",
     "lint": "eslint ./client",
@@ -80,6 +81,7 @@
     "react-router-dom": "^5.1.2",
     "redux": "^4.0.1",
     "regenerator-runtime": "^0.13.3",
+    "sleep": "^6.1.0",
     "style-loader": "^1.0.0",
     "url-loader": "^2.2.0",
     "vertical-timeline-component-for-react": "^1.0.6",
