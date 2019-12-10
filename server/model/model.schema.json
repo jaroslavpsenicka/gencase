@@ -1,4 +1,5 @@
 {
+  "$id": "http://datacase.org/schemas/schema.json",
   "type": "object",
   "required": ["entities", "phases"],
   "properties": {
@@ -10,19 +11,19 @@
     },
     "overviewFormat": {
       "type": "array",
-      "items": [{ "$ref": "common/FormatItem" }]
+      "items": [{ "$ref": "common.json#/definitions/FormatItem" }]
     },
     "detailFormat": {
       "type": "array",
-      "items": [{ "$ref": "common/FormatItem" }]
+      "items": [{ "$ref": "common.json#/definitions/FormatItem" }]
     },
     "entities": {
       "type": "array",
-      "items": [{ "$ref": "common/Entity"}]
+      "items": [{ "$ref": "common.json#/definitions/Entity"}]
    },
     "phases": {
       "type": "array",
-      "items": [{ "$ref": "common/Phase" }]
+      "items": [{ "$ref": "common.json#/definitions/Phase" }]
     }
   }
 }

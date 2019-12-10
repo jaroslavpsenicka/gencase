@@ -1,5 +1,6 @@
 const expect  = require('chai').expect;
 const request = require('request');
+const validModel = require('../data/loan.spec');
 
 const file = (value) => {
   return {
@@ -40,8 +41,8 @@ describe('Model', () => {
 
   it('upload model, empty', (done) => {
     request.post(file({}), (error, response, body) => {
-      expect(response.statusCode).to.equal(400);
       expect(JSON.parse(body).error).to.equal("should have required property \'entities\'");
+      expect(response.statusCode).to.equal(400);
       done();
     });
   });
@@ -69,6 +70,13 @@ describe('Model', () => {
     request.post(file(contents), (error, response, body) => {
       expect(response.statusCode).to.equal(400);
       expect(JSON.parse(body).error).to.equal("entities[0]: should have required property \'attributes\'");
+      done();
+    });
+  });
+
+  it('upload valid model', (done) => {
+    request.post(file(validModel), (error, response, body) => {
+      expect(response.statusCode).to.equal(201);
       done();
     });
   });

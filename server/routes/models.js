@@ -5,9 +5,16 @@ const Model = require('../model/model');
 const { ModelValidationError } = require('../errors');
 const Ajv = require('ajv');
 const fs = require('fs');
+const log4js = require('log4js');
+const getStream = require('get-stream')
 
+const logger = log4js.getLogger();
 const hash = new Hashids();
-const upload = multer({ storage: multer.memoryStorage() });
+const disk = multer.diskStorage({
+	destination: function (req, file, cb) { cb(null, '/tmp')},
+  filename: function (req, file, cb) { cb(null, file.fieldname + '-' + Date.now())}
+});
+const upload = multer({ storage: disk });
 const ajv = Ajv({ allErrors: true, removeAdditional: 'all' });
 
 const schemaFileExt = '.schema.json'
@@ -17,7 +24,7 @@ fs.readdir('./server/model', (err, files) => {
   files.forEach(file => {
     if (file.endsWith(schemaFileExt)) {
 			const schemaName = file.substring(0, file.length - schemaFileExt.length);
-			console.log('registering', schemaName, 'schema');
+			logger.info('registering', schemaName, 'schema');
 			ajv.addSchema(require('../model/' + file), schemaName);
 		}
   });
@@ -30,6 +37,8 @@ const parseAndValidate = (payload) => {
 		const path = ajv.errors[0].dataPath ? ajv.errors[0].dataPath.substring(1) + ": " : "";
 		throw new ModelValidationError(path + ajv.errors[0].message);
 	}
+
+	return json;
 }
 
 module.exports = function (app) {
@@ -37,14 +46,14 @@ module.exports = function (app) {
 	// upload model
 
 	app.post('/api/models', upload.single("file"), (req, res) => {
-		console.log("Uploading model", req.file.originalname);
+		logger.info("uploading model", req.file.originalname);
 		const nid = new ObjectId();
 		try {
-			const payload = parseAndValidate(req.file.buffer);
+			const payload = parseAndValidate(fs.readFileSync(req.file.path).toString());
 			Model.create({
 				_id: nid,
 				id: hash.encodeHex(nid.toHexString()), 			
-				name: payload.name,
+				name: payload.name ? payload.name : nid,
 				revision: 1,
 				createdAt: new Date(),
 				spec: payload
@@ -62,7 +71,7 @@ module.exports = function (app) {
 	// get models
 	
 	app.get('/api/models', (req, res) => {
-		console.log("Retrieving models");
+		logger.info("retrieving models");
 		Model.find()
 			.select('-_id')
 			.exec((err, models) => {
@@ -74,7 +83,7 @@ module.exports = function (app) {
 	// update model
 	
 	app.put('/api/models/:id', (req, res) => {
-		console.log("Updating model", req.params.id, req.body);
+		logger.info(req.params.id, "- updating model", req.body);
 		Model.findByIdAndUpdate(hash.decodeHex(req.params.id), {
 			...req.body, 
 			updatedAt: new Date()

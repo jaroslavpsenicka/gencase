@@ -30,6 +30,7 @@
     "eslint-plugin-react-hooks": "^1.7.0",
     "mocha": "^6.2.2",
     "nodemon": "^1.19.1",
+    "nyc": "^14.1.1",
     "request": "^2.88.0",
     "webpack-cli": "^3.3.9",
     "webpack-dev-server": "^3.8.2"
@@ -55,6 +56,7 @@
     "express": "^4.17.1",
     "file-loader": "^4.2.0",
     "font-awesome": "^4.7.0",
+    "get-stream": "^5.1.0",
     "handlebars": "^4.5.1",
     "handlebars-dateformat": "^1.1.1",
     "hashids": "^2.0.1",

@@ -28,6 +28,7 @@
 */
 
 module.exports = {  
+  name: 'loan',
   nameFormat: "{{data.clientName}}'s loan",
 	descriptionFormat: 'Lovely {{data.loanAmount}} CZK',
   overviewFormat: [{

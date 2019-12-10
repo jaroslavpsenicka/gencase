@@ -1,5 +1,5 @@
 {
-  "$id": "common",
+  "$id": "http://datacase.org/schemas/common.json",
   "definitions" : {
 
     "FormatItem": {
@@ -24,14 +24,14 @@
 
     "Entity": {
       "type": "object",
-      "required": ["name", "description", "extends", "attributes"],
+      "required": ["name", "attributes"],
       "properties": {
         "name":         { "type": "string" },
         "description":  { "type": "string" },
         "extends":      { "type": "string" },
         "attributes": {
           "type": "array",
-          "items": [{ "$ref": "common/Attribute" }]
+          "items": [{ "$ref": "#/definitions/Attribute" }]
         }      
       }
     },
