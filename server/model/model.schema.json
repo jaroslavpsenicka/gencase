@@ -1,8 +1,11 @@
 {
   "$id": "http://datacase.org/schemas/schema.json",
   "type": "object",
-  "required": ["entities", "phases"],
+  "required": ["name", "entities", "phases"],
   "properties": {
+    "name": {
+      "type": "string"
+    },
     "nameFormat": {
       "type": "string"
     },

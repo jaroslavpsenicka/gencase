@@ -53,7 +53,7 @@ module.exports = function (app) {
 			Model.create({
 				_id: nid,
 				id: hash.encodeHex(nid.toHexString()), 			
-				name: payload.name ? payload.name : nid,
+				name: payload.name,
 				revision: 1,
 				createdAt: new Date(),
 				spec: payload

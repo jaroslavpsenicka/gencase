@@ -41,32 +41,23 @@ describe('Model', () => {
 
   it('upload model, empty', (done) => {
     request.post(file({}), (error, response, body) => {
-      expect(JSON.parse(body).error).to.equal("should have required property \'entities\'");
+      expect(JSON.parse(body).error).to.equal("should have required property \'name\'");
       expect(response.statusCode).to.equal(400);
       done();
     });
   });
 
-  it('upload model, no entities', (done) => {
-    const contents = { phases: [] };
+  it('upload model, only name', (done) => {
+    const contents = { name: "name" };
     request.post(file(contents), (error, response, body) => {
       expect(response.statusCode).to.equal(400);
       expect(JSON.parse(body).error).to.equal("should have required property \'entities\'");
-      done();
-    });
-  });
-
-  it('upload model, no phases', (done) => {
-    const contents = { entities: [] };
-    request.post(file(contents), (error, response, body) => {
-      expect(response.statusCode).to.equal(400);
-      expect(JSON.parse(body).error).to.equal("should have required property \'phases\'");
       done();
     });
   });
 
   it('upload model, empty entity', (done) => {
-    const contents = { phases: [{ name: "P1"}], entities: [{ name: "E1"}] };
+    const contents = { name: "name", phases: [{ name: "P1"}], entities: [{ name: "E1"}] };
     request.post(file(contents), (error, response, body) => {
       expect(response.statusCode).to.equal(400);
       expect(JSON.parse(body).error).to.equal("entities[0]: should have required property \'attributes\'");
