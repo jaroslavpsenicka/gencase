@@ -25,7 +25,7 @@ describe('Model', () => {
     request.get('http://localhost:8080/api/models' , (error, response) => {
       expect(response.statusCode).to.equal(200);
       const json = JSON.parse(response.body);
-      expect(json.length).to.equals(3);
+      expect(json.length).to.greaterThan(0);
       model = json[0];
       done();
     });
@@ -67,7 +67,16 @@ describe('Model', () => {
 
   it('upload valid model', (done) => {
     request.post(file(validModel), (error, response, body) => {
+      model = JSON.parse(body);
+      expect(model).to.not.be.null;
       expect(response.statusCode).to.equal(201);
+      done();
+    });
+  });
+
+  it('get uploaded model', (done) => {
+    request.get('http://localhost:8080/api/models/' + model.id, (error, response, body) => {
+      expect(response.statusCode).to.equal(200);
       done();
     });
   });

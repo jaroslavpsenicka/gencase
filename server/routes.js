@@ -38,17 +38,6 @@ Model.deleteMany({}, (err) => {
 			entities: []
 		} 
 	});	
-	Model.create({ _id: test, 
-		id: hash.encodeHex(test.toHexString()),  
-		name: 'Test', 
-		description: 'A brand new product for the rest of us.', 
-		revision: 1, 
-		createdBy: 'Jane Doe',
-		spec: {
-			phases: [],
-			entities: []
-		} 
-	});	
 });
 
 console.log("Creating test cases");

@@ -72,14 +72,22 @@ module.exports = function (app) {
 	
 	app.get('/api/models', (req, res) => {
 		logger.info("retrieving models");
-		Model.find()
-			.select('-_id')
-			.exec((err, models) => {
-				if (err) throw err;
-				res.status(200).send(models);
-			});
+		Model.find((err, models) => {
+			if (err) throw err;
+			res.status(200).send(models);
+		});
 	});
 
+	// get one model
+
+	app.get('/api/models/:model', (req, res) => {
+		logger.info(req.params.model, "retrieving model");
+		Model.findOne((err, model) => {
+			if (err) throw err;
+			res.status(200).send(model);
+		});
+	});
+	
 	// update model
 	
 	app.put('/api/models/:id', (req, res) => {
