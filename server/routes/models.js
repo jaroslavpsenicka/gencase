@@ -5,10 +5,7 @@ const Model = require('../model/model');
 const { ModelValidationError } = require('../errors');
 const Ajv = require('ajv');
 const fs = require('fs');
-const log4js = require('log4js');
-const getStream = require('get-stream')
 
-const logger = log4js.getLogger();
 const hash = new Hashids();
 const disk = multer.diskStorage({
 	destination: function (req, file, cb) { cb(null, '/tmp')},
@@ -24,7 +21,6 @@ fs.readdir('./server/model', (err, files) => {
   files.forEach(file => {
     if (file.endsWith(schemaFileExt)) {
 			const schemaName = file.substring(0, file.length - schemaFileExt.length);
-			logger.info('registering', schemaName, 'schema');
 			ajv.addSchema(require('../model/' + file), schemaName);
 		}
   });
@@ -46,7 +42,6 @@ module.exports = function (app) {
 	// upload model
 
 	app.post('/api/models', upload.single("file"), (req, res) => {
-		logger.info("uploading model", req.file.originalname);
 		const nid = new ObjectId();
 		try {
 			const payload = parseAndValidate(fs.readFileSync(req.file.path).toString());
@@ -71,17 +66,15 @@ module.exports = function (app) {
 	// get models
 	
 	app.get('/api/models', (req, res) => {
-		logger.info("retrieving models");
 		Model.find((err, models) => {
 			if (err) throw err;
 			res.status(200).send(models);
 		});
 	});
 
-	// get one model
+	// get model by id
 
 	app.get('/api/models/:model', (req, res) => {
-		logger.info(req.params.model, "retrieving model");
 		Model.findOne((err, model) => {
 			if (err) throw err;
 			res.status(200).send(model);
@@ -91,7 +84,6 @@ module.exports = function (app) {
 	// update model
 	
 	app.put('/api/models/:id', (req, res) => {
-		logger.info(req.params.id, "- updating model", req.body);
 		Model.findByIdAndUpdate(hash.decodeHex(req.params.id), {
 			...req.body, 
 			updatedAt: new Date()

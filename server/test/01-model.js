@@ -19,7 +19,7 @@ const file = (value) => {
 
 describe('Model', () => {
 
-  var model = undefined;
+  var model;
 
   it('query models', (done) => {
     request.get('http://localhost:8080/api/models' , (error, response) => {

@@ -8,14 +8,22 @@ module.exports = {
 	log4js: {
 		appenders: { 
 			console: { 
-				type: 'console' 
+				type: 'stdout',
+				layout: { 
+					type: "colored" 
+				} 
 			}
 		},
 		categories: { 
 			default: { 
 				appenders: ['console'], 
-				level: 'info' 
+				level: process.env.LOG_LEVEL || 'debug' 
 			}
 		}
+	},
+	express: {
+		level: 'info',
+		format: (req, res, format) => format(`:remote-addr :method :url ${JSON.stringify(req.body)} - :status`),
+		statusRules: [{ from: 200, to: 399, level: 'info' }, { from: 400, to: 599, level: 'warn' }]
 	}
 };

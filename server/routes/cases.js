@@ -4,9 +4,7 @@ const Case = require('../model/case');
 const Model = require('../model/model');
 const StateMachine = require('javascript-state-machine');
 const Axios = require('axios');
-const log4js = require('log4js');
 
-const logger = log4js.getLogger();
 const hash = new Hashids();
 const Formatter = require('../formatters');
 
@@ -16,7 +14,7 @@ const HTTP_CONFIG = {
 	}
 };
 
-const validateModel = (model) => {
+const validateModel = (model, values, data) => {
 	const initialPhase = model.spec.phases.find(p => p.initial);			
 	if (!initialPhase) throw "no initial phase defined for " + model.name;
 
@@ -25,9 +23,9 @@ const validateModel = (model) => {
 
 	const requiredAttributes = entity.attributes.filter(a => a.notEmpty);
 	requiredAttributes.forEach(a => {
-		const value = req.body[a.name];
+		const value = values[a.name];
 		if (value) data.set(a.name, value);	
-		else throw "required attribute '" + a.name + "' not given";
+		else throw "should have required property '" + a.name + "'";
 	});
 }
 
@@ -36,7 +34,6 @@ module.exports = function (app) {
 	// get cases	
 	
 	app.get('/api/models/:id/cases', (req, res) => {
-		logger.info(req.params.id, "- querying cases");
 		Case.find({model: new ObjectId(hash.decodeHex(req.params.id))})
 			.populate("model")
 			.exec((err, data) => {
@@ -48,21 +45,23 @@ module.exports = function (app) {
 	// create a new case
 
 	app.post('/api/models/:id/cases', (req, res) => {
-		console.log("Create case of", req.params.id);
 		Model.findById(new ObjectId(hash.decodeHex(req.params.id)), (err, model) => {
 			if (err) throw err;
+			const data = new Map([]);
+
+			// Validate input against initial phase model
 
 			try {
-				validateModel(model);
+				validateModel(model, req.body, data);
 			} catch (error) {
 				return res.status(400).json({
 					error: error
 				});
 			} 
 
-			const data = new Map([]);
+			// Then create data entity
+
 			const caseId = new ObjectId();	
-			console.log('Creating case', caseId, data);
 			Case.create({ _id: caseId, 
 				id: hash.encodeHex(caseId.toHexString()),  
 				name: "Case " + caseId, 
@@ -72,9 +71,10 @@ module.exports = function (app) {
 				createdAt: new Date(),
 				model: model._id,
 				data: data
-			}, (err, data) => {
+			}, (err, caseObject) => {
 				if (err) throw err;
-				res.status(200).send(data);
+				const resp = { ...caseObject.toObject(), data: Formatter.toObject(caseObject.get('data')) };
+				res.status(200).send(resp);
 			});	
 		
 		});
@@ -83,7 +83,6 @@ module.exports = function (app) {
 	// get case data
 
 	app.get('/api/cases/:id', (req, res) => {
-		logger.info(req.params.id, "- reading case");
 		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
 			.populate("model")
 			.exec((err, data) => {
@@ -95,7 +94,6 @@ module.exports = function (app) {
 	// update case
 
 	app.put('/api/cases/:id', (req, res) => {
-		logger.info(req.params.id, "- updating case:", req.body);
 		Case.findByIdAndUpdate(hash.decodeHex(req.params.id), {
 			...req.body,
 			updatedAt: new Date()
@@ -108,7 +106,6 @@ module.exports = function (app) {
 	// get case detail data
 
 	app.get('/api/cases/:id/overview', (req, res) => {
-		logger.info(req.params.id, "- reading overview");
 		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
 			.populate("model")
 			.exec((err, data) => {
@@ -120,7 +117,6 @@ module.exports = function (app) {
 	// get case actions
 	
 	app.get('/api/cases/:id/actions', (req, res) => {
-		logger.info(req.params.id, "- reading actions");
 		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
 			.populate("model")
 			.exec((err, data) => {
@@ -155,7 +151,6 @@ module.exports = function (app) {
 	// perform case action
 	
 	app.post('/api/cases/:id/actions/:action', (req, res) => {
-		logger.info(req.params.id, "- performing action", req.params.action);
 		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
 			.populate("model")
 			.exec((err, data) => {
@@ -192,7 +187,6 @@ module.exports = function (app) {
 	// receive action callback
 
 	app.post('/api/cases/:id/actions/:action/callback', (req, res) => {
-		logger.info(req.params.id, "- action callback", req.params.action);
 		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
 			.populate("model")
 			.exec((err, data) => {
@@ -220,7 +214,6 @@ module.exports = function (app) {
 	// cancel action
 
 	app.delete('/api/cases/:id/actions/:action', (req, res) => {
-		logger.info(req.params.id, "- cancelling action", req.params.action);
 		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
 			.populate("model")
 			.exec((err, data) => {

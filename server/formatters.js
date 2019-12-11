@@ -68,6 +68,7 @@ const formatValue = (format, caseObject) => {
 }
 
 module.exports = {
+	toObject,
   formatCaseList, formatCase, formatCaseOverview,
   formatProcessUrl, formatProcessBody
 } 

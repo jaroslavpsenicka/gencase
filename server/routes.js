@@ -13,7 +13,6 @@ const test = new ObjectId('000000000003');
 
 const loanSpec = require('./data/loan.spec.js');
 
-console.log("Creating test models");
 Model.deleteMany({}, (err) => {	
 	if (err) throw err;
 	Model.create({ _id: mortgage, 
@@ -40,7 +39,6 @@ Model.deleteMany({}, (err) => {
 	});	
 });
 
-console.log("Creating test cases");
 Case.deleteMany({}, (err) => {	
 	if (err) throw err;
 	const case1 = new ObjectId('000000000010');	
@@ -62,7 +60,6 @@ Case.deleteMany({}, (err) => {
 	});	
 });
 
-console.log("Creating test documents");
 Document.deleteMany({}, (err) => {	
 	if (err) throw err;
 	const doc1 = new ObjectId('000000000100');	
@@ -78,7 +75,6 @@ Document.deleteMany({}, (err) => {
 	})
 });
 
-console.log("Creating test comments");
 Comment.deleteMany({}, (err) => {	
 	if (err) throw err;
 	const doc1 = new ObjectId('000000001000');	

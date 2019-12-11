@@ -16,9 +16,8 @@ log4js.configure(config.log4js);
 mongoose.connect(config.database.url, { useNewUrlParser: true, useUnifiedTopology: true });
 mongoose.set('useFindAndModify', false);
 
-app.use(log4js.connectLogger(log4js.getLogger('access')));
+app.use(log4js.connectLogger(log4js.getLogger('access'), config.express));
 app.use(cors());
-app.use(morgan('combined')); // log every request to the console
 app.use(bodyParser.urlencoded({ 'extended': 'true' })); // parse application/x-www-form-urlencoded
 app.use(bodyParser.json()); // parse application/json
 app.use(bodyParser.json({ type: 'application/vnd.api+json' })); // parse application/vnd.api+json as json
