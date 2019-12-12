@@ -26,9 +26,15 @@
       "type": "object",
       "required": ["name", "attributes"],
       "properties": {
-        "name":         { "type": "string" },
-        "description":  { "type": "string" },
-        "extends":      { "type": "string" },
+        "name": { 
+          "type": "string" 
+        },
+        "description": { 
+          "type": "string" 
+        },
+        "extends": { 
+          "type": "string" 
+        },
         "attributes": {
           "type": "array",
           "items": [{ "$ref": "#/definitions/Attribute" }]
@@ -36,9 +42,51 @@
       }
     },
 
-    "Attribute": {
+    "State": {
+      "type": "object",
+      "required": ["transitions"],
+      "properties": {
+        "transitions": {
+          "type": "array",
+          "items": [{ "$ref": "#/definitions/Transition" }]
+        }      
+      }
+    },
 
+    "Attribute": {
+      "type": "object",
+      "required": ["name", "type"],
+      "properties": {
+        "name": { 
+          "type": "string" 
+        },
+        "type": { 
+          "type": "string" 
+        }
+      }
+    },
+
+    "Transition": {
+      "type": "object",
+      "required": ["name", "label", "from", "to", "url"],
+      "properties": {
+        "name": { 
+          "type": "string" 
+        },
+        "label": { 
+          "type": "string" 
+        },
+        "from": { 
+          "type": "string" 
+        },
+        "to": { 
+          "type": "string" 
+        },
+        "url": { 
+          "type": "string" 
+        }      
+      }
     }
-    
+
   }
 }

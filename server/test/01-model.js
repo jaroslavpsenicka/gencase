@@ -32,9 +32,21 @@ describe('Model', () => {
   });
 
   it('update model', (done) => {
-    const payload = {...model, name: 'Loan' }
-    request.put('http://localhost:8080/api/models/' + model.id , payload, (error, response) => {
+    const contents = {...model, name: 'Loan' }
+    request.put({
+      uri: 'http://localhost:8080/api/models/' + model.id, 
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(contents)
+    }, (error, response) => {
       expect(response.statusCode).to.equal(204);
+      done();
+    });
+  });
+
+  it('verify updated model', (done) => {
+    request.get('http://localhost:8080/api/models/' + model.id, (error, response, body) => {
+      expect(JSON.parse(body).name).to.equal("Loan");
+      expect(response.statusCode).to.equal(200);
       done();
     });
   });
@@ -69,6 +81,7 @@ describe('Model', () => {
     request.post(file(validModel), (error, response, body) => {
       model = JSON.parse(body);
       expect(model).to.not.be.null;
+      if (response.statusCode != 201) console.log(body);
       expect(response.statusCode).to.equal(201);
       done();
     });

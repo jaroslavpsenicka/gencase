@@ -8,13 +8,14 @@ const Axios = require('axios');
 const hash = new Hashids();
 const Formatter = require('../formatters');
 
+const UPDATABLE_PROPERTIES = ['name', 'starred'];
 const HTTP_CONFIG = {
 	headers: {
 		'Content-Type': 'application/json'
 	}
 };
 
-const validateModel = (model, values, data) => {
+const validateAgainstModel = (model, values, data) => {
 	const initialPhase = model.spec.phases.find(p => p.initial);			
 	if (!initialPhase) throw "no initial phase defined for " + model.name;
 
@@ -52,11 +53,9 @@ module.exports = function (app) {
 			// Validate input against initial phase model
 
 			try {
-				validateModel(model, req.body, data);
+				validateAgainstModel(model, req.body, data);
 			} catch (error) {
-				return res.status(400).json({
-					error: error
-				});
+				return res.status(400).json({ error: error });
 			} 
 
 			// Then create data entity
@@ -70,6 +69,7 @@ module.exports = function (app) {
 				createdBy: 'Mary Doe',
 				createdAt: new Date(),
 				model: model._id,
+				state: model.spec.states.init,
 				data: data
 			}, (err, caseObject) => {
 				if (err) throw err;
@@ -94,12 +94,25 @@ module.exports = function (app) {
 	// update case
 
 	app.put('/api/cases/:id', (req, res) => {
+		try {
+			Object.keys(req.body).forEach(k => {
+				if (!UPDATABLE_PROPERTIES.includes(k)) {
+					throw 'cannot update property \'' + k + '\'';
+				}
+			});
+		} catch (err) {
+			return res.status(400).send({ error: err });
+		}
+
 		Case.findByIdAndUpdate(hash.decodeHex(req.params.id), {
 			...req.body,
-			updatedAt: new Date()
+			updatedAt: new Date(),
+			$inc: { 
+				revision: 1 
+			}
 		}, err => {
 			if (err) throw err;
-			res.status(204).send();
+			return res.status(204).send();
 		});
 	});
 
@@ -110,7 +123,7 @@ module.exports = function (app) {
 			.populate("model")
 			.exec((err, data) => {
 				if (err) throw err;
-				res.status(200).send(Formatter.formatCaseOverview(data, data.model.spec));
+				return res.status(200).send(Formatter.formatCaseOverview(data, data.model.spec));
 			});
 	});
 

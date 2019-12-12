@@ -24,6 +24,10 @@
       "type": "array",
       "items": [{ "$ref": "common.json#/definitions/Entity"}]
    },
+    "states": {
+      "type": "object",
+      "items": [{ "$ref": "common.json#/definitions/State"}]
+   },
     "phases": {
       "type": "array",
       "items": [{ "$ref": "common.json#/definitions/Phase" }]
