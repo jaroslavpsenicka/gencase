@@ -45,7 +45,10 @@ describe('Model', () => {
 
   it('verify updated model', (done) => {
     request.get('http://localhost:8080/api/models/' + model.id, (error, response, body) => {
-      expect(JSON.parse(body).name).to.equal("Loan");
+      const json = JSON.parse(body);
+      expect(json._id).to.be.undefined;
+      expect(json.__v).to.be.undefined;
+      expect(json.name).to.equal("Loan");
       expect(response.statusCode).to.equal(200);
       done();
     });

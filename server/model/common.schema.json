@@ -6,8 +6,12 @@
       "type": "object",
       "required": ["name", "value"],
       "properties": {
-        "name":         { "type": "string" },
-        "value":        { "type": "string" }
+        "name": { 
+          "type": "string" 
+        },
+        "value": { 
+          "type": "string" 
+        }
       }
     },
 
@@ -15,10 +19,18 @@
       "type": "object",
       "required": ["name", "dataModel"],
       "properties": {
-        "name":         { "type": "string" },
-        "description":  { "type": "string" },
-        "initial":      { "type": "boolean" },
-        "dataModel":    { "type": "string" }
+        "name": { 
+          "type": "string" 
+        },
+        "description": { 
+          "type": "string" 
+        },
+        "initial": { 
+          "type": "boolean" 
+        },
+        "dataModel": { 
+          "type": "string" 
+        }
       }
     },
 

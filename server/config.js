@@ -5,6 +5,12 @@ module.exports = {
 	elasticsearch: { 
 		url: "http://localhost:9092/datacase" 
 	},
+	morgan: {
+		enabled: true,
+		options: {
+			theme: 'dimmed'
+		}
+	},
 	log4js: {
 		appenders: { 
 			console: { 
