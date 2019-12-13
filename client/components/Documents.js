@@ -4,23 +4,29 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Axios from 'axios';
+import VagueTime from 'vague-time';
 
 import Loading from '../components/Loading';
 import LoadingError from '../components/LoadingError'
 import { formatFileSize } from '../Formatters';
 
-const Documents = ({documents, documentsRef, dateFormat}) => {
+const vagueTime = (time) => {
+  return VagueTime.get({to: new Date(time)})
+}
+
+const Documents = ({caseId, documents, setDocuments, documentsRef}) => {
 
   const inputDocumentRef = useRef(null); 
 
   const DocumentRow = ({document}) => (
-    <Row className="p-2 mb-1 bg-white text-dark">
+    <Row className="p-2 mb-0 bg-white text-dark">
       <Col md={6} className="pl-2">
         <FontAwesomeIcon icon={faFilePdf}></FontAwesomeIcon>
         <span className="pl-2 text-primary font-weight-bold">{document.name}</span>
       </Col>
       <Col md={2} className="text-secondary">{document.createdBy}</Col>
-      <Col md={2} className="text-secondary text-right">{dateFormat.format(new Date(document.createdAt))}</Col>
+      <Col md={2} className="text-secondary text-right">{vagueTime(document.createdAt)}</Col>
       <Col md={2} className="text-secondary text-right pr-2">{formatFileSize(document.size, 0)}</Col>
     </Row>
   )
@@ -29,14 +35,21 @@ const Documents = ({documents, documentsRef, dateFormat}) => {
     <div className="text-center text-secondary">No documents.</div>
   )
 
-  const onDocumentUpload = () => {
+  const onUpload = (event) => {
+    if (event.target.name === "file") {
+      const formData = new FormData();
+      formData.append('file', event.target.files[0], event.target.files[0].name);
+      Axios.post('http://localhost:8080/api/cases/' + caseId + '/documents', formData)
+        .then(resp => setDocuments({ loading: false, data: [...documents.data, resp.data]}))
+        .catch(err => console.error(err));
+      }
   }
 
   return (
     <div>
       <h5 className="pt-4" ref={documentsRef}>
         <input type="file" name="file" id="file" ref={inputDocumentRef} className="d-none" 
-          onChange={(event) => onDocumentUpload(event)} />
+          onChange={(event) => onUpload(event)} />
         <FontAwesomeIcon icon={faPlus} className="mr-2 float-right cursor-pointer text-success"
           disabled = {documents.loading || documents.error}
           onClick = {() => inputDocumentRef.current.click()}/>

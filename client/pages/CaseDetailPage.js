@@ -29,7 +29,6 @@ const CaseDetailPage = ({modelId, id}) => {
 
   const commentsRef = useRef(null);
   const documentsRef = useRef(null);
-  const DateFormat = Intl.DateTimeFormat({ dateStyle: 'short' });
 
   useEffect(() => {
     Axios.get('http://localhost:8080/api/cases/' + id)
@@ -51,12 +50,6 @@ const CaseDetailPage = ({modelId, id}) => {
       .then(response => setActions({ loading: false, data: response.data }))
       .catch(err => setActions({ loading: false, error: err }))
   }, [id]);
-
-  const updateData = (prev, id) => {
-    return prev.data.map(row => {
-      return row.id === id ? {...row, starred: !row.starred} : row 
-    })
-  }
 
   const toggleStarred = (toggledCase) => {
     Axios.put('http://localhost:8080/api/cases/' + theCase.data.id, { starred: !theCase.data.starred })
@@ -103,12 +96,12 @@ const CaseDetailPage = ({modelId, id}) => {
       <Row className="p-2 pl-3 mb-1 ml-0 mr-0 mt-3 bg-white text-dark">
         <CaseDetail />
       </Row>
-      <Documents documents={documents} 
-        documentsRef={documentsRef} 
-        dateFormat={DateFormat} />
+      <Documents caseId={id}
+        documents={documents} 
+        setDocuments={setDocuments}
+        documentsRef={documentsRef} />
       <Comments comments={comments} 
-        commentsRef={commentsRef} 
-        dateFormat={DateFormat} />
+        commentsRef={commentsRef} />
     </div>    
   )
 

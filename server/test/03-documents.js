@@ -45,6 +45,12 @@ describe('Documents', () => {
   it('upload document', (done) => {
     request.post(file(caseObject.id, {}), (error, response) => {
       expect(response.statusCode).to.equal(201);
+      const json = JSON.parse(response.body);
+      expect(json.name).to.equal("file.json");
+      expect(json.revision).to.equal(1);
+      expect(json.size).to.equal(2);
+      expect(json.contents).to.be.undefined;
+      expect(json.case).to.be.undefined;
       done();
     });
   });

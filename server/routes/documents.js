@@ -37,9 +37,9 @@ module.exports = function (app) {
 			size: req.file.size,
 			case: new ObjectId(hash.decodeHex(req.params.id)),	
 			contents: fs.readFileSync(req.file.path).toString()
-		}, err => {
+		}, (err, doc) => {
 			if (err) throw err;
-			return res.status(201).send();
+			return res.status(201).send({ ...doc.toObject(), case: undefined, contents: undefined });
 		});
 	});
 

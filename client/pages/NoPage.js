@@ -3,7 +3,7 @@ import Container from 'react-bootstrap/Container';
 
 const NoPage = () => (
   <Container className="pt-4">
-    <div>No, there is no page like that.</div>
+    <div>Hic sunt leones.</div>
   </Container>
 );
 

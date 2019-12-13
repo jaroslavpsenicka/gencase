@@ -12,10 +12,15 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Axios from 'axios';
+import VagueTime from 'vague-time';
 
 import Loading from '../components/Loading';
 import LoadingError from '../components/LoadingError'
 import { byId } from '../ContextUtils';
+
+const vagueTime = (time) => {
+  return VagueTime.get({to: new Date(time)})
+}
 
 const Comments = ({comments, commentsRef, dateFormat}) => {
 
@@ -24,7 +29,7 @@ const Comments = ({comments, commentsRef, dateFormat}) => {
   const CommentRow = ({comment}) => (
     <Row className="p-2 mb-1 bg-white text-dark">
       <Col md={6} className="pl-2 text-primary font-weight-bold">{comment.createdBy}</Col>
-      <Col md={6} className="text-secondary text-right pr-2">{dateFormat.format(new Date(comment.createdAt))}</Col>
+      <Col md={6} className="text-secondary text-right pr-2">{vagueTime(comment.createdAt)}</Col>
       <Col md={12} className="pl-2 pt-2 text-primary">{comment.text}</Col>
     </Row>
   )
