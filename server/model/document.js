@@ -5,7 +5,7 @@ module.exports = mongoose.model('Document', {
 	id: 					{ type: String, required: true },
 	name: 				{ type: String, required: true },
 	revision: 		{ type: Number, required: true },
-	case:					{ type: mongoose.Schema.Types.ObjectId, ref: 'Model', required: true },
+	case:					{ type: mongoose.Schema.Types.ObjectId, ref: 'Case', required: true },
 	createdBy:		{ type: String },
 	createdAt: 		{ type: Date },
 	updatedBy:		{ type: String },

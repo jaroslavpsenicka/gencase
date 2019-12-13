@@ -142,7 +142,7 @@ describe('Case', () => {
     });
   });
 
-  it('case actions', (done) => {
+  it('list case actions', (done) => {
     request.get('http://localhost:8080/api/cases/' + caseObject.id + '/actions' , (error, response) => {
       expect(response.statusCode).to.equal(200);
       const json = JSON.parse(response.body);
@@ -155,4 +155,60 @@ describe('Case', () => {
     });
   });
 
-});
+  it('perform illegal action', (done) => {
+    request.post('http://localhost:8080/api/cases/' + caseObject.id + '/actions/illegal', (error, response) => {
+      expect(response.statusCode).to.equal(400);
+      expect(JSON.parse(response.body).error).to.equal("illegal action 'illegal'");
+      done();
+    });
+  });
+
+  it('perform valid action', (done) => {
+    request.post('http://localhost:8080/api/cases/' + caseObject.id + '/actions/toIdentification', (error, response) => {
+      expect(response.statusCode).to.equal(204);
+      done();
+    });
+  });
+
+  it('check performed action', (done) => {
+    request.get('http://localhost:8080/api/cases/' + caseObject.id, (error, response) => {
+      const json = JSON.parse(response.body);
+      expect(response.statusCode).to.equal(200);
+      expect(json.state).to.equal("new");
+      expect(json.transition).to.equal("toIdentification");
+      done();
+    });
+  });
+
+  it('list case actions again', (done) => {
+    request.get('http://localhost:8080/api/cases/' + caseObject.id + '/actions' , (error, response) => {
+      expect(response.statusCode).to.equal(200);
+      const json = JSON.parse(response.body);
+      expect(json.length).to.equal(1);
+      expect(json[0]).to.eql({ 
+        name: 'toIdentification', 
+        label: 'Cancel identification',
+        to: 'identification',
+        cancel: true });
+      done();
+    });
+  });
+
+  it('cancel the action', (done) => {
+    request.delete('http://localhost:8080/api/cases/' + caseObject.id + '/actions/toIdentification', (error, response) => {
+      expect(response.statusCode).to.equal(204);
+      done();
+    });
+  });
+
+  it('and make sure it\'s back new', (done) => {
+    request.get('http://localhost:8080/api/cases/' + caseObject.id, (error, response) => {
+      const json = JSON.parse(response.body);
+      expect(response.statusCode).to.equal(200);
+      expect(json.state).to.equal("new");
+      expect(json.transition).to.be.undefined;
+      done();
+    });
+  });
+
+})

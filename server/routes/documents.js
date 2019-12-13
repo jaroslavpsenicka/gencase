@@ -1,10 +1,15 @@
+const fs = require('fs');
 const Hashids = require('hashids/cjs');
 const multer = require('multer');
 const ObjectId = require('mongoose').Types.ObjectId; 
 const Document = require('../model/document');
 
 const hash = new Hashids();
-const upload = multer({ storage: multer.memoryStorage() });
+const disk = multer.diskStorage({
+	destination: function (req, file, cb) { cb(null, '/tmp')},
+  filename: function (req, file, cb) { cb(null, file.fieldname + '-' + Date.now())}
+});
+const upload = multer({ storage: disk });
 
 module.exports = function (app) {
 
@@ -12,10 +17,10 @@ module.exports = function (app) {
 
 	app.get('/api/cases/:id/documents', (req, res) => {
 		Document.find({ case: new ObjectId(hash.decodeHex(req.params.id))})
-			.select('-_id -contents') 
+			.select('-contents -case') 
 			.exec((err, data) => {
 				if (err) throw err;
-				res.status(200).send(data);
+				return res.status(200).send(data);
 			});
 	});
 
@@ -23,22 +28,19 @@ module.exports = function (app) {
 
 	app.post('/api/cases/:id/documents', upload.single("file"), (req, res) => {
 		const nid = new ObjectId();
-		try {
-			Document.create({
-				_id: nid,
-				id: hash.encodeHex(nid.toHexString()), 			
-				name: req.file.originalname,
-				revision: 1,
-				createdAt: new Date(),
-				size: req.file.size,
-				contents: req.file.buffer
-			}, (err, doc) => {
-				if (err) throw err;
-				res.status(201).send(doc);
-			});
-		} catch (err) {
-			res.status(400).send('Error processing the file.');
-		}
+		Document.create({
+			_id: nid,
+			id: hash.encodeHex(nid.toHexString()), 		
+			name: req.file.originalname,
+			revision: 1,
+			createdAt: new Date(),
+			size: req.file.size,
+			case: new ObjectId(hash.decodeHex(req.params.id)),	
+			contents: fs.readFileSync(req.file.path).toString()
+		}, err => {
+			if (err) throw err;
+			return res.status(201).send();
+		});
 	});
 
 };

@@ -1,5 +1,5 @@
-const expect  = require('chai').expect;
 const request = require('request');
+const expect  = require('chai').expect;
 const validModel = require('../data/loan.spec');
 
 const file = (value) => {

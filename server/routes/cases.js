@@ -3,17 +3,12 @@ const ObjectId = require('mongoose').Types.ObjectId;
 const Case = require('../model/case');
 const Model = require('../model/model');
 const StateMachine = require('javascript-state-machine');
-const Axios = require('axios');
+const request = require('request');
 
 const hash = new Hashids();
 const Formatter = require('../formatters');
 
 const UPDATABLE_PROPERTIES = ['name', 'starred'];
-const HTTP_CONFIG = {
-	headers: {
-		'Content-Type': 'application/json'
-	}
-};
 
 const validateAgainstModel = (model, values, data) => {
 	const initialPhase = model.spec.phases.find(p => p.initial);			
@@ -140,7 +135,7 @@ module.exports = function (app) {
 
 				if (data.transition) {
 					const tspec = data.model.spec.states.transitions.find(t => t.name === data.transition)
-					res.status(200).json([{
+					return res.status(200).json([{
 						name: data.transition,
 						label: 'Cancel ' + tspec.to,
 						to: tspec.to,
@@ -177,23 +172,25 @@ module.exports = function (app) {
 				});	
 				const transitions = sm.transitions() || [];
 				if (!transitions.find(t => t === req.params.action)) {
-					res.status(400).json({ error: 'illegal action ' + req.params.action });
+					res.status(400).json({ error: 'illegal action \'' + req.params.action + '\''});
 					return;
 				}
 
 				// then perform transition
 
 				const transition = data.model.spec.states.transitions.find(t => t.name === req.params.action);
-				const url = Formatter.formatProcessUrl(data, transition.url);
-				const payload = Formatter.formatProcessBody(data, transition.payload);
-				Axios.post(url, payload, HTTP_CONFIG)
-					.then(() => {
-						data.transition = req.params.action;
-						data.save(err => {
-							if (err) throw err;
-							res.status(204).send()});
-						})
-					.catch(err => res.status(500).json({ error: err.message ? err.message : err }));
+				request.post({
+					uri: Formatter.formatProcessUrl(data, transition.url), 
+					headers: { 'Content-Type': 'application/json' }, 
+					body: JSON.stringify(Formatter.formatProcessBody(data, transition.payload)) 
+				}, err => {
+					if (err) return res.status(500).json({ error: err.message ? err.message : err });
+					data.transition = req.params.action;
+					data.save(err => {
+						if (err) throw err;
+						return res.status(204).send();
+					})
+				});
 			});
 	});
 

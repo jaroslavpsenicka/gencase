@@ -22,7 +22,6 @@ app.use(express.static(path.join(__dirname, '../dist')));
 
 app.post('/identify', (req, res) => {
   console.log("Identification", req.body);
-  sleep.sleep(3);
   setTimeout(() => {
     Axios.post(req.body.callbackUrl, {
       cid: Math.floor(Math.random())
