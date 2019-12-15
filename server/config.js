@@ -6,7 +6,7 @@ module.exports = {
 		url: "http://localhost:9092/datacase" 
 	},
 	morgan: {
-		enabled: true,
+		enabled: false,
 		options: {
 			theme: 'dimmed'
 		}

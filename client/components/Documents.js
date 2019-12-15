@@ -25,8 +25,7 @@ const Documents = ({caseId, documents, setDocuments, documentsRef}) => {
         <FontAwesomeIcon icon={faFilePdf}></FontAwesomeIcon>
         <span className="pl-2 text-primary font-weight-bold">{document.name}</span>
       </Col>
-      <Col md={2} className="text-secondary">{document.createdBy}</Col>
-      <Col md={2} className="text-secondary text-right">{vagueTime(document.createdAt)}</Col>
+      <Col md={4} className="text-secondary text-right text-ellipsis">{vagueTime(document.createdAt)} by {document.createdBy}</Col>
       <Col md={2} className="text-secondary text-right pr-2">{formatFileSize(document.size, 0)}</Col>
     </Row>
   )

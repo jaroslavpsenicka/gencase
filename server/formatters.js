@@ -19,16 +19,21 @@ const toArray = (obj) => {
 const formatCaseList = (caseObject, model) => {
 	return {
 		...caseObject._doc,
+		data: undefined, 
 		name: model.nameFormat ? formatValue(model.nameFormat, caseObject) : caseObject.name,
 		description: model.descriptionFormat ? formatValue(model.descriptionFormat, caseObject) : caseObject.description
 	}
 }
 
-const formatCase = (caseObject, model) => {
+const formatCaseMetadata = (caseObject, model) => {
 	return {
 		...formatCaseList(caseObject, model),
-		detail: model.detailFormat ? formatCaseDetail(caseObject, model) : toArray(toObject(caseObject.data))
+		detail: model.detailFormat ? formatCaseDetail(caseObject, model) : []
 	}
+}
+
+const formatCaseData = (caseObject, model) => {
+	return toObject(caseObject.data);
 }
 
 const formatCaseOverview = (caseObject, model) => {
@@ -69,6 +74,6 @@ const formatValue = (format, caseObject) => {
 
 module.exports = {
 	toObject,
-  formatCaseList, formatCase, formatCaseOverview,
+  formatCaseList, formatCaseData, formatCaseMetadata, formatCaseOverview,
   formatProcessUrl, formatProcessBody
 } 

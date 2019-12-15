@@ -75,6 +75,17 @@ module.exports = function (app) {
 		});
 	});
 
+	// get case metadata
+
+	app.get('/api/cases/:id/metadata', (req, res) => {
+		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
+			.populate("model")
+			.exec((err, data) => {
+				if (err) throw err;
+				res.status(200).send(Formatter.formatCaseMetadata(data, data.model.spec));
+			});
+	});
+
 	// get case data
 
 	app.get('/api/cases/:id', (req, res) => {
@@ -82,13 +93,13 @@ module.exports = function (app) {
 			.populate("model")
 			.exec((err, data) => {
 				if (err) throw err;
-				res.status(200).send(Formatter.formatCase(data, data.model.spec));
+				res.status(200).send(Formatter.formatCaseData(data, data.model.spec));
 			});
 	});
+	
+	// update case metadata
 
-	// update case
-
-	app.put('/api/cases/:id', (req, res) => {
+	app.put('/api/cases/:id/metadata', (req, res) => {
 		try {
 			Object.keys(req.body).forEach(k => {
 				if (!UPDATABLE_PROPERTIES.includes(k)) {
@@ -111,7 +122,32 @@ module.exports = function (app) {
 		});
 	});
 
-	// get case detail data
+	// update case data
+
+	app.put('/api/cases/:id', (req, res) => {
+		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
+			.populate("model")
+			.exec((err, caseObject) => {
+				if (err) throw err;
+
+				// Validate input against initial phase model
+
+				try {
+					const update = { ...Formatter.toObject(caseObject.data), ...req.body };
+					validateAgainstModel(caseObject.model, update, caseObject.data);
+					caseObject.save(err => {
+						if (err) throw err;
+						console.log('case saved')
+						return res.status(204).send();
+					});
+				} catch (error) {
+					return res.status(400).json({ error: error });
+				} 
+
+			});
+	});
+	
+	// get case overview
 
 	app.get('/api/cases/:id/overview', (req, res) => {
 		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))

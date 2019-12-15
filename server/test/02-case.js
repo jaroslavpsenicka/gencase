@@ -76,17 +76,17 @@ describe('Case', () => {
     });
   });
 
-  it('update case, starring', (done) => {
+  it('update case metadata, starring', (done) => {
     const contents = { starred: true };
     request.put({
-      uri: 'http://localhost:8080/api/cases/' + caseObject.id, 
+      uri: 'http://localhost:8080/api/cases/' + caseObject.id + '/metadata', 
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(contents)
     }, (error, response, body) => {
       expect(response.statusCode).to.equal(204);
-      request.get('http://localhost:8080/api/cases/' + caseObject.id, (error, response, body) => {
+      request.get('http://localhost:8080/api/cases/' + caseObject.id + '/metadata', (error, response) => {
         expect(response.statusCode).to.equal(200);
-        caseObject = JSON.parse(body);
+        caseObject = JSON.parse(response.body);
         expect(caseObject.starred).to.equal(true);
         expect(caseObject.revision).to.equal(2);
         done();
@@ -97,7 +97,7 @@ describe('Case', () => {
   it('update case, non-uptatable field', (done) => {
     const contents = { createdBy: 'John Doe' };
     request.put({
-      uri: 'http://localhost:8080/api/cases/' + caseObject.id, 
+      uri: 'http://localhost:8080/api/cases/' + caseObject.id + '/metadata', 
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(contents)
     }, (error, response, body) => {
@@ -107,16 +107,35 @@ describe('Case', () => {
     });
   });
 
-  it('update case, unknown field', (done) => {
+  it('update case metadata, unknown field', (done) => {
     const contents = { unknownField: 1 };
     request.put({
-      uri: 'http://localhost:8080/api/cases/' + caseObject.id, 
+      uri: 'http://localhost:8080/api/cases/' + caseObject.id + '/metadata', 
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(contents)
     }, (error, response, body) => {
       expect(response.statusCode).to.equal(400);
       expect(JSON.parse(body).error).to.equal("cannot update property \'unknownField\'");
       done();
+    });
+  });
+
+  it('update case data', (done) => {
+    const contents = { clientName: 'Frank Doe' };
+    request.put({
+      uri: 'http://localhost:8080/api/cases/' + caseObject.id, 
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(contents)
+    }, (error, response) => {
+      expect(response.statusCode).to.equal(204);
+      request.get('http://localhost:8080/api/cases/' + caseObject.id, (error, response) => {
+        expect(response.statusCode).to.equal(200);
+        const json = JSON.parse(response.body);
+        expect(json.clientName).to.equal("Frank Doe");
+        expect(json.personalId).to.equal("AB123456");
+        expect(json.loanAmount).to.equal(1000);
+        done();
+      });
     });
   });
 
@@ -133,7 +152,7 @@ describe('Case', () => {
   });
 
   it('case initial state', (done) => {
-    request.get('http://localhost:8080/api/cases/' + caseObject.id, (error, response) => {
+    request.get('http://localhost:8080/api/cases/' + caseObject.id + '/metadata', (error, response) => {
       expect(response.statusCode).to.equal(200);
       const json = JSON.parse(response.body);
       expect(json.state).to.equal("new");
@@ -171,7 +190,7 @@ describe('Case', () => {
   });
 
   it('check performed action', (done) => {
-    request.get('http://localhost:8080/api/cases/' + caseObject.id, (error, response) => {
+    request.get('http://localhost:8080/api/cases/' + caseObject.id + '/metadata', (error, response) => {
       const json = JSON.parse(response.body);
       expect(response.statusCode).to.equal(200);
       expect(json.state).to.equal("new");
@@ -202,7 +221,7 @@ describe('Case', () => {
   });
 
   it('and make sure it\'s back new', (done) => {
-    request.get('http://localhost:8080/api/cases/' + caseObject.id, (error, response) => {
+    request.get('http://localhost:8080/api/cases/' + caseObject.id + '/metadata', (error, response) => {
       const json = JSON.parse(response.body);
       expect(response.statusCode).to.equal(200);
       expect(json.state).to.equal("new");
