@@ -25,10 +25,27 @@ const validateAgainstModel = (model, values, data) => {
 	});
 }
 
+/**
+ * @typedef Case
+ * @property {string} id - unique identifier
+ * @property {string} name - model name
+ * @property {string} title - comment title
+ * @property {integer} revision - revision number
+ * @property {string}	createdBy - original author  
+ * @property {string}	createdAt - creation date, UTC ISO date
+ * @property {string}	updatedBy - last update author
+ * @property {string}	updatedAt - last update date, UTC ISO date
+ */
 module.exports = function (app) {
 
-	// get cases	
-	
+	/**
+	 * Get cases belonging to given model.
+	 * @route GET /api/models/{modelId}/cases
+	 * @group Cases - Main data here
+   * @produces application/json
+	 * @returns {[Case.model]} 200 - An array of respective cases
+	 * @returns {Error} 500 - system error
+	 */
 	app.get('/api/models/:id/cases', (req, res) => {
 		Case.find({model: new ObjectId(hash.decodeHex(req.params.id))})
 			.populate("model")
@@ -38,8 +55,14 @@ module.exports = function (app) {
 			});
 	});
 
-	// create a new case
-
+	/**
+	 * Create a new case.
+	 * @route POST /api/models/{modelId}/cases
+	 * @group Cases - Main data here
+   * @produces application/json
+	 * @returns {[Case.model]} 200 - An array of respective cases
+	 * @returns {Error} 500 - system error
+	 */
 	app.post('/api/models/:id/cases', (req, res) => {
 		Model.findById(new ObjectId(hash.decodeHex(req.params.id)), (err, model) => {
 			if (err) throw err;
@@ -75,8 +98,14 @@ module.exports = function (app) {
 		});
 	});
 
-	// get case metadata
-
+	/**
+	 * Get cases metadata.
+	 * @route GET /api/cases/{caseId}/metadata
+	 * @group Cases - Main data here
+   * @produces application/json
+	 * @returns {Case.model} 200 - Case metadata
+	 * @returns {Error} 500 - system error
+	 */
 	app.get('/api/cases/:id/metadata', (req, res) => {
 		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
 			.populate("model")
@@ -86,8 +115,14 @@ module.exports = function (app) {
 			});
 	});
 
-	// get case data
-
+	/**
+	 * Get cases data.
+	 * @route GET /api/cases/{caseId}
+	 * @group Cases - Main data here
+   * @produces application/json
+	 * @returns 200 - Case data, corresponds to a model
+	 * @returns {Error} 500 - system error
+	 */
 	app.get('/api/cases/:id', (req, res) => {
 		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
 			.populate("model")
@@ -97,8 +132,14 @@ module.exports = function (app) {
 			});
 	});
 	
-	// update case metadata
-
+	/**
+	 * Update case metadata, only a selected set of properties may be updated.
+	 * @route PUT /api/cases/{caseId}/metadata
+	 * @group Cases - Main data here
+   * @produces application/json
+	 * @returns {Case.model} 200 - Case metadata
+	 * @returns {Error} 500 - system error
+	 */
 	app.put('/api/cases/:id/metadata', (req, res) => {
 		try {
 			Object.keys(req.body).forEach(k => {
@@ -122,8 +163,14 @@ module.exports = function (app) {
 		});
 	});
 
-	// update case data
-
+	/**
+	 * Update case data, corresponding to model schema.
+	 * @route PUT /api/cases/{caseId}
+	 * @group Cases - Main data here
+   * @produces application/json
+	 * @returns {Case.model} 200 - Case metadata
+	 * @returns {Error} 500 - system error
+	 */
 	app.put('/api/cases/:id', (req, res) => {
 		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
 			.populate("model")
@@ -147,8 +194,14 @@ module.exports = function (app) {
 			});
 	});
 	
-	// get case overview
-
+	/**
+	 * Get case overview fields.
+	 * @route GET /api/cases/{caseId}/overview
+	 * @group Cases - Main data here
+   * @produces application/json
+	 * @returns {Case.model} 200 - Case overview fields
+	 * @returns {Error} 500 - system error
+	 */
 	app.get('/api/cases/:id/overview', (req, res) => {
 		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
 			.populate("model")
@@ -158,8 +211,14 @@ module.exports = function (app) {
 			});
 	});
 
-	// get case actions
-	
+	/**
+	 * Get case actions.
+	 * @route GET /api/cases/{caseId}/actions
+	 * @group Cases - Main data here
+   * @produces application/json
+	 * @returns {Action.model} 200 - Case overview fields
+	 * @returns {Error} 500 - system error
+	 */
 	app.get('/api/cases/:id/actions', (req, res) => {
 		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
 			.populate("model")
@@ -192,8 +251,15 @@ module.exports = function (app) {
 			});
 	});	
 
-	// perform case action
-	
+	/**
+	 * Perform case action.
+	 * @route GET /api/cases/{caseId}/actions/{action}
+	 * @group Cases - Main data here
+   * @produces application/json
+	 * @returns {Case.model} 204 - Case overview fields
+	 * @returns {Error} 400 - Illegal action
+	 * @returns {Error} 500 - system error
+	 */
 	app.post('/api/cases/:id/actions/:action', (req, res) => {
 		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
 			.populate("model")
@@ -230,8 +296,15 @@ module.exports = function (app) {
 			});
 	});
 
-	// receive action callback
-
+	/**
+	 * Receive case callback.
+	 * @route POST /api/cases/{caseId}/actions/callback
+	 * @group Cases - Main data here
+   * @produces application/json
+	 * @returns 204 - Success
+	 * @returns {Error} 400 - Illegal action
+	 * @returns {Error} 500 - system error
+	 */
 	app.post('/api/cases/:id/actions/:action/callback', (req, res) => {
 		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
 			.populate("model")
@@ -257,8 +330,15 @@ module.exports = function (app) {
 			})
 	});
 
-	// cancel action
-
+	/**
+	 * Cancel the transition.
+	 * @route DELETE /api/cases/{caseId}/actions/{action}
+	 * @group Cases - Main data here
+   * @produces application/json
+	 * @returns 204 - Success
+	 * @returns {Error} 400 - Illegal action
+	 * @returns {Error} 500 - system error
+	 */
 	app.delete('/api/cases/:id/actions/:action', (req, res) => {
 		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
 			.populate("model")

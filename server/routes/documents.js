@@ -29,7 +29,7 @@ module.exports = function (app) {
 	/**
 	 * Get document belonging to given case.
 	 * @route GET /api/cases/{caseId}/documents
-	 * @group Cases - Main data here
+	 * @group Case documents 
    * @produces application/json
 	 * @returns {[Document.model]} 200 - An array of respective documents
 	 * @returns {Error} 500 - system error
@@ -46,7 +46,7 @@ module.exports = function (app) {
 	/**
 	 * Upload new document.
 	 * @route POST /api/cases/{caseId}/documents
-	 * @group Cases - Main data here
+	 * @group Case documents 
    * @produces application/json
 	 * @returns {[Document.model]} 20+ - Document without contents
 	 * @returns {Error} 500 - system error
