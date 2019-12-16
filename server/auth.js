@@ -11,12 +11,8 @@ module.exports = (req, resp, next) => {
          req.auth = jwt.verify(auth[1], SECRET);
          if (!req.auth) throw new AuthError('authorization token not valid');
          if (req.auth.iss !== ISSUER) throw new AuthError('authorization token not valid');
-         if (!req.auth.iat) throw new AuthError('authorization token not valid');
-         if (req.auth.iat * 1000 > Date.now()) throw new AuthError('authorization token not valid');
-         if (!req.auth.exp) throw new AuthError('authorization token not valid');
-         if (req.auth.exp * 1000 < Date.now()) throw new AuthError('authorization token expired');
-		} catch (JsonWebTokenError) {
-         throw new AuthError('authorization token not valid');
+		} catch (err) {
+         throw new AuthError(err.message);
       }
 	}
 
