@@ -37,8 +37,15 @@ app.get('*', function(req, res) {
 
 app.use((err, req, res, next) => {
   logger.error('root error handler', err);
-  res.status(500);
-  res.json({ error: err.message ? err.message : err });
+  if (err.message) {
+    const errd = config.errors[err.message];
+    if (errd) {
+      res.status(errd.status).json({ error: errd.message })
+    } else {
+      res.status(500);
+      res.json({ error: err.message ? err.message : err });
+    }
+  }
 });
 
 app.listen(process.env.PORT || 8080);

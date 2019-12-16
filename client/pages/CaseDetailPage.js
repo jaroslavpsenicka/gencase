@@ -31,7 +31,7 @@ const CaseDetailPage = ({modelId, id}) => {
   const documentsRef = useRef(null);
 
   useEffect(() => {
-    Axios.get('http://localhost:8080/api/cases/' + id)
+    Axios.get('http://localhost:8080/api/cases/' + id + '/metadata')
       .then(response => setTheCase({ loading: false, data: response.data }))
       .catch(err => setTheCase({ loading: false, error: err }))
   }, [id]);
@@ -96,12 +96,8 @@ const CaseDetailPage = ({modelId, id}) => {
       <Row className="p-2 pl-3 mb-1 ml-0 mr-0 mt-3 bg-white text-dark">
         <CaseDetail />
       </Row>
-      <Documents caseId={id}
-        documents={documents} 
-        setDocuments={setDocuments}
-        documentsRef={documentsRef} />
-      <Comments comments={comments} 
-        commentsRef={commentsRef} />
+      <Documents caseId={id} documents={documents} setDocuments={setDocuments} documentsRef={documentsRef} />
+      <Comments caseId={id} comments={comments} setComments={setComments} commentsRef={commentsRef} />
     </div>    
   )
 

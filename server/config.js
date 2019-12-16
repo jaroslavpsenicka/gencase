@@ -31,5 +31,21 @@ module.exports = {
 		level: 'info',
 		format: (req, res, format) => format(`:remote-addr :method :url ${JSON.stringify(req.body)} - :status`),
 		statusRules: [{ from: 200, to: 399, level: 'info' }, { from: 400, to: 599, level: 'warn' }]
+	},
+	errors: {
+		"Argument passed in must be a single String of 12 bytes or a string of 24 hex characters": {
+			status: 400,
+			message: "argument not valid"
+		}
+	},
+	swagger: {
+    basedir: __dirname, 
+    files: ['./routes/**/*.js'],
+		swaggerDefinition: {
+			info: {    
+				title: "DataCase API",
+				version: "0.1.0"
+			}
+		}
 	}
 };

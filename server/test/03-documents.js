@@ -69,4 +69,27 @@ describe('Documents', () => {
     });
   });
 
+  it('illegal case', (done) => {
+    request.post({
+      uri: 'http://localhost:8080/api/cases/illegal/documents', 
+      headers: { "Content-Type": "application/json"},
+      contents: ""
+    }, (error, response) => {
+      expect(response.statusCode).to.equal(400);
+      expect(JSON.parse(response.body).error).to.equal('argument not valid');
+      done();
+    })
+  });
+
+  it('non existing case', (done) => {
+    request.post({
+      uri: 'http://localhost:8080/api/cases/QlXO2YZ2KzTVY141lJQ0/documents', 
+      headers: { "Content-Type": "application/json"},
+      contents: ""
+    }, (error, response) => {
+      expect(response.statusCode).to.equal(404);
+      expect(JSON.parse(response.body).error).to.equal('case not found: QlXO2YZ2KzTVY141lJQ0');
+      done();
+    })
+  });
 })

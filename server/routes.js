@@ -4,6 +4,8 @@ const Model = require('./model/model');
 const Case = require('./model/case');
 const Document = require('./model/document');
 const Comment = require('./model/comment');
+const swagger = require('express-swagger-generator');
+const config = require('./config');
 
 const hash = new Hashids();
 
@@ -88,11 +90,21 @@ Comment.deleteMany({}, (err) => {
 	})
 });
 
+/** 
+ * @typedef Error
+ * @property {string} error - error description
+ */
 module.exports = function (app) {
 
 	require('./routes/cases.js')(app);
 	require('./routes/models.js')(app);
 	require('./routes/documents.js')(app);
 	require('./routes/comments.js')(app);
-	
+
+	swagger(app)(config.swagger);
+
+	app.get('/swagger.json', (err, res) => {
+    res.status(200).json(swagger.json());
+	})
+
 }	

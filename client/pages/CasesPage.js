@@ -42,7 +42,7 @@ const CasesPage = ({modelId}) => {
   }
 
   const toggleStarred = (thecase) => {
-    Axios.put('http://localhost:8080/api/cases/' + thecase.id, { starred: !thecase.starred })
+    Axios.put('http://localhost:8080/api/cases/' + thecase.id + '/metadata', { starred: !thecase.starred })
     .then(resp => setCases(prev => {
       const data = updateData(prev, thecase);
       return { ...prev, data: data, byId: byId(data)}}))
