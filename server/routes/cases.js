@@ -7,6 +7,7 @@ const request = require('request');
 
 const hash = new Hashids();
 const Formatter = require('../formatters');
+const auth = require('../auth');
 
 const UPDATABLE_PROPERTIES = ['name', 'starred'];
 
@@ -46,7 +47,7 @@ module.exports = function (app) {
 	 * @returns {[Case.model]} 200 - An array of respective cases
 	 * @returns {Error} 500 - system error
 	 */
-	app.get('/api/models/:id/cases', (req, res) => {
+	app.get('/api/models/:id/cases', auth, (req, res) => {
 		Case.find({model: new ObjectId(hash.decodeHex(req.params.id))})
 			.populate("model")
 			.exec((err, data) => {
@@ -63,7 +64,7 @@ module.exports = function (app) {
 	 * @returns {[Case.model]} 200 - An array of respective cases
 	 * @returns {Error} 500 - system error
 	 */
-	app.post('/api/models/:id/cases', (req, res) => {
+	app.post('/api/models/:id/cases', auth, (req, res) => {
 		Model.findById(new ObjectId(hash.decodeHex(req.params.id)), (err, model) => {
 			if (err) throw err;
 			const data = new Map([]);
@@ -184,7 +185,6 @@ module.exports = function (app) {
 					validateAgainstModel(caseObject.model, update, caseObject.data);
 					caseObject.save(err => {
 						if (err) throw err;
-						console.log('case saved')
 						return res.status(204).send();
 					});
 				} catch (error) {

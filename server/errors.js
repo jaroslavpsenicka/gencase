@@ -1,8 +1,13 @@
 class ModelValidationError extends Error {  
   constructor (message) {
     super(message)
-    this.name = this.constructor.name
   }
 }
 
-module.exports = { ModelValidationError }   
+class AuthError extends Error {  
+  constructor (message) {
+    super(message)
+  }
+}
+
+module.exports = { ModelValidationError, AuthError }   

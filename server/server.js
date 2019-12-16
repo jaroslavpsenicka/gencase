@@ -8,6 +8,7 @@ const mask = require('mongoosemask');
 const path = require('path');
 const log4js = require('log4js');
 const morganBody = require('morgan-body');
+const AuthError = require('./errors').AuthError;
 
 const app = express();
 const logger = log4js.getLogger();
@@ -36,14 +37,15 @@ app.get('*', function(req, res) {
 });
 
 app.use((err, req, res, next) => {
-  logger.error('root error handler', err);
-  if (err.message) {
+  logger.error('root handler', err);
+  if (err instanceof AuthError) {
+    res.status(403).json({ error: err.message });
+  } else if (err.message) {
     const errd = config.errors[err.message];
     if (errd) {
       res.status(errd.status).json({ error: errd.message })
     } else {
-      res.status(500);
-      res.json({ error: err.message ? err.message : err });
+      res.status(500).json({ error: err.message ? err.message : err });
     }
   }
 });

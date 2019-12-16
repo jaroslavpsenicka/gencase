@@ -1,9 +1,9 @@
 module.exports = {
 	database: { 
-		url: "mongodb://localhost:27017/datacase" 
+		url: process.env.MONGODB_URL || "mongodb://localhost:27017/datacase" 
 	},
 	elasticsearch: { 
-		url: "http://localhost:9092/datacase" 
+		url: process.env.ELASTICSEARCH_URL || "http://localhost:9092/datacase" 
 	},
 	morgan: {
 		enabled: false,
@@ -31,6 +31,9 @@ module.exports = {
 		level: 'info',
 		format: (req, res, format) => format(`:remote-addr :method :url ${JSON.stringify(req.body)} - :status`),
 		statusRules: [{ from: 200, to: 399, level: 'info' }, { from: 400, to: 599, level: 'warn' }]
+	},
+	jwt: {
+		secret: process.env.JWT_SECRET || "qwertyuiopasdfghjklzxcvbnm123456"
 	},
 	errors: {
 		"Argument passed in must be a single String of 12 bytes or a string of 24 hex characters": {
