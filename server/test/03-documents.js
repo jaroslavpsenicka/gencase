@@ -72,7 +72,7 @@ describe('Documents', () => {
   it('illegal case', (done) => {
     request.post({
       uri: 'http://localhost:8080/api/cases/illegal/documents', 
-      headers: { "Content-Type": "application/json"},
+      headers: { "Content-Type": "application/json" },
       contents: ""
     }, (error, response) => {
       expect(response.statusCode).to.equal(400);
@@ -84,7 +84,7 @@ describe('Documents', () => {
   it('non existing case', (done) => {
     request.post({
       uri: 'http://localhost:8080/api/cases/QlXO2YZ2KzTVY141lJQ0/documents', 
-      headers: { "Content-Type": "application/json"},
+      headers: { "Content-Type": "application/json" },
       contents: ""
     }, (error, response) => {
       expect(response.statusCode).to.equal(404);
