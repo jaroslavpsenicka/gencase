@@ -4,10 +4,13 @@ const Case = require('../model/case');
 const Model = require('../model/model');
 const StateMachine = require('javascript-state-machine');
 const request = require('request');
+const log4js = require('log4js');
 
+const logger = log4js.getLogger('cases')
 const hash = new Hashids();
 const Formatter = require('../formatters');
-const auth = require('../auth');
+const auth = require('../auth').auth;
+const aud = require('../auth').aud;
 
 const UPDATABLE_PROPERTIES = ['name', 'starred'];
 
@@ -19,6 +22,7 @@ const validateAgainstModel = (model, values, data) => {
 	if (!entity) throw "entity '" + initialPhase.dataModel + "' not defined"
 
 	const requiredAttributes = entity.attributes.filter(a => a.notEmpty);
+	logger.debug('verifying attributes', requiredAttributes.map(a => a.name));
 	requiredAttributes.forEach(a => {
 		const value = values[a.name];
 		if (value) data.set(a.name, value);	
@@ -38,23 +42,6 @@ const validateAgainstModel = (model, values, data) => {
  * @property {string}	updatedAt - last update date, UTC ISO date
  */
 module.exports = function (app) {
-
-	/**
-	 * Get cases belonging to given model.
-	 * @route GET /api/models/{modelId}/cases
-	 * @group Cases - Main data here
-   * @produces application/json
-	 * @returns {[Case.model]} 200 - An array of respective cases
-	 * @returns {Error} 500 - system error
-	 */
-	app.get('/api/models/:id/cases', auth, (req, res) => {
-		Case.find({model: new ObjectId(hash.decodeHex(req.params.id))})
-			.populate("model")
-			.exec((err, data) => {
-				if (err) throw err;
-				res.status(200).send(data.map(m => Formatter.formatCaseList(m, m.model.spec)));
-			});
-	});
 
 	/**
 	 * Create a new case.
@@ -82,10 +69,11 @@ module.exports = function (app) {
 			const caseId = new ObjectId();	
 			Case.create({ _id: caseId, 
 				id: hash.encodeHex(caseId.toHexString()),  
+				aud: req.auth ? req.auth.aud : undefined,
 				name: "Case " + caseId, 
 				revision: 1, 
 				starred: false,
-				createdBy: 'Mary Doe',
+				createdBy: req.auth ? req.auth.sub : undefined,
 				createdAt: new Date(),
 				model: model._id,
 				state: model.spec.states.init,
@@ -93,10 +81,28 @@ module.exports = function (app) {
 			}, (err, caseObject) => {
 				if (err) throw err;
 				const resp = { ...caseObject.toObject(), data: Formatter.toObject(caseObject.get('data')) };
-				res.status(200).send(resp);
+				res.status(201).send(resp);
 			});	
 		
 		});
+	});
+
+	/**
+	 * Get cases belonging to given model.
+	 * @route GET /api/models/{modelId}/cases
+	 * @group Cases - Main data here
+   * @produces application/json
+	 * @returns {[Case.model]} 200 - An array of respective cases
+	 * @returns {Error} 500 - system error
+	 */
+	app.get('/api/models/:id/cases', auth, (req, res) => {
+		Case
+			.find({ aud: aud(req), model: new ObjectId(hash.decodeHex(req.params.id)) })
+			.populate("model")
+			.exec((err, data) => {
+				if (err) throw err;
+				res.status(200).send(data.map(m => Formatter.formatCaseList(m, m.model.spec)));
+			});
 	});
 
 	/**
@@ -107,33 +113,18 @@ module.exports = function (app) {
 	 * @returns {Case.model} 200 - Case metadata
 	 * @returns {Error} 500 - system error
 	 */
-	app.get('/api/cases/:id/metadata', (req, res) => {
-		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
+	app.get('/api/cases/:id/metadata', auth, (req, res) => {
+		Case
+			.findOne({ aud: aud(req), id: req.params.id })
 			.populate("model")
 			.exec((err, data) => {
 				if (err) throw err;
-				res.status(200).send(Formatter.formatCaseMetadata(data, data.model.spec));
+				if (data) return res.status(200).send(Formatter.formatCaseMetadata(data, data.model.spec));
+				return res.status(404).send();
 			});
 	});
 
-	/**
-	 * Get cases data.
-	 * @route GET /api/cases/{caseId}
-	 * @group Cases - Main data here
-   * @produces application/json
-	 * @returns 200 - Case data, corresponds to a model
-	 * @returns {Error} 500 - system error
-	 */
-	app.get('/api/cases/:id', (req, res) => {
-		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
-			.populate("model")
-			.exec((err, data) => {
-				if (err) throw err;
-				res.status(200).send(Formatter.formatCaseData(data, data.model.spec));
-			});
-	});
-	
-	/**
+		/**
 	 * Update case metadata, only a selected set of properties may be updated.
 	 * @route PUT /api/cases/{caseId}/metadata
 	 * @group Cases - Main data here
@@ -141,7 +132,7 @@ module.exports = function (app) {
 	 * @returns {Case.model} 200 - Case metadata
 	 * @returns {Error} 500 - system error
 	 */
-	app.put('/api/cases/:id/metadata', (req, res) => {
+	app.put('/api/cases/:id/metadata', auth, (req, res) => {
 		try {
 			Object.keys(req.body).forEach(k => {
 				if (!UPDATABLE_PROPERTIES.includes(k)) {
@@ -152,18 +143,34 @@ module.exports = function (app) {
 			return res.status(400).send({ error: err });
 		}
 
-		Case.findByIdAndUpdate(hash.decodeHex(req.params.id), {
-			...req.body,
-			updatedAt: new Date(),
-			$inc: { 
-				revision: 1 
-			}
-		}, err => {
+		Case.findOneAndUpdate({ aud: aud(req), id: req.params.id }, {
+			...req.body, updatedAt: new Date(), $inc: { revision: 1 }
+		}, (err, data) => {
 			if (err) throw err;
+			if (!data) return res.status(404).send();
 			return res.status(204).send();
 		});
 	});
 
+	/**
+	 * Get cases data.
+	 * @route GET /api/cases/{caseId}
+	 * @group Cases - Main data here
+   * @produces application/json
+	 * @returns 200 - Case data, corresponds to a model
+	 * @returns {Error} 500 - system error
+	 */
+	app.get('/api/cases/:id', auth, (req, res) => {
+		Case
+			.findOne({ aud: aud(req), id: req.params.id })
+			.populate("model")
+			.exec((err, data) => {
+				if (err) throw err;
+				if (!data) return res.status(404).send({ error: 'case not found' });
+				return res.status(200).send(Formatter.formatCaseData(data, data.model.spec));
+			});
+	});
+	
 	/**
 	 * Update case data, corresponding to model schema.
 	 * @route PUT /api/cases/{caseId}
@@ -172,11 +179,13 @@ module.exports = function (app) {
 	 * @returns {Case.model} 200 - Case metadata
 	 * @returns {Error} 500 - system error
 	 */
-	app.put('/api/cases/:id', (req, res) => {
-		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
+	app.put('/api/cases/:id', auth, (req, res) => {
+		Case
+			.findOne({ aud: aud(req), id: req.params.id })
 			.populate("model")
 			.exec((err, caseObject) => {
 				if (err) throw err;
+				if (!caseObject) return res.status(404).send({ error: 'case not found'});
 
 				// Validate input against initial phase model
 
@@ -202,13 +211,15 @@ module.exports = function (app) {
 	 * @returns {Case.model} 200 - Case overview fields
 	 * @returns {Error} 500 - system error
 	 */
-	app.get('/api/cases/:id/overview', (req, res) => {
-		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
-			.populate("model")
-			.exec((err, data) => {
-				if (err) throw err;
-				return res.status(200).send(Formatter.formatCaseOverview(data, data.model.spec));
-			});
+	app.get('/api/cases/:id/overview', auth, (req, res) => {
+		Case
+		.findOne({ aud: aud(req), id: req.params.id })
+		.populate("model")
+		.exec((err, data) => {
+			if (err) throw err;
+			if (!data) return res.status(404).send({ error: 'case not found'});
+			return res.status(200).send(Formatter.formatCaseOverview(data, data.model.spec));
+		});
 	});
 
 	/**
@@ -219,11 +230,13 @@ module.exports = function (app) {
 	 * @returns {Action.model} 200 - Case overview fields
 	 * @returns {Error} 500 - system error
 	 */
-	app.get('/api/cases/:id/actions', (req, res) => {
-		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
+	app.get('/api/cases/:id/actions', auth, (req, res) => {
+		Case
+			.findOne({ aud: aud(req), id: req.params.id })
 			.populate("model")
 			.exec((err, data) => {
 				if (err) throw err;
+				if (!data) return res.status(404).send({ error: 'case not found' });
 
 				// if the transition is running, allow cancelling only
 				// otherwise list all transitions and show them as actions
@@ -260,11 +273,13 @@ module.exports = function (app) {
 	 * @returns {Error} 400 - Illegal action
 	 * @returns {Error} 500 - system error
 	 */
-	app.post('/api/cases/:id/actions/:action', (req, res) => {
-		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
+	app.post('/api/cases/:id/actions/:action', auth, (req, res) => {
+		Case
+			.findOne({ aud: aud(req), id: req.params.id })
 			.populate("model")
 			.exec((err, data) => {
 				if (err) throw err;
+				if (!data) return res.status(404).send({ error: 'case not found' });
 
 				// verify the action is valid first
 

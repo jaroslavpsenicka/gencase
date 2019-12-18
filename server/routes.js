@@ -8,10 +8,8 @@ const swagger = require('express-swagger-generator');
 const config = require('./config');
 
 const hash = new Hashids();
-
 const mortgage = new ObjectId('000000000001');	
 const loan = new ObjectId('000000000002');	
-const test = new ObjectId('000000000003');	
 
 const loanSpec = require('./data/loan.spec.js');
 
@@ -46,7 +44,8 @@ Case.deleteMany({}, (err) => {
 	const case1 = new ObjectId('000000000010');	
 	Case.create({ _id: case1, 
 		id: hash.encodeHex(case1.toHexString()),  
-		name: "Case " + case1, 
+		aud: 'public',
+		name: "Case " + hash.encodeHex(case1.toHexString()), 
 		revision: 3, 
 		starred: false,
 		state: 'new',

@@ -21,7 +21,7 @@ describe('Comments', () => {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(contents)
     }, (error, response, body) => {
-      expect(response.statusCode).to.equal(200);
+      expect(response.statusCode).to.equal(201);
       caseObject = JSON.parse(body);
       done();
     });

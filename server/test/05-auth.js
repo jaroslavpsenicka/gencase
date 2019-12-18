@@ -7,6 +7,7 @@ const EXPIRED_JWT = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJkYXRhY2FzZS
 describe('Auth', () => {
 
   var model;
+  var audCase;
 
   it('find test model', done => {
     request.get('http://localhost:8080/api/models' , (error, response) => {
@@ -61,6 +62,154 @@ describe('Auth', () => {
     }, (error, response, body) => {
       expect(response.statusCode).to.equal(400);
       expect(JSON.parse(body).error).to.equal("should have required property \'clientName\'");
+      done();
+    });
+  });
+
+  it('create case, with aud', (done) => {
+    const contents = { clientName: 'John Doe', personalId: 'AB123456', loanAmount: 1000 };
+    request.post({
+      uri: 'http://localhost:8080/api/models/' + model.id + '/cases', 
+      headers: { Authorization: 'Bearer ' + TEST_JWT, 'Content-Type': 'application/json' },
+      body: JSON.stringify(contents)
+    }, (error, response) => {
+      expect(response.statusCode).to.equal(201);
+      audCase = JSON.parse(response.body);
+      expect(audCase.id).to.be.not.null;
+      request.get({
+        uri: 'http://localhost:8080/api/models/' + model.id + '/cases', 
+        headers: { Authorization: 'Bearer ' + TEST_JWT }
+      }, (error, response) => {
+        expect(response.statusCode).to.equal(200);
+        const json = JSON.parse(response.body);
+        expect(json.length).to.gt(0);
+        expect(json.find(c => c.id === audCase.id)).to.be.not.null;
+        done();
+      });
+    });
+  });
+
+  it('get case metadata as aud user', (done) => {
+    request.get({
+      uri: 'http://localhost:8080/api/cases/' + audCase.id + '/metadata', 
+      headers: { Authorization: 'Bearer ' + TEST_JWT }
+    }, (error, response) => {
+      expect(response.statusCode).to.equal(200);
+      done();
+    });
+  });
+
+  it('get case metadata as anonymous', (done) => {
+    request.get('http://localhost:8080/api/cases/' + audCase.id + '/metadata', (error, response) => {
+      expect(response.statusCode).to.equal(404);
+      done();
+    });
+  });
+
+  it('get case data as aud user', (done) => {
+    request.get({
+      uri: 'http://localhost:8080/api/cases/' + audCase.id, 
+      headers: { Authorization: 'Bearer ' + TEST_JWT }
+    }, (error, response) => {
+      expect(response.statusCode).to.equal(200);
+      expect(JSON.parse(response.body)).to.eql({
+        clientName: 'John Doe', 
+        personalId: 'AB123456', 
+        loanAmount: 1000
+      });
+      done();
+    });
+  });
+
+  it('get case data as anonymous', (done) => {
+    request.get('http://localhost:8080/api/cases/' + audCase.id, (error, response) => {
+      expect(response.statusCode).to.equal(404);
+      done();
+    });
+  });
+
+  it('update case data as aud user', (done) => {
+    const contents = { clientName: 'Frank Doe' };
+    request.put({
+      uri: 'http://localhost:8080/api/cases/' + audCase.id, 
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TEST_JWT },
+      body: JSON.stringify(contents)
+    }, (error, response) => {
+      expect(response.statusCode).to.equal(204);
+      request.get({
+        uri: 'http://localhost:8080/api/cases/' + audCase.id, 
+        headers: { Authorization: 'Bearer ' + TEST_JWT }
+      }, (error, response) => {
+        expect(response.statusCode).to.equal(200);
+        expect(JSON.parse(response.body)).to.eql({
+          clientName: 'Frank Doe', 
+          personalId: 'AB123456', 
+          loanAmount: 1000
+        });    
+        done();
+      });
+    });
+  });
+
+  it('update case data as anonymous', (done) => {
+    const contents = { clientName: 'Frank Doe' };
+    request.put({
+      uri: 'http://localhost:8080/api/cases/' + audCase.id, 
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(contents)
+    }, (error, response) => {
+      expect(response.statusCode).to.equal(404);
+      done();
+    });
+  });
+
+  it('get case overview as aud user', (done) => {
+    request.get({
+      uri: 'http://localhost:8080/api/cases/' + audCase.id + '/overview', 
+      headers: { Authorization: 'Bearer ' + TEST_JWT }
+    }, (error, response) => {
+      expect(response.statusCode).to.equal(200);
+      done();
+    });
+  });
+
+  it('get case overview as anonymous', (done) => {
+    request.get('http://localhost:8080/api/cases/' + audCase.id + '/overview', (error, response) => {
+      expect(response.statusCode).to.equal(404);
+      done();
+    });
+  });
+
+  it('get case actions as aud user', (done) => {
+    request.get({
+      uri: 'http://localhost:8080/api/cases/' + audCase.id + '/actions', 
+      headers: { Authorization: 'Bearer ' + TEST_JWT }
+    }, (error, response) => {
+      expect(response.statusCode).to.equal(200);
+      done();
+    });
+  });
+
+  it('get case actions as anonymous', (done) => {
+    request.get('http://localhost:8080/api/cases/' + audCase.id + '/actions', (error, response) => {
+      expect(response.statusCode).to.equal(404);
+      done();
+    });
+  });
+
+  it('execute case action as aud user', (done) => {
+    request.post({
+      uri: 'http://localhost:8080/api/cases/' + audCase.id + '/actions/toIdentification', 
+      headers: { Authorization: 'Bearer ' + TEST_JWT }
+    }, (error, response) => {
+      expect(response.statusCode).to.equal(204);
+      done();
+    });
+  });
+
+  it('execute case action as anonymous', (done) => {
+    request.post('http://localhost:8080/api/cases/' + audCase.id + '/actions', (error, response) => {
+      expect(response.statusCode).to.equal(404);
       done();
     });
   });

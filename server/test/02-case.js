@@ -64,7 +64,7 @@ describe('Case', () => {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(contents)
     }, (error, response, body) => {
-      expect(response.statusCode).to.equal(200);
+      expect(response.statusCode).to.equal(201);
       caseObject = JSON.parse(body);
       expect(caseObject.starred).to.equal(false);
       expect(caseObject.revision).to.equal(1);
@@ -80,9 +80,9 @@ describe('Case', () => {
     const contents = { starred: true };
     request.put({
       uri: 'http://localhost:8080/api/cases/' + caseObject.id + '/metadata', 
-      headers: {'Content-Type': 'application/json'},
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(contents)
-    }, (error, response, body) => {
+    }, (error, response) => {
       expect(response.statusCode).to.equal(204);
       request.get('http://localhost:8080/api/cases/' + caseObject.id + '/metadata', (error, response) => {
         expect(response.statusCode).to.equal(200);
@@ -146,7 +146,7 @@ describe('Case', () => {
       expect(json.length).to.equal(2);
       expect(json[0]).to.eql({ name: "Loan amount", value: "1000 CZK" });
       expect(json[1].name).to.equal("Created");
-      expect(json[1].value).to.contain("Mary Doe");
+      expect(json[1].value).to.contain("by");
       done();
     });
   });

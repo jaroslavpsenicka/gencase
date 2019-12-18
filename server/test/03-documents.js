@@ -33,10 +33,10 @@ describe('Documents', () => {
     const contents = { clientName: 'John Doe', personalId: 'AB123456', loanAmount: 1000 };
     request.post({
       uri: 'http://localhost:8080/api/models/' + model.id + '/cases', 
-      headers: {'Content-Type': 'application/json'},
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(contents)
     }, (error, response, body) => {
-      expect(response.statusCode).to.equal(200);
+      expect(response.statusCode).to.equal(201);
       caseObject = JSON.parse(body);
       done();
     });
