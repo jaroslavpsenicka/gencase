@@ -4,6 +4,8 @@ const multer = require('multer');
 const ObjectId = require('mongoose').Types.ObjectId; 
 const Document = require('../model/document');
 const Case = require('../model/case');
+const auth = require('../auth').auth;
+const aud = require('../auth').aud;
 
 const hash = new Hashids();
 const disk = multer.diskStorage({
@@ -34,12 +36,19 @@ module.exports = function (app) {
 	 * @returns {[Document.model]} 200 - An array of respective documents
 	 * @returns {Error} 500 - system error
 	 */
-	app.get('/api/cases/:id/documents', (req, res) => {
-		Document.find({ case: new ObjectId(hash.decodeHex(req.params.id))})
-			.select('-contents -case') 
-			.exec((err, data) => {
+	app.get('/api/cases/:id/documents', auth, (req, res) => {
+		Case
+			.findOne({ aud: aud(req), id: req.params.id }, (err, theCase) => {
 				if (err) throw err;
-				return res.status(200).send(data);
+				if (!theCase) return res.status(404).send({ error: 'case not found' });
+
+				Document
+					.find({ case: theCase._id })
+					.select('-contents -case') 
+					.exec((err, data) => {
+						if (err) throw err;
+						return res.status(200).send(data);
+					});
 			});
 	});
 
@@ -51,10 +60,11 @@ module.exports = function (app) {
 	 * @returns {[Document.model]} 20+ - Document without contents
 	 * @returns {Error} 500 - system error
 	 */
-	app.post('/api/cases/:id/documents', upload.single("file"), (req, res) => {
-		Case.findById(new ObjectId(hash.decodeHex(req.params.id)), (err, data) => {
+	app.post('/api/cases/:id/documents', auth, upload.single("file"), (req, res) => {
+		Case.findOne({ aud: aud(req), id: req.params.id }, (err, data) => {
 			if (err) throw err;
-			if (!data) return res.status(404).json({ error: 'case not found: ' + req.params.id });
+			if (!data) return res.status(404).json({ error: 'case not found' });
+
 			const nid = new ObjectId();
 			Document.create({
 				_id: nid,

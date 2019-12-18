@@ -270,4 +270,43 @@ describe('Auth', () => {
     });
   });
 
+  it('get case documents as aud user', (done) => {
+    request.get({
+      uri: 'http://localhost:8080/api/cases/' + audCase.id + '/documents', 
+      headers: { Authorization: 'Bearer ' + TEST_JWT }
+    }, (error, response) => {
+      expect(response.statusCode).to.equal(200);
+      done();
+    });
+  });
+
+  it('get case documents as anonymous', (done) => {
+    request.get('http://localhost:8080/api/cases/' + audCase.id + '/documents', (err, response) => {
+      expect(response.statusCode).to.equal(404);
+      done();
+    });
+  });
+
+  it('upload document as aud user', (done) => {
+    request.post({
+      uri: 'http://localhost:8080/api/cases/' + audCase.id + '/comments', 
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TEST_JWT },
+      body: "{}"
+    }, (error, response) => {
+      expect(response.statusCode).to.equal(201);
+      done();
+    });
+  });
+
+  it('upload document as anonymous', (done) => {
+    request.post({
+      uri: 'http://localhost:8080/api/cases/' + audCase.id + '/comments',
+      headers: { 'Content-Type': 'application/json' },
+      body: "{}"
+    }, (err, response) => {
+      expect(response.statusCode).to.equal(404);
+      done();
+    });
+  });
+
 })
