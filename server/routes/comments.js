@@ -4,6 +4,8 @@ const Comment = require('../model/comment');
 const Case = require('../model/case');
 
 const hash = new Hashids();
+const auth = require('../auth').auth;
+const aud = require('../auth').aud;
 
 /**
  * @typedef Comment
@@ -27,12 +29,19 @@ module.exports = function (app) {
 	 * @returns {[Comment.model]} 200 - An array of respective comments
 	 * @returns {Error} 500 - system error
 	 */
-	app.get('/api/cases/:id/comments', (req, res) => {
-		Comment.find({ case: new ObjectId(hash.decodeHex(req.params.id))})
-			.select('-case')
-			.exec((err, data) => {
+	app.get('/api/cases/:id/comments', auth, (req, res) => {
+		Case
+			.findOne({ aud: aud(req), id: req.params.id }, (err, theCase) => {
 				if (err) throw err;
-				res.status(200).send(data);
+				if (!theCase) return res.status(404).send({ error: 'case not found' });
+
+				Comment
+					.find({ case: theCase._id })
+					.select('-case')
+					.exec((err, data) => {
+						if (err) throw err;
+						res.status(200).send(data);
+					});
 			});
 	});
 
@@ -44,23 +53,27 @@ module.exports = function (app) {
 	 * @returns {[Comment.model]} 201 - Created comment
 	 * @returns {Error} 500 - system error
 	 */
-	app.post('/api/cases/:id/comments', (req, res) => {
-		Case.findById(new ObjectId(hash.decodeHex(req.params.id)), (err, data) => {
-			if (err) throw err;
-			if (!data) return res.status(404).json({ error: 'case not found: ' + req.params.id });
-			const nid = new ObjectId();
-			Comment.create({
-				_id: nid,
-				id: hash.encodeHex(nid.toHexString()), 		
-				title: req.body.title,
-				revision: 1,
-				createdAt: new Date(),
-				case: new ObjectId(hash.decodeHex(req.params.id)),	
-				text: req.body.text
-			}, (err, doc) => {
+	app.post('/api/cases/:id/comments', auth, (req, res) => {
+		Case
+			.findOne({ aud: aud(req), id: req.params.id }, (err, theCase) => {
 				if (err) throw err;
-				return res.status(201).send(doc);
+				if (!theCase) return res.status(404).send({ error: 'case not found' });
+
+				const nid = new ObjectId();
+				Comment
+					.create({
+						_id: nid,
+						id: hash.encodeHex(nid.toHexString()), 		
+						title: req.body.title,
+						revision: 1,
+						createdAt: new Date(),
+						case: theCase._id,	
+						text: req.body.text
+					}, (err, doc) => {
+						if (err) throw err;
+						return res.status(201).send(doc);
+					});
 			});
-		});
 	});
+
 };

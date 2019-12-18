@@ -6,24 +6,16 @@ const Case = require('../model/case');
 
 describe('Basics', () => {
 
-  it('connect', (done) => {
+  it('mongo multiple field query', (done) => {
     mongoose.connect(config.database.url, { useNewUrlParser: true, useUnifiedTopology: true });
     mongoose.set('useFindAndModify', false);
-    done();
-  })
-
-  it('mongo multiple field query', (done) => {
     const mortgage = new ObjectId('000000000001');	
     Case.findOne({ model: mortgage, aud: 'public' }, (err, data) => {
+      mongoose.disconnect();
       expect(data).to.be.not.null;
       done();
     })
   });
-
-  it('disconect', (done) => {
-    mongoose.disconnect();
-    done();
-  })
 
 });
 

@@ -100,7 +100,7 @@ describe('Auth', () => {
   });
 
   it('get case metadata as anonymous', (done) => {
-    request.get('http://localhost:8080/api/cases/' + audCase.id + '/metadata', (error, response) => {
+    request.get('http://localhost:8080/api/cases/' + audCase.id + '/metadata', (err, response) => {
       expect(response.statusCode).to.equal(404);
       done();
     });
@@ -122,7 +122,7 @@ describe('Auth', () => {
   });
 
   it('get case data as anonymous', (done) => {
-    request.get('http://localhost:8080/api/cases/' + audCase.id, (error, response) => {
+    request.get('http://localhost:8080/api/cases/' + audCase.id, (err, response) => {
       expect(response.statusCode).to.equal(404);
       done();
     });
@@ -174,7 +174,7 @@ describe('Auth', () => {
   });
 
   it('get case overview as anonymous', (done) => {
-    request.get('http://localhost:8080/api/cases/' + audCase.id + '/overview', (error, response) => {
+    request.get('http://localhost:8080/api/cases/' + audCase.id + '/overview', (err, response) => {
       expect(response.statusCode).to.equal(404);
       done();
     });
@@ -191,7 +191,7 @@ describe('Auth', () => {
   });
 
   it('get case actions as anonymous', (done) => {
-    request.get('http://localhost:8080/api/cases/' + audCase.id + '/actions', (error, response) => {
+    request.get('http://localhost:8080/api/cases/' + audCase.id + '/actions', (err, response) => {
       expect(response.statusCode).to.equal(404);
       done();
     });
@@ -208,7 +208,63 @@ describe('Auth', () => {
   });
 
   it('execute case action as anonymous', (done) => {
-    request.post('http://localhost:8080/api/cases/' + audCase.id + '/actions', (error, response) => {
+    request.post('http://localhost:8080/api/cases/' + audCase.id + '/actions', (err, response) => {
+      expect(response.statusCode).to.equal(404);
+      done();
+    });
+  });
+
+  it('cancel case action as aud user', (done) => {
+    request.delete({
+      uri: 'http://localhost:8080/api/cases/' + audCase.id + '/actions/toIdentification', 
+      headers: { Authorization: 'Bearer ' + TEST_JWT }
+    }, (error, response) => {
+      expect(response.statusCode).to.equal(204);
+      done();
+    });
+  });
+
+  it('cancel case action as anonymous', (done) => {
+    request.delete('http://localhost:8080/api/cases/' + audCase.id + '/actions', (err, response) => {
+      expect(response.statusCode).to.equal(404);
+      done();
+    });
+  });
+
+  it('get case comments as aud user', (done) => {
+    request.get({
+      uri: 'http://localhost:8080/api/cases/' + audCase.id + '/comments', 
+      headers: { Authorization: 'Bearer ' + TEST_JWT }
+    }, (error, response) => {
+      expect(response.statusCode).to.equal(200);
+      done();
+    });
+  });
+
+  it('get case comments as anonymous', (done) => {
+    request.get('http://localhost:8080/api/cases/' + audCase.id + '/comments', (err, response) => {
+      expect(response.statusCode).to.equal(404);
+      done();
+    });
+  });
+
+  it('create case comment as aud user', (done) => {
+    request.post({
+      uri: 'http://localhost:8080/api/cases/' + audCase.id + '/comments', 
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TEST_JWT },
+      body: "{}"
+    }, (error, response) => {
+      expect(response.statusCode).to.equal(201);
+      done();
+    });
+  });
+
+  it('get case comments as anonymous', (done) => {
+    request.post({
+      uri: 'http://localhost:8080/api/cases/' + audCase.id + '/comments',
+      headers: { 'Content-Type': 'application/json' },
+      body: "{}"
+    }, (err, response) => {
       expect(response.statusCode).to.equal(404);
       done();
     });

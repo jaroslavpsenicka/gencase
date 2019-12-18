@@ -119,8 +119,8 @@ module.exports = function (app) {
 			.populate("model")
 			.exec((err, data) => {
 				if (err) throw err;
-				if (data) return res.status(200).send(Formatter.formatCaseMetadata(data, data.model.spec));
-				return res.status(404).send();
+				if (!data) return res.status(404).send({ error: 'case not found' });
+				return res.status(200).send(Formatter.formatCaseMetadata(data, data.model.spec));
 			});
 	});
 
@@ -354,11 +354,13 @@ module.exports = function (app) {
 	 * @returns {Error} 400 - Illegal action
 	 * @returns {Error} 500 - system error
 	 */
-	app.delete('/api/cases/:id/actions/:action', (req, res) => {
-		Case.findById(new ObjectId(hash.decodeHex(req.params.id)))
+	app.delete('/api/cases/:id/actions/:action', auth, (req, res) => {
+		Case
+			.findOne({ aud: aud(req), id: req.params.id })
 			.populate("model")
 			.exec((err, data) => {
 				if (err) throw err;
+				if (!data) return res.status(404).send({ error: 'case not found' });
 
 					// verify the transition is valid first, then reset the transition
 
