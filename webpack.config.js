@@ -3,6 +3,11 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const { env } = process;
 
+const envKeys = Object.keys(env).reduce((prev, next) => {
+  prev[`process.env.${next}`] = JSON.stringify(env[next]);
+  return prev;
+}, {});
+
 const options = {
   mode: env.NODE_ENV,
   entry: './client/index.js',
@@ -18,7 +23,7 @@ const options = {
     ]
   },
   plugins: [
-    new webpack.DefinePlugin({ 'process.env.NODE_ENV': JSON.stringify(env.NODE_ENV) }),
+    new webpack.DefinePlugin(envKeys),
     new HtmlWebpackPlugin()
   ],
   devServer: {

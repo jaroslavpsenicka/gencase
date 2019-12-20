@@ -44,7 +44,7 @@ Case.deleteMany({}, (err) => {
 	const case1 = new ObjectId('000000000010');	
 	Case.create({ _id: case1, 
 		id: hash.encodeHex(case1.toHexString()),  
-		aud: 'public',
+		aud: 'doe.com',
 		name: "Case " + hash.encodeHex(case1.toHexString()), 
 		revision: 3, 
 		starred: false,

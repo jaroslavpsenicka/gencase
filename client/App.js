@@ -1,10 +1,11 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { useRoutes, useRedirect } from 'hookrouter';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import Contents from './components/Contents';
 import { ModelsProvider } from './ModelsContext';
 import { CasesProvider } from './CasesContext';
+import Axios from 'axios';
 
 import ModelsPage from './pages/ModelsPage';
 import ModelDetailPage from './pages/ModelDetailPage';
@@ -34,6 +35,13 @@ const App = () => {
     return useRoutes(routes) || <NoPage />;
   };
   
+  Axios.defaults.headers.common['X-Version'] = process.env.REACT_APP_VERSION;
+  Axios.defaults.headers.common['X-Environment'] = process.env.NODE_ENV;
+  if (process.env.REACT_APP_JWT_TOKEN) {
+    console.log('Using authorization token', process.env.REACT_APP_JWT_TOKEN);
+    Axios.defaults.headers.common['Authorization'] = 'Bearer ' + process.env.REACT_APP_JWT_TOKEN;
+  }
+
   return (
     <ModelsProvider>
     <CasesProvider>

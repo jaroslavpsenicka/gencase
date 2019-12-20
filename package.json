@@ -1,18 +1,20 @@
 {
-  "name": "counter",
-  "version": "1.0.0",
-  "description": "An app using React Redux hooks to increment and decrement a counter",
-  "main": "index.js",
+  "name": "datacase",
+  "version": "0.1.0",
+  "description": "DataCase",
+  "main": "server/server.js",
+  "config": {
+    "jwt_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJkYXRhY2FzZS5vcmciLCJpYXQiOjE1NzY1MTk5NTAsImV4cCI6MTYwODA1NTk1MCwiYXVkIjoiZG9lLmNvbSIsInN1YiI6ImpvaG5AZG9lLmNvbSJ9.g5NgWO_gya25jXKqjO0qIhtLFKBOdg7Y18HvC077hAk"
+  },
   "scripts": {
     "server": "nodemon server/server.js",
     "bpmsim": "nodemon bpmsim/server.js",
-    "client": "cross-env NODE_ENV=development webpack-dev-server --hot --history-api-fallback",
-    "build": "cross-env NODE_ENV=production webpack",
+    "client": "cross-env NODE_ENV=development REACT_APP_VERSION=$npm_package_version REACT_APP_JWT_TOKEN=$npm_package_config_jwt_token webpack-dev-server --hot --history-api-fallback",
+    "build": "cross-env NODE_ENV=production REACT_APP_VERSION=$npm_package_version webpack",
     "lint": "eslint ./client",
-    "test": "cd server && mocha",
-    "dev": "concurrently \"webpack-dev-server --open --history-api-fallback\" \"nodemon server/server.js\""
+    "test": "cd server && mocha"
   },
-  "author": "",
+  "author": "Jaroslav Psenicka",
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.6.4",
