@@ -90,19 +90,23 @@ describe('Events', () => {
     });
   });
 
-  it('start and complete identification, check actions', (done) => {
+  it('start/complete identification', (done) => {
     request.post('http://localhost:8080/api/cases/' + caseObject.id + '/actions/identification', (error, response) => {
       expect(response.statusCode).to.equal(204);
       request.post('http://localhost:8080/api/cases/' + caseObject.id + '/actions/identification/callback', (error, response) => {
         expect(response.statusCode).to.equal(204);
-        request.get('http://localhost:8080/api/cases/' + caseObject.id + '/actions', (error, response) => {
-          expect(response.statusCode).to.equal(200);
-          const json = JSON.parse(response.body);
-          expect(json.length).to.equal(1);
-          expect(json[0].name).to.equal("toBasicApproval");
-          done();
-        });
+        done();
       });
+    });
+  });
+
+  it('check actions', (done) => {
+    request.get('http://localhost:8080/api/cases/' + caseObject.id + '/actions', (error, response) => {
+      expect(response.statusCode).to.equal(200);
+      const json = JSON.parse(response.body);
+      expect(json.length).to.equal(1);
+      expect(json[0].name).to.equal("toBasicApproval");
+      done();
     });
   });
 
