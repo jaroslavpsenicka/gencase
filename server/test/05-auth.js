@@ -199,7 +199,7 @@ describe('Auth', () => {
 
   it('execute case action as aud user', (done) => {
     request.post({
-      uri: 'http://localhost:8080/api/cases/' + audCase.id + '/actions/toIdentification', 
+      uri: 'http://localhost:8080/api/cases/' + audCase.id + '/actions/identification', 
       headers: { Authorization: 'Bearer ' + TEST_JWT }
     }, (error, response) => {
       expect(response.statusCode).to.equal(204);

@@ -165,11 +165,15 @@ describe('Case', () => {
     request.get('http://localhost:8080/api/cases/' + caseObject.id + '/actions' , (error, response) => {
       expect(response.statusCode).to.equal(200);
       const json = JSON.parse(response.body);
-      expect(json.length).to.equal(1);
-      expect(json[0].name).to.equal("toIdentification");
-      expect(json[0].label).to.equal("Identify client");
+      expect(json.length).to.equal(2);
+      expect(json[0].name).to.equal("check");
+      expect(json[0].label).to.equal("fund check");
       expect(json[0].from).to.equal("new");
-      expect(json[0].to).to.equal("identification");
+      expect(json[0].to).to.equal("new");
+      expect(json[1].name).to.equal("identification");
+      expect(json[1].label).to.equal("identification");
+      expect(json[1].from).to.equal("new");
+      expect(json[1].to).to.equal("identification");
       done();
     });
   });
@@ -183,18 +187,8 @@ describe('Case', () => {
   });
 
   it('perform valid action', (done) => {
-    request.post('http://localhost:8080/api/cases/' + caseObject.id + '/actions/toIdentification', (error, response) => {
+    request.post('http://localhost:8080/api/cases/' + caseObject.id + '/actions/identification', (error, response) => {
       expect(response.statusCode).to.equal(204);
-      done();
-    });
-  });
-
-  it('check performed action', (done) => {
-    request.get('http://localhost:8080/api/cases/' + caseObject.id + '/metadata', (error, response) => {
-      const json = JSON.parse(response.body);
-      expect(response.statusCode).to.equal(200);
-      expect(json.state).to.equal("new");
-      expect(json.transition).to.equal("toIdentification");
       done();
     });
   });
@@ -203,12 +197,14 @@ describe('Case', () => {
     request.get('http://localhost:8080/api/cases/' + caseObject.id + '/actions' , (error, response) => {
       expect(response.statusCode).to.equal(200);
       const json = JSON.parse(response.body);
-      expect(json.length).to.equal(1);
-      expect(json[0]).to.eql({ 
-        name: 'toIdentification', 
-        label: 'Cancel identification',
-        to: 'identification',
-        cancel: true });
+      expect(json[0].name).to.equal('check');
+      expect(json[0].label).to.equal('fund check');
+      expect(json[0].to).to.equal('new');
+      expect(json[0].cancel).to.equal(false);
+      expect(json[1].name).to.equal('identification');
+      expect(json[1].label).to.equal('identification');
+      expect(json[1].to).to.equal('identification');
+      expect(json[1].cancel).to.equal(true);
       done();
     });
   });

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
-import { faCog } from '@fortawesome/free-solid-svg-icons'
+import { faCog, faPlayCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from 'react-bootstrap/Button';
 import Axios from 'axios';
@@ -49,7 +49,7 @@ const CaseActions = ({caseId, actions, setActions}) => {
           <Modal.Title>{action.label}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>Are you sure you want to {what} the {action.to}?</p>
+          <p>Are you sure you want to {what} the {action.label}?</p>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setActionDialog(false)}>No, keep everything as is</Button>
@@ -97,8 +97,11 @@ const CaseActions = ({caseId, actions, setActions}) => {
         actions.loading ? <Loading /> : 
         actions.error ? <LoadingError error = { comments.error }/> :  
         actions.data && actions.data.length > 0 ? actions.data.map(a => 
-          <Button className={'ml-2 ' + (a.cancel ? 'btn-warning' : 'btn-primary')} key={a.name}
-            onClick={() => { setAction(a); setActionDialog(true) }}>{a.label}</Button>
+          <Button className={'ml-2 ' + (a.cancel ? 'btn-danger' : 'btn-primary')} key={a.name}
+            onClick={() => { setAction(a); setActionDialog(true) }}>
+            <FontAwesomeIcon icon={a.cancel ? faTimesCircle : faPlayCircle} className="mr-3 br-1 border-right-1"/>
+            {a.cancel ? 'Cancel ' + a.label : 'Start ' + a.label}
+          </Button>
         ) : <div />
       }
     </div>

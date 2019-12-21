@@ -10,7 +10,7 @@ describe('Basics', () => {
     mongoose.connect(config.database.url, { useNewUrlParser: true, useUnifiedTopology: true });
     mongoose.set('useFindAndModify', false);
     const mortgage = new ObjectId('000000000001');	
-    Case.findOne({ model: mortgage, aud: 'public' }, (err, data) => {
+    Case.findOne({ model: mortgage }, (err, data) => {
       mongoose.disconnect();
       expect(data).to.be.not.null;
       done();

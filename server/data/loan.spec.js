@@ -82,6 +82,19 @@ module.exports = {
         key: 3, value: "Idenfification failed"
       }]
     }, {
+      type: "Number",
+      name: "moneyCheckStatus",
+      default: 0,
+      options: [{ 
+        key: 0, value: "Not checked"
+      }, {
+        key: 1, value: "Checked, "
+      }, {
+        key: 2, value: "Idenfification aborted"
+      }, {
+        key: 3, value: "Idenfification failed"
+      }]
+    }, {
       type: "String",
       name: "clientId"
     }]
@@ -134,20 +147,32 @@ module.exports = {
   states: {
     init: 'new',
     transitions: [{ 
-      name: 'toIdentification', 
-      label: 'Identify client',
+      name: 'check', 
+      label: 'fund check',
+      from: 'new', 
+      to: 'new',
+      when: 'data.loanAmount > 10000 && moneyCheckStatus > 0',
+      url: 'http://localhost:8082/check',
+      payload: {
+        'caseId': '{{id}}',
+        'callbackUrl': 'http://localhost:8080/api/cases/{{id}}/actions/check/callback',
+        'amount': '{{data.loanAmount}}'
+      } 
+    }, { 
+      name: 'identification', 
+      label: 'identification',
       from: 'new', 
       to: 'identification',
       url: 'http://localhost:8082/identify',
       payload: {
         'caseId': '{{id}}',
-        'callbackUrl': 'http://localhost:8080/api/cases/{{id}}/actions/toIdentification/callback',
+        'callbackUrl': 'http://localhost:8080/api/cases/{{id}}/actions/identification/callback',
         'client': '{{data.clientName}}',
         'pid': '{{data.personalId}}'
       } 
     }, { 
       name: 'toBasicApproval',
-      label: 'Start approval',
+      label: 'approval',
       style: 'warning', 
       from: 'identification', 
       to: 'basicApproval' 
