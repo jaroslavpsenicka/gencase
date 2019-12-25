@@ -6,7 +6,7 @@ Handlebars.registerHelper('dateFormat', HandlebarsDateFormat);
 
 const toObject = (map) => {
 	const obj = {};
-	map.forEach ((v,k) => { obj[k] = v });
+	map.forEach((v,k) => { obj[k] = v });
 	return obj;
 }
 
@@ -72,8 +72,12 @@ const formatValue = (format, caseObject) => {
 	return Handlebars.compile(format)({...caseObject._doc, data: toObject(caseObject.data)});
 }
 
+const formatObject = (format, object) => {
+	return Handlebars.compile(format)(object);
+}
+
 module.exports = {
 	toObject,
   formatCaseList, formatCaseData, formatCaseMetadata, formatCaseOverview,
-  formatProcessUrl, formatProcessBody
+  formatProcessUrl, formatProcessBody, formatObject
 } 

@@ -30,6 +30,10 @@
         },
         "dataModel": { 
           "type": "string" 
+        },
+        "states": {
+          "type": "array",
+          "items": [{ "type": "string" }]
         }
       }
     },

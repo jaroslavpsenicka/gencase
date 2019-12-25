@@ -88,11 +88,11 @@ module.exports = {
       options: [{ 
         key: 0, value: "Not checked"
       }, {
-        key: 1, value: "Checked, "
+        key: 1, value: "Checked"
       }, {
-        key: 2, value: "Idenfification aborted"
+        key: 2, value: "Check aborted"
       }, {
-        key: 3, value: "Idenfification failed"
+        key: 3, value: "Check failed"
       }]
     }, {
       type: "String",
@@ -153,10 +153,15 @@ module.exports = {
       to: 'new',
       when: 'data.loanAmount > 10000 && moneyCheckStatus > 0',
       url: 'http://localhost:8082/check',
-      payload: {
+      request: {
         'caseId': '{{id}}',
         'callbackUrl': 'http://localhost:8080/api/cases/{{id}}/actions/check/callback',
         'amount': '{{data.loanAmount}}'
+      }, 
+      response: {
+        data: {
+          "moneyCheckStatus": "{{result}}"
+        }
       } 
     }, { 
       name: 'identification', 
@@ -164,11 +169,16 @@ module.exports = {
       from: 'new', 
       to: 'identification',
       url: 'http://localhost:8082/identify',
-      payload: {
+      request: {
         'caseId': '{{id}}',
         'callbackUrl': 'http://localhost:8080/api/cases/{{id}}/actions/identification/callback',
         'client': '{{data.clientName}}',
         'pid': '{{data.personalId}}'
+      },
+      response: {
+        data: {
+          "clientId": "{{cid}}"
+        }
       } 
     }, { 
       name: 'toBasicApproval',
@@ -186,14 +196,17 @@ module.exports = {
     name: 'Request and identification',
     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vel massa tempor, eleifend erat non, euismod dolor. Cras non nibh mauris. In dapibus nunc in tortor vestibulum, nec fermentum nulla tincidunt. In et tincidunt erat, a laoreet mauris.',
     initial: true,
+    states: ['new', 'identification'],
     dataModel: 'Base' 
   }, {
     name: 'Approval',
     description: 'In ac lobortis augue, eget dictum nisi. Morbi vitae iaculis mauris, viverra scelerisque lectus. Nam vulputate sit amet purus et facilisis.',
+    states: ['basicApproval'],
     dataModel: 'Approval' 
   }, {
     name: 'Completion',
     description: 'In tristique diam quis dolor suscipit, nec commodo quam venenatis. Proin odio erat, blandit vitae est in, commodo vehicula odio. Integer fermentum cursus felis, vel ornare orci sodales et. Praesent condimentum ipsum tellus, non tristique tellus maximus in.',
+    states: [],
     dataModel: 'Approval' 
   }]
 };

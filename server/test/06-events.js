@@ -61,9 +61,14 @@ describe('Events', () => {
   });
 
   it('start again and complete', (done) => {
+    const contents = { result: 1 };
     request.post('http://localhost:8080/api/cases/' + caseObject.id + '/actions/check', (error, response) => {
       expect(response.statusCode).to.equal(204);
-      request.post('http://localhost:8080/api/cases/' + caseObject.id + '/actions/check/callback', (error, response) => {
+      request.post({
+        uri: 'http://localhost:8080/api/cases/' + caseObject.id + '/actions/check/callback', 
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(contents)
+      }, (error, response) => {
         expect(response.statusCode).to.equal(204);    
         request.get('http://localhost:8080/api/cases/' + caseObject.id + '/events', (error, response) => {
           expect(response.statusCode).to.equal(200);
@@ -91,6 +96,7 @@ describe('Events', () => {
   });
 
   it('start/complete identification', (done) => {
+    const contents = { result: 1 };
     request.post('http://localhost:8080/api/cases/' + caseObject.id + '/actions/identification', (error, response) => {
       expect(response.statusCode).to.equal(204);
       request.post('http://localhost:8080/api/cases/' + caseObject.id + '/actions/identification/callback', (error, response) => {

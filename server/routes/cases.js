@@ -31,6 +31,29 @@ const validateAgainstModel = (model, values, data) => {
 	});
 }
 
+const findType = (model, state, key) => {
+	const phase = model.phases.find(p => p.states ? p.states.includes(state) : false);
+	if (!phase) throw 'cannot find phase for state ' + state;
+	const entity = model.entities.find(m => m.name === phase.dataModel);
+	if (!entity) throw 'cannot find entity ' + phase.dataModel;
+	const attr = entity.attributes.find(a => a.name === key);
+	if (!attr) throw 'cannot find attribute ' + key + ' in entity ' + phase.dataModel;
+	return attr.type;
+}
+
+const toType = (field, type, value) => {
+	console.log('converting', value, 'to', type)
+	if (type === 'Number') {
+		const rval = Number.parseInt(value);
+		if (Number.isNaN(rval)) throw 'not a number: \'' + value + '\' in field \'' + field + '\'';
+		return rval; 
+	} else if (type === 'Date') {
+		return new Date(value);
+	}
+	
+	return value;
+}
+
 /**
  * @typedef Case
  * @property {string} id - unique identifier
@@ -321,7 +344,7 @@ module.exports = function (app) {
 		request.post({
 			uri: Formatter.formatProcessUrl(theCase, transition.url), 
 			headers: { 'Content-Type': 'application/json' }, 
-			body: JSON.stringify(Formatter.formatProcessBody(theCase, transition.payload)) 
+			body: JSON.stringify(Formatter.formatProcessBody(theCase, transition.request)) 
 		}, err => {
 			if (err) return res.status(500).json({ error: err.message ? err.message : err });
 			const createdBy = req.auth ? req.auth.sub : undefined;
@@ -362,7 +385,29 @@ module.exports = function (app) {
 			return res.status(400).json({ error: 'illegal action ' + req.params.action })
 		} 
 
-		const transition = theCase.model.spec.states.transitions.find(t => t.name === req.params.action);
+		const transitions = theCase.model.spec.states.transitions; 
+		const transition = transitions.find(t => t.name === req.params.action);
+
+		// apply response mapping to the case
+		// and case data
+
+		try {
+			Object.keys(transition.response).forEach(key => {
+				if (UPDATABLE_PROPERTIES.includes(key)) {
+					const fmt = transition.response[key];
+					theCase[key] = Formatter.formatObject(fmt, req.body);
+				}
+			});
+			Object.keys(transition.response.data).forEach(key => {
+				const fmt = transition.response.data[key];
+				const val = Formatter.formatObject(fmt, req.body);
+				const type = findType(theCase.model.spec, theCase.state, key);
+				theCase.data.set(key, toType(key, type, val));
+			});
+		} catch (err) {
+			return res.status(400).json({ error: err })
+		}
+
 		theCase.state = transition.to;
 		theCase.save(err => {
 			if (err) throw err;
