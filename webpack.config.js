@@ -1,5 +1,7 @@
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const LoadablePlugin = require('@loadable/webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const { env } = process;
 
@@ -13,18 +15,30 @@ const options = {
   entry: './client/index.js',
   output: {
     filename: '[name].js',
+    chunkFilename: '[name].[chunkhash].js',
     publicPath: '/'
   },
   module: {
-    rules: [
-      { test: /\.css$/i, use: ['style-loader', 'css-loader']},
-      { test: /\.js$/, loader: 'babel-loader', exclude: /node_modules/ },
-      { test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192' }
-    ]
+    rules: [{ 
+      test: /\.css$/i, 
+      use: [MiniCssExtractPlugin.loader, 'css-loader']
+    }, { 
+      test: /\.js$/, 
+      loader: 'babel-loader', 
+      exclude: /node_modules/
+    }, { 
+      test: /\.(png|jpg)$/, 
+      loader: 'url-loader?limit=8192' 
+    }]
   },
   plugins: [
+    new LoadablePlugin(),
     new webpack.DefinePlugin(envKeys),
-    new HtmlWebpackPlugin()
+    new HtmlWebpackPlugin(),
+    new MiniCssExtractPlugin({
+      filename: '[name].[hash].css',
+      chunkFilename: '[name].[hash].css'
+    })
   ],
   devServer: {
     hot: true
