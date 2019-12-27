@@ -35,7 +35,7 @@
     "grunt-contrib-watch": "0.3.1",
     "grunt-contrib-jshint": "0.4.3",
     "grunt-jasmine-node": "~0.1.0",
-    "mongoose": "~3.6.16",
+    "mongoose": "~5.7.5",
     "express": "~3.3.5",
     "supertest": "~0.7.1",
     "mockgoose": "~1.0.0"
