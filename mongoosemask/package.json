@@ -1,7 +1,7 @@
 {
   "name": "mongoosemask",
   "description": "mongoosemask",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "author": {
     "name": "Anthony McCormick",
     "email": "anthony.mccormick AT gmail.com"
@@ -26,18 +26,8 @@
   "homepage": "https://github.com/mccormicka/mongoosemask",
   "readmeFilename": "README.md",
   "dependencies": {
-    "lodash": "~4.17.15",
-    "nodelogger": "https://github.com/mccormicka/nodelogger/archive/master.tar.gz"
+    "lodash": "~4.17.15"
   },
   "devDependencies": {
-    "express": "^4.17.1",
-    "grunt": "0.4.1",
-    "grunt-contrib-jshint": "0.4.3",
-    "grunt-contrib-watch": "0.3.1",
-    "grunt-jasmine-node": "~0.1.0",
-    "jasmine-node": "https://github.com/mccormicka/jasmine-node/archive/exclusive-tests.tar.gz",
-    "mockgoose": "~1.0.0",
-    "mongoose": "^5.7.5",
-    "supertest": "~0.7.1"
   }
 }

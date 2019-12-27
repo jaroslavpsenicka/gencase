@@ -188,6 +188,7 @@ describe('Case', () => {
 
   it('perform valid action', (done) => {
     request.post('http://localhost:8080/api/cases/' + caseObject.id + '/actions/identification', (error, response) => {
+      console.log(response.body);
       expect(response.statusCode).to.equal(204);
       done();
     });
