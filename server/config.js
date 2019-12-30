@@ -1,9 +1,9 @@
 module.exports = {
 	database: { 
-		url: process.env.MONGODB_URL || "mongodb://localhost:27017/datacase" 
+		url: process.env.MONGODB_URI || "mongodb://localhost:27017/datacase" 
 	},
 	elasticsearch: { 
-		url: process.env.ELASTICSEARCH_URL || "http://localhost:9200",
+		url: process.env.BONSAI_URL || "http://localhost:9200",
 		refresh: true // set to "wait_for" to enforce searchable state, warning: fairly slow 
 	},
 	morgan: {
