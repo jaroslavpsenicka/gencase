@@ -13,6 +13,8 @@ import Loading from '../components/Loading';
 import LoadingError from '../components/LoadingError';
 import { ModelsContext  } from '../ModelsContext';
 
+const SERVICE_URL = process.env.REACT_APP_SERVICE_URL || '';
+
 const ModelsPage = () => {
 
   const [ models, setModels ] = useContext(ModelsContext);
@@ -24,7 +26,7 @@ const ModelsPage = () => {
     if (event.target.name === "file") {
       const formData = new FormData();
       formData.append('file', event.target.files[0], event.target.files[0].name);
-      axios.post('http://localhost:8080/api/models', formData)
+      axios.post(SERVICE_URL + '/api/models', formData)
         .then(resp => setModels([...models, resp.data]))
         .catch(err => console.log(err));
       }
@@ -37,7 +39,7 @@ const ModelsPage = () => {
   }
 
   const toggleStarred = (model) => {
-    axios.put('http://localhost:8080/api/models/' + model.id, { starred: !model.starred })
+    axios.put(SERVICE_URL + '/api/models/' + model.id, { starred: !model.starred })
     .then(resp => setModels(prev => {
       const data = updateData(prev, model);
       return { ...prev, data: data, byId: byId(data)}}))

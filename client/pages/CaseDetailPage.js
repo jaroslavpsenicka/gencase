@@ -18,6 +18,7 @@ import Documents from '../components/Documents';
 import Comments from '../components/Comments';
 import CaseActions from '../components/CaseActions';
 
+const SERVICE_URL = process.env.REACT_APP_SERVICE_URL || '';
 const scrollToRef = (ref) => window.scrollTo(0, ref.current.offsetTop);   
 
 const CaseDetailPage = ({modelId, id}) => {
@@ -31,28 +32,28 @@ const CaseDetailPage = ({modelId, id}) => {
   const documentsRef = useRef(null);
 
   useEffect(() => {
-    Axios.get('http://localhost:8080/api/cases/' + id + '/metadata')
+    Axios.get(SERVICE_URL + '/api/cases/' + id + '/metadata')
       .then(response => setTheCase({ loading: false, data: response.data }))
       .catch(err => setTheCase({ loading: false, error: err }))
   }, [id]);
   useEffect(() => {
-    Axios.get('http://localhost:8080/api/cases/' + id + '/documents')
+    Axios.get(SERVICE_URL + '/api/cases/' + id + '/documents')
       .then(response => setDocuments({ loading: false, data: response.data }))
       .catch(err => setDocuments({ loading: false, error: err }))
   }, [id]);
   useEffect(() => {
-    Axios.get('http://localhost:8080/api/cases/' + id + '/comments')
+    Axios.get(SERVICE_URL + '/api/cases/' + id + '/comments')
       .then(response => setComments({ loading: false, data: response.data }))
       .catch(err => setComments({ loading: false, error: err }))
   }, [id]);
   useEffect(() => {
-    Axios.get('http://localhost:8080/api/cases/' + id + '/actions')
+    Axios.get(SERVICE_URL + '/api/cases/' + id + '/actions')
       .then(response => setActions({ loading: false, data: response.data }))
       .catch(err => setActions({ loading: false, error: err }))
   }, [id]);
 
   const toggleStarred = (toggledCase) => {
-    Axios.put('http://localhost:8080/api/cases/' + theCase.data.id, { starred: !theCase.data.starred })
+    Axios.put(SERVICE_URL + '/api/cases/' + theCase.data.id, { starred: !theCase.data.starred })
       .then(resp => setTheCase(prev => {
         return { ...prev, data: {...prev.data, starred: !prev.data.starred }}
       }))

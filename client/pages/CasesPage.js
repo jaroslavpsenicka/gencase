@@ -18,6 +18,8 @@ import LoadingError from '../components/LoadingError';
 import Search from '../components/Search';
 import CreateCaseDialog from '../components/CreateCaseDialog'
 
+const SERVICE_URL = process.env.REACT_APP_SERVICE_URL || '';
+
 const CasesPage = ({modelId}) => {
 
   const [ models ] = useContext(ModelsContext);
@@ -42,7 +44,7 @@ const CasesPage = ({modelId}) => {
   }
 
   const toggleStarred = (thecase) => {
-    Axios.put('http://localhost:8080/api/cases/' + thecase.id + '/metadata', { starred: !thecase.starred })
+    Axios.put(SERVICE_URL + '/api/cases/' + thecase.id + '/metadata', { starred: !thecase.starred })
     .then(resp => setCases(prev => {
       const data = updateData(prev, thecase);
       return { ...prev, data: data, byId: byId(data)}}))
@@ -54,7 +56,7 @@ const CasesPage = ({modelId}) => {
       setCaseOverview(thecase.id, null);
     } else {
       setCaseOverview(thecase.id, { loading: true });
-      Axios.get('http://localhost:8080/api/cases/' + thecase.id + '/overview')
+      Axios.get(SERVICE_URL + '/api/cases/' + thecase.id + '/overview')
         .then(response => setCaseOverview(thecase.id, { loading: false, data: response.data }))
         .catch(err => setCaseOverview(thecase.id, { loading: false, error: err }));
     }

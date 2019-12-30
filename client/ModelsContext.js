@@ -10,7 +10,7 @@ const ModelsProvider = (props) => {
   const [models, setModels] = useState({ loading: true });
 
   useEffect(() => {
-    Axios.get(SERVICE_URL = '/api/models')
+    Axios.get(SERVICE_URL + '/api/models')
       .then(response => setModels({ 
         loading: false, 
         data: response.data, 

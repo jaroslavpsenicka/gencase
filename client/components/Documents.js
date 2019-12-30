@@ -11,6 +11,8 @@ import Loading from '../components/Loading';
 import LoadingError from '../components/LoadingError'
 import { formatFileSize } from '../Formatters';
 
+const SERVICE_URL = process.env.REACT_APP_SERVICE_URL || '';
+
 const vagueTime = (time) => {
   return VagueTime.get({to: new Date(time)})
 }
@@ -38,7 +40,7 @@ const Documents = ({caseId, documents, setDocuments, documentsRef}) => {
     if (event.target.name === "file") {
       const formData = new FormData();
       formData.append('file', event.target.files[0], event.target.files[0].name);
-      Axios.post('http://localhost:8080/api/cases/' + caseId + '/documents', formData)
+      Axios.post(SERVICE_URL + '/api/cases/' + caseId + '/documents', formData)
         .then(resp => setDocuments({ loading: false, data: [...documents.data, resp.data]}))
         .catch(err => console.error(err));
       }

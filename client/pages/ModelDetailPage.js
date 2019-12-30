@@ -14,6 +14,8 @@ import LoadingError from '../components/LoadingError'
 
 import '../static/timeline.css';
 
+const SERVICE_URL = process.env.REACT_APP_SERVICE_URL || '';
+
 const ModelDetailPage = ({modelId}) => {
 
   const [ models, setModels ] = useContext(ModelsContext);
@@ -25,7 +27,7 @@ const ModelDetailPage = ({modelId}) => {
   }
 
   const toggleStarred = (model) => {
-    Axios.put('http://localhost:8080/api/models/' + model.id, { starred: !model.starred })
+    Axios.put(SERVICE_URL + '/api/models/' + model.id, { starred: !model.starred })
       .then(resp => setModels(prev => {
         const data = updateData(prev, model);
         return { ...prev, data: data, byId: byId(data)}}))

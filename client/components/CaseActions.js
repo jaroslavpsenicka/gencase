@@ -8,6 +8,8 @@ import Axios from 'axios';
 import Loading from '../components/Loading';
 import LoadingError from '../components/LoadingError'
 
+const SERVICE_URL = process.env.REACT_APP_SERVICE_URL || '';
+
 const CaseActions = ({caseId, actions, setActions}) => {
 
   const [action, setAction] = useState({});
@@ -17,7 +19,7 @@ const CaseActions = ({caseId, actions, setActions}) => {
 
   const reloadActions = () => {
     setLoadingOverlay(false);
-    Axios.get('http://localhost:8080/api/cases/' + caseId + '/actions')
+    Axios.get(SERVICE_URL + '/api/cases/' + caseId + '/actions')
     .then(response => setActions({ loading: false, data: response.data }))
     .catch(err => setActions({ loading: false, error: err }));
   }
@@ -31,11 +33,11 @@ const CaseActions = ({caseId, actions, setActions}) => {
     setActionDialog(false);
     setLoadingOverlay(true);
     if (action.cancel) {
-      Axios.delete('http://localhost:8080/api/cases/' + caseId + '/actions/' + action.name)
+      Axios.delete(SERVICE_URL + '/api/cases/' + caseId + '/actions/' + action.name)
       .then(() => reloadActions())
       .catch(err => showError(err))
     } else {
-      Axios.post('http://localhost:8080/api/cases/' + caseId + '/actions/' + action.name)
+      Axios.post(SERVICE_URL + '/api/cases/' + caseId + '/actions/' + action.name)
       .then(() => reloadActions())
       .catch(err => showError(err))
     }
