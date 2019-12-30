@@ -2,6 +2,7 @@ import React, { useState, useEffect, createContext } from 'react';
 import { byId } from './ContextUtils';
 import Axios from 'axios'
 
+const SERVICE_URL = process.env.REACT_APP_SERVICE_URL || '';
 const ModelsContext = createContext([{}, () => {}]);
 
 const ModelsProvider = (props) => {
@@ -9,7 +10,7 @@ const ModelsProvider = (props) => {
   const [models, setModels] = useState({ loading: true });
 
   useEffect(() => {
-    Axios.get('http://localhost:8080/api/models')
+    Axios.get(SERVICE_URL = '/api/models')
       .then(response => setModels({ 
         loading: false, 
         data: response.data, 

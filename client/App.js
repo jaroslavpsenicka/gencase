@@ -38,6 +38,9 @@ const App = () => {
   
   Axios.defaults.headers.common['X-Version'] = process.env.REACT_APP_VERSION;
   Axios.defaults.headers.common['X-Environment'] = process.env.NODE_ENV;
+  if (process.env.REACT_APP_SERVICE_URL) {
+    console.log('Using service', process.env.REACT_APP_SERVICE_URL);
+  }
   if (process.env.REACT_APP_JWT_TOKEN) {
     console.log('Using authorization token', process.env.REACT_APP_JWT_TOKEN.substring(0, 16));
     Axios.defaults.headers.common['Authorization'] = 'Bearer ' + process.env.REACT_APP_JWT_TOKEN;

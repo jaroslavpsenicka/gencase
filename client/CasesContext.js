@@ -2,6 +2,7 @@ import React, { useState, createContext } from 'react';
 import { byId, findByIdAndReplace } from './ContextUtils';
 import Axios from 'axios';
 
+const SERVICE_URL = process.env.REACT_APP_SERVICE_URL || '';
 const CasesContext = createContext([{}, () => {}]);
 
 const CasesProvider = (props) => {
@@ -11,7 +12,7 @@ const CasesProvider = (props) => {
   const loadCases = (modelId) => {
     if (cases.modelId == modelId && cases.byId) return;
     setCases(prev => { return { ...prev, loading: true }});
-    Axios.get('http://localhost:8080/api/models/' + modelId + '/cases')
+    Axios.get(SERVICE_URL + '/api/models/' + modelId + '/cases')
       .then(response => setCases({ 
         loading: false, 
         modelId: modelId, 
@@ -23,7 +24,7 @@ const CasesProvider = (props) => {
   const loadCase = (caseId) => {
     if (cases.byId && cases.byId[caseId] && cases.byId[caseId].detailed) return;
     setCases(prev => { return { ...prev, loading: true }});
-    Axios.get('http://localhost:8080/api/cases/' + caseId)
+    Axios.get(SERVICE_URL + '/api/cases/' + caseId)
       .then(response => {
         const newData = cases.data ? findByIdAndReplace(cases.data, response.data) : [response.data];
         setCases({ loading: false, detailed: true, data: newData, byId: byId(newData) });
