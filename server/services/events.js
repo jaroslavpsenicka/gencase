@@ -3,7 +3,7 @@ const config = require('../config');
 const log4js = require('log4js');
 
 const logger = log4js.getLogger('events')
-const esclient = new elasticsearch.Client({ host: config.elasticsearch.url, log: 'info' });
+const esclient = new elasticsearch.Client({ host: config.elasticsearch.url });
 const mapping = require('./events.mapping');
 
 esclient.indices.exists({
