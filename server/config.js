@@ -3,7 +3,8 @@ module.exports = {
 		url: process.env.MONGODB_URL || "mongodb://localhost:27017/datacase" 
 	},
 	elasticsearch: { 
-		url: process.env.ELASTICSEARCH_URL || "http://localhost:9092/datacase" 
+		url: process.env.ELASTICSEARCH_URL || "http://localhost:9200",
+		refresh: true // set to "wait_for" to enforce searchable state, warning: fairly slow 
 	},
 	morgan: {
 		enabled: false,

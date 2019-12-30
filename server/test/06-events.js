@@ -84,13 +84,18 @@ describe('Events', () => {
   });
 
   it('try to cancel completed', (done) => {
-    request.delete('http://localhost:8080/api/cases/' + caseObject.id + '/actions/check', (error, response) => {
-      expect(response.statusCode).to.equal(400);
-      request.get('http://localhost:8080/api/cases/' + caseObject.id + '/events', (error, response) => {
-        expect(response.statusCode).to.equal(200);
-        const json = JSON.parse(response.body);
-        expect(json.length).to.equal(4);
-        done();
+    request.get('http://localhost:8080/api/cases/' + caseObject.id + '/events', (error, response) => {
+      expect(response.statusCode).to.equal(200);
+      const json = JSON.parse(response.body);
+      expect(json.length).to.equal(4);
+      request.delete('http://localhost:8080/api/cases/' + caseObject.id + '/actions/check', (error, response) => {
+        expect(response.statusCode).to.equal(400);
+        request.get('http://localhost:8080/api/cases/' + caseObject.id + '/events', (error, response) => {
+          expect(response.statusCode).to.equal(200);
+          const json = JSON.parse(response.body);
+          expect(json.length).to.equal(4);
+          done();
+        });
       });
     });
   });

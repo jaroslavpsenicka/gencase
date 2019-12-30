@@ -7,7 +7,6 @@ const methodOverride = require('method-override');
 const mask = require('mongoosemask');
 const path = require('path');
 const log4js = require('log4js');
-const morganBody = require('morgan-body');
 const AuthError = require('./errors').AuthError;
 
 const app = express();
@@ -24,9 +23,6 @@ app.use(bodyParser.urlencoded({ 'extended': 'true' })); // parse application/x-w
 app.use(bodyParser.json()); // parse application/json
 app.use(bodyParser.json({ type: 'application/vnd.api+json' })); // parse application/vnd.api+json as json
 app.use(methodOverride('X-HTTP-Method-Override')); // override with the X-HTTP-Method-Override header in the request
-
-if (config.morgan.enabled) morganBody(app, config.morgan.options);
-
 app.use(express.static(path.join(__dirname, '../dist')));
 
 require('./routes.js')(app);

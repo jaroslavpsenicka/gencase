@@ -1,0 +1,19 @@
+{
+  "properties": {
+    "case": { 
+      "type": "keyword" 
+    },
+    "class": { 
+      "type": "keyword" 
+    },
+    "type": { 
+      "type": "keyword" 
+    },
+    "createdBy": { 
+      "type": "keyword" 
+    },
+    "createdAt": { 
+      "type": "date" 
+    }
+  }
+}

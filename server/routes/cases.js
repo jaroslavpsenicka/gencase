@@ -5,7 +5,7 @@ const Model = require('../model/model');
 const StateMachine = require('javascript-state-machine');
 const request = require('request');
 const log4js = require('log4js');
-const Events = require('../events');
+const eventService = require('../services/events');
 
 const logger = log4js.getLogger('cases')
 const hash = new Hashids();
@@ -23,7 +23,6 @@ const validateAgainstModel = (model, values, data) => {
 	if (!entity) throw "entity '" + initialPhase.dataModel + "' not defined"
 
 	const requiredAttributes = entity.attributes.filter(a => a.notEmpty);
-	logger.debug('verifying attributes', requiredAttributes.map(a => a.name));
 	requiredAttributes.forEach(a => {
 		const value = values[a.name];
 		if (value) data.set(a.name, value);	
@@ -42,7 +41,6 @@ const findType = (model, state, key) => {
 }
 
 const toType = (field, type, value) => {
-	console.log('converting', value, 'to', type)
 	if (type === 'Number') {
 		const rval = Number.parseInt(value);
 		if (Number.isNaN(rval)) throw 'not a number: \'' + value + '\' in field \'' + field + '\'';
@@ -64,6 +62,17 @@ const toType = (field, type, value) => {
  * @property {string}	createdAt - creation date, UTC ISO date
  * @property {string}	updatedBy - last update author
  * @property {string}	updatedAt - last update date, UTC ISO date
+ */
+/**
+ * @typedef Event
+ * @property {string} id - unique identifier
+ * @property {string} class - event class: ACTION 
+ * @property {string} type - event type: ACTION_STARTED, ACTION_CANCELLED, ACTION_COMPLETED
+ * @property {string}	createdBy - original author  
+ * @property {string}	createdAt - creation date, UTC ISO date
+ * @property {string}	updatedBy - last update author
+ * @property {string}	updatedAt - last update date, UTC ISO date
+ * @property {object} data - event payload
  */
 module.exports = function (app) {
 
@@ -265,7 +274,7 @@ module.exports = function (app) {
 				// find all action-started events, 
 				// these actions are currently running
 				
-				Events.findEvents(theCase._id, 'ACTION').then(
+				eventService.findEvents(theCase.id, 'ACTION').then(
 					events => res.status(200).json(getActions(theCase, events)), 
 					err => { throw err }
 				);
@@ -315,7 +324,7 @@ module.exports = function (app) {
 				// verify the action is not already running
 				// and is valid according to state chart
 
-				Events.findLastEvent(theCase._id, 'ACTION', { name: req.params.action }).then(
+				eventService.findLastEventByName(theCase.id, 'ACTION', req.params.action).then(
 					event => performAction(theCase, event, req, res),
 					err => { throw err }
 				);
@@ -349,8 +358,8 @@ module.exports = function (app) {
 			if (err) return res.status(500).json({ error: err.message ? err.message : err });
 			const createdBy = req.auth ? req.auth.sub : undefined;
 			const eventData = { name: req.params.action };
-			Events.submitEvent(theCase._id, 'ACTION_STARTED', createdBy, eventData).then(
-				event => res.status(204).send(),
+			eventService.submitEvent(theCase.id, 'ACTION_STARTED', createdBy, eventData).then(
+				() => res.status(204).send(),
 				err => { throw err }
 			);
 		});
@@ -373,7 +382,7 @@ module.exports = function (app) {
 				if (err) throw err;
 				if (!theCase) return res.status(404).send({ error: 'case not found' });
 
-				Events.findLastEvent(theCase._id, 'ACTION', { name: req.params.action }).then(
+				eventService.findLastEventByName(theCase.id, 'ACTION', req.params.action).then(
 					event => completeAction(theCase, event, req, res),
 					err => { throw err }
 				);
@@ -413,7 +422,7 @@ module.exports = function (app) {
 			if (err) throw err;
 			const createdBy = req.auth ? req.auth.sub : undefined;
 			const eventData = { name: req.params.action };
-			Events.submitEvent(theCase._id, 'ACTION_COMPLETED', createdBy, eventData).then(
+			eventService.submitEvent(theCase.id, 'ACTION_COMPLETED', createdBy, eventData).then(
 				event => res.status(204).send(),
 				err => { 
 					console.err('error saving event ACTION_COMPLETED for case ' + theCase.id); 
@@ -440,7 +449,7 @@ module.exports = function (app) {
 				if (err) throw err;
 				if (!theCase) return res.status(404).send({ error: 'case not found' });
 
-				Events.findLastEvent(theCase._id, 'ACTION', { name: req.params.action }).then(
+				eventService.findLastEventByName(theCase.id, 'ACTION', req.params.action).then(
 					event => cancelAction(theCase, event, req, res),
 					err => { throw err }
 				);
@@ -454,10 +463,30 @@ module.exports = function (app) {
 
 		const createdBy = req.auth ? req.auth.sub : undefined;
 		const eventData = { name: req.params.action };
-		Events.submitEvent(theCase._id, 'ACTION_CANCELLED', createdBy, eventData).then(
+		eventService.submitEvent(theCase.id, 'ACTION_CANCELLED', createdBy, eventData).then(
 			() => { return res.status(204).send() },
 			err => { throw err }
 		);
 	}
+
+	/**
+	 * Get events belonging to given case.
+	 * @route GET /api/cases/{caseId}/events
+	 * @group Case events 
+   * @produces application/json
+	 * @returns {[Event.model]} 200 - An array of respective events
+	 * @returns {Error} 500 - system error
+	 */
+	app.get('/api/cases/:id/events', auth, (req, res) => {
+		Case
+			.findOne({ aud: aud(req), id: req.params.id }, (err, theCase) => {
+				if (err) throw err;
+				if (!theCase) return res.status(404).send({ error: 'case not found' });
+
+				eventService.findEvents(theCase.id)
+					.then(data => res.status(200).send(data))
+					.catch(err => { throw err });
+			});
+	});
 
 }

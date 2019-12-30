@@ -4,7 +4,6 @@ const Model = require('./model/model');
 const Case = require('./model/case');
 const Document = require('./model/document');
 const Comment = require('./model/comment');
-const Event = require('./model/event');
 const swagger = require('express-swagger-generator');
 const config = require('./config');
 
@@ -90,21 +89,16 @@ Comment.deleteMany({}, (err) => {
 	})
 });
 
-Event.deleteMany({}, (err) => {	
-	if (err) throw err;
-});
-
 /** 
  * @typedef Error
  * @property {string} error - error description
  */
-module.exports = function (app) {
+module.exports = function (app, eventService) {
 
-	require('./routes/cases.js')(app);
+	require('./routes/cases.js')(app, eventService);
 	require('./routes/models.js')(app);
 	require('./routes/documents.js')(app);
 	require('./routes/comments.js')(app);
-	require('./routes/events.js')(app);
 
 	swagger(app)(config.swagger);
 
