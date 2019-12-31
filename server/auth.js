@@ -11,14 +11,14 @@ const auth = (req, resp, next) => {
   if (req.headers.authorization) {
 		const auth = req.headers.authorization.split(' ');
 		if (auth[0] === 'Bearer') try {
-         req.auth = jwt.verify(auth[1], SECRET);
-         logger.debug('token', JSON.stringify(req.auth, null, 0));
-         if (!req.auth) throw new AuthError('authorization token not valid');
-         if (req.auth.iss !== ISSUER) throw new AuthError('authorization token not valid');
+      req.auth = jwt.verify(auth[1], SECRET);
+      logger.debug('token', JSON.stringify(req.auth, null, 0));
+      if (!req.auth) throw new AuthError('authorization token not valid');
+      if (req.auth.iss !== ISSUER) throw new AuthError('authorization token not valid');
 		} catch (err) {
-         logger.error('error', err);
-         throw new AuthError(err.message);
-      }
+      logger.error(err.message, auth.length > 0 ? auth[1] : req.headers.authorization);
+      throw new AuthError(err.message);
+    }
 	}
 
 	next();

@@ -194,17 +194,15 @@ describe('Case', () => {
   });
 
   it('list case actions again', (done) => {
+    console.log(caseObject.id);
     request.get('http://localhost:8080/api/cases/' + caseObject.id + '/actions' , (error, response) => {
       expect(response.statusCode).to.equal(200);
       const json = JSON.parse(response.body);
-      expect(json[0].name).to.equal('check');
-      expect(json[0].label).to.equal('fund check');
-      expect(json[0].to).to.equal('new');
-      expect(json[0].cancel).to.equal(false);
-      expect(json[1].name).to.equal('identification');
-      expect(json[1].label).to.equal('identification');
-      expect(json[1].to).to.equal('identification');
-      expect(json[1].cancel).to.equal(true);
+      expect(json.length).to.equal(1);
+      expect(json[0].name).to.equal('identification');
+      expect(json[0].label).to.equal('identification');
+      expect(json[0].to).to.equal('identification');
+      expect(json[0].cancel).to.equal(true);
       done();
     });
   });
@@ -222,6 +220,22 @@ describe('Case', () => {
       expect(response.statusCode).to.equal(200);
       expect(json.state).to.equal("new");
       expect(json.transition).to.be.undefined;
+      done();
+    });
+  });
+
+  it('as well as actions', (done) => {
+    request.get('http://localhost:8080/api/cases/' + caseObject.id + '/actions' , (error, response) => {
+      expect(response.statusCode).to.equal(200);
+      const json = JSON.parse(response.body);
+      expect(json[0].name).to.equal('check');
+      expect(json[0].label).to.equal('fund check');
+      expect(json[0].to).to.equal('new');
+      expect(json[0].cancel).to.equal(false);
+      expect(json[1].name).to.equal('identification');
+      expect(json[1].label).to.equal('identification');
+      expect(json[1].to).to.equal('identification');
+      expect(json[1].cancel).to.equal(false);
       done();
     });
   });

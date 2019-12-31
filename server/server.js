@@ -33,16 +33,19 @@ app.get('*', function(req, res) {
 });
 
 app.use((err, req, res, next) => {
-  logger.error('root handler', err);
   if (err instanceof AuthError) {
     res.status(403).json({ error: err.message });
   } else if (err.message) {
+    logger.error('root handler', err.message);
     const errd = config.errors[err.message];
     if (errd) {
       res.status(errd.status).json({ error: errd.message })
     } else {
-      res.status(500).json({ error: err.message ? err.message : err });
+      res.status(500).json({ error: err.message });
     }
+  } else {
+    logger.error('root handler', err);
+    res.status(500).json({ error: err });
   }
 });
 

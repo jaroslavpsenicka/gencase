@@ -151,16 +151,16 @@ module.exports = {
       label: 'fund check',
       from: 'new', 
       to: 'new',
-      when: 'data.loanAmount > 10000 && moneyCheckStatus > 0',
+      when: 'data.loanAmount > 500',
       url: 'http://localhost:8082/check',
       request: {
-        'caseId': '{{id}}',
-        'callbackUrl': 'http://localhost:8080/api/cases/{{id}}/actions/check/callback',
-        'amount': '{{data.loanAmount}}'
+        caseId: '{{id}}',
+        callbackUrl: 'http://localhost:8080/api/cases/{{id}}/actions/check/callback',
+        amount: '{{data.loanAmount}}'
       }, 
       response: {
         data: {
-          "moneyCheckStatus": "{{result}}"
+          moneyCheckStatus: "{{result}}"
         }
       } 
     }, { 
@@ -170,10 +170,11 @@ module.exports = {
       to: 'identification',
       url: 'http://localhost:8082/identify',
       request: {
-        'caseId': '{{id}}',
-        'callbackUrl': 'http://localhost:8080/api/cases/{{id}}/actions/identification/callback',
-        'client': '{{data.clientName}}',
-        'pid': '{{data.personalId}}'
+        caseId: '{{id}}',
+        callbackUrl: 'http://localhost:8080/api/cases/{{id}}/actions/identification/callback',
+        client: '{{data.clientName}}',
+        pid: '{{data.personalId}}',
+        amount: '{{data.loanAmount}}'
       },
       response: {
         data: {

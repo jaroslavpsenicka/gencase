@@ -2,18 +2,19 @@ const Hashids = require('hashids/cjs');
 const ObjectId = require('mongoose').Types.ObjectId;
 const Case = require('../model/case');
 const Model = require('../model/model');
-const StateMachine = require('javascript-state-machine');
 const request = require('request');
 const log4js = require('log4js');
-const eventService = require('../services/events');
+const eventService = require('../services/event-service');
+const transitionService = require('../services/transition-service');
 
+const config = require('../config');
 const logger = log4js.getLogger('cases')
 const hash = new Hashids();
 const Formatter = require('../formatters');
 const auth = require('../auth').auth;
 const aud = require('../auth').aud;
 
-const UPDATABLE_PROPERTIES = ['name', 'starred'];
+const UPDATABLE_PROPERTIES = config.cases.updatableProperties;
 
 const validateAgainstModel = (model, values, data) => {
 	const initialPhase = model.spec.phases.find(p => p.initial);			
@@ -275,34 +276,11 @@ module.exports = function (app) {
 				// these actions are currently running
 				
 				eventService.findEvents(theCase.id, 'ACTION').then(
-					events => res.status(200).json(getActions(theCase, events)), 
+					events => res.status(200).json(transitionService.getActions(theCase, events)), 
 					err => { throw err }
 				);
 			});
 	});	
-
-	const getActions = (theCase, events) => {
-		const runningActions = [];
-		events.forEach(e => {
-			if (e.type === 'ACTION_STARTED') runningActions.push(e.data.name);
-			else runningActions.splice(runningActions.indexOf(e.data.name));
-		});
-
-		// calculate all possible transitions, 
-		// allow already running actions to cancel 
-
-		const sm = new StateMachine({
-			init: theCase.state,
-			transitions: theCase.model.spec.states.transitions
-		});	
-		const transitions = sm.transitions() || [];
-		return transitions.map(tn => {
-			return { 
-				...theCase.model.spec.states.transitions.find(t => t.name === tn),
-				cancel: runningActions.includes(tn)
-			}
-		});
-	}; 
 
 	/**
 	 * Perform case action.
@@ -336,14 +314,10 @@ module.exports = function (app) {
 			return res.status(400).json({ error: 'action \'' + req.params.action + '\' is already running'});
 		}
 
-		const sm = new StateMachine({
-			init: theCase.state,
-			transitions: theCase.model.spec.states.transitions
-		});	
-		const transitions = sm.transitions() || [];
-		if (!transitions.find(t => t === req.params.action)) {
-			res.status(400).json({ error: 'illegal action \'' + req.params.action + '\''});
-			return;
+		// valdate first
+
+		if (!transitionService.canRunAction(theCase, req.params.action)) {
+			return res.status(400).json({ error: 'illegal action \'' + req.params.action + '\''});
 		}
 
 		// then perform transition (remote call)
