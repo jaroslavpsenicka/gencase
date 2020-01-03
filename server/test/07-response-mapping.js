@@ -37,7 +37,7 @@ describe('Response mapping', () => {
         body: JSON.stringify(contents)
       }, (error, response) => {
         expect(response.statusCode).to.equal(400);
-        expect(JSON.parse(response.body).error).to.equal('not a number: \'\' in field \'moneyCheckStatus\'')
+        expect(JSON.parse(response.body).error).to.equal('not a boolean: \'\' in field \'moneyCheckStatus\'')
         request.get('http://localhost:8080/api/cases/' + caseObject.id, (error, response) => {
           expect(response.statusCode).to.equal(200);
           const json = JSON.parse(response.body);
@@ -52,7 +52,7 @@ describe('Response mapping', () => {
   });
 
   it('cancelled action', (done) => {
-    const contents = { result: 1 };
+    const contents = { result: true };
     request.post('http://localhost:8080/api/cases/' + caseObject.id + '/actions/check', (error, response) => {
       expect(response.statusCode).to.equal(204);
       request.delete('http://localhost:8080/api/cases/' + caseObject.id + '/actions/check', (error, response) => {
@@ -71,7 +71,7 @@ describe('Response mapping', () => {
   });
   
   it('already completed action', (done) => {
-    const contents = { result: 1 };
+    const contents = { result: true };
     request.post('http://localhost:8080/api/cases/' + caseObject.id + '/actions/check', (error, response) => {
       expect(response.statusCode).to.equal(204);
       request.post({
@@ -103,7 +103,7 @@ describe('Response mapping', () => {
         body: JSON.stringify(contents)
       }, (error, response) => {
         expect(response.statusCode).to.equal(400);
-        expect(JSON.parse(response.body).error).to.equal('not a number: \'wrong\' in field \'moneyCheckStatus\'');
+        expect(JSON.parse(response.body).error).to.equal('not a boolean: \'wrong\' in field \'moneyCheckStatus\'');
         request.delete('http://localhost:8080/api/cases/' + caseObject.id + '/actions/check', (error, response) => {
           expect(response.statusCode).to.equal(204);
           done();
@@ -113,7 +113,7 @@ describe('Response mapping', () => {
   });
 
   it('successful check', (done) => {
-    const contents = { result: 1 };
+    const contents = { result: true };
     request.post('http://localhost:8080/api/cases/' + caseObject.id + '/actions/check', (error, response) => {
       expect(response.statusCode).to.equal(204);
       request.post({
@@ -125,7 +125,7 @@ describe('Response mapping', () => {
         request.get('http://localhost:8080/api/cases/' + caseObject.id, (error, response) => {
           expect(response.statusCode).to.equal(200);
           const json = JSON.parse(response.body);
-          expect(json).to.eql({ clientName: 'John Doe', personalId: 'AB123456', loanAmount: 1000, moneyCheckStatus: 1 });
+          expect(json).to.eql({ clientName: 'John Doe', personalId: 'AB123456', loanAmount: 1000, moneyCheckStatus: 'true' });
           done();
         });
       });

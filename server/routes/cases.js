@@ -8,7 +8,6 @@ const eventService = require('../services/event-service');
 const transitionService = require('../services/transition-service');
 
 const config = require('../config');
-const logger = log4js.getLogger('cases')
 const hash = new Hashids();
 const Formatter = require('../formatters');
 const auth = require('../auth').auth;
@@ -16,29 +15,53 @@ const aud = require('../auth').aud;
 
 const UPDATABLE_PROPERTIES = config.cases.updatableProperties;
 
-const validateAgainstModel = (model, values, data) => {
+const validateNewCase = (model, values, caseData) => {
 	const initialPhase = model.spec.phases.find(p => p.initial);			
 	if (!initialPhase) throw "no initial phase defined for " + model.name;
 
 	const entity = model.spec.entities.find(e => e.name == initialPhase.dataModel);
 	if (!entity) throw "entity '" + initialPhase.dataModel + "' not defined"
 
+	validateCase(entity, values, caseData);
+}
+
+const validateCase = (entity, values, caseData) => {
+
+	// validate required attributes
+
 	const requiredAttributes = entity.attributes.filter(a => a.notEmpty);
 	requiredAttributes.forEach(a => {
 		const value = values[a.name];
-		if (value) data.set(a.name, value);	
+		if (value) caseData.set(a.name, value);	
 		else throw "should have required property '" + a.name + "'";
 	});
+
+	// validate attribute value
+
+	entity.attributes.forEach(a => validateAttribute(a, values[a.name]));
 }
 
-const findType = (model, state, key) => {
+const validateAttribute = (attribute, value) => {
+	if (attribute.type === 'Number') {
+		if (attribute.min && value < attribute.min) throw "property '" + attribute.name + "' should be < " + attribute.min;
+		if (attribute.max && value > attribute.max) throw "property '" + attribute.name + "' should be > " + attribute.max;
+	}
+}
+
+const findEntity = (model, state) => {
+	const phase = model.spec.phases.find(p => (p.states && p.states.includes(state)));
+	if (!phase) throw "cannot find phase for state " + state;
+	return model.spec.entities.find(e => e.name === phase.dataModel);
+}
+
+const findAttribute = (model, state, key) => {
 	const phase = model.phases.find(p => p.states ? p.states.includes(state) : false);
 	if (!phase) throw 'cannot find phase for state ' + state;
 	const entity = model.entities.find(m => m.name === phase.dataModel);
 	if (!entity) throw 'cannot find entity ' + phase.dataModel;
 	const attr = entity.attributes.find(a => a.name === key);
 	if (!attr) throw 'cannot find attribute ' + key + ' in entity ' + phase.dataModel;
-	return attr.type;
+	return attr;
 }
 
 const toType = (field, type, value) => {
@@ -46,6 +69,9 @@ const toType = (field, type, value) => {
 		const rval = Number.parseInt(value);
 		if (Number.isNaN(rval)) throw 'not a number: \'' + value + '\' in field \'' + field + '\'';
 		return rval; 
+	} else if (type === 'Boolean') {
+		if (!(value instanceof Boolean) && value !== 'true' && value !== 'false') throw 'not a boolean: \'' + value + '\' in field \'' + field + '\'';
+		return value;
 	} else if (type === 'Date') {
 		return new Date(value);
 	}
@@ -93,7 +119,7 @@ module.exports = function (app) {
 			// Validate input against initial phase model
 
 			try {
-				validateAgainstModel(model, req.body, data);
+				validateNewCase(model, req.body, data);
 			} catch (error) {
 				return res.status(400).json({ error: error });
 			} 
@@ -225,7 +251,8 @@ module.exports = function (app) {
 
 				try {
 					const update = { ...Formatter.toObject(caseObject.data), ...req.body };
-					validateAgainstModel(caseObject.model, update, caseObject.data);
+					const entity = findEntity(caseObject.model, caseObject.state);
+					validateCase(entity, update, caseObject.data, caseObject.phase);
 					caseObject.save(err => {
 						if (err) throw err;
 						return res.status(204).send();
@@ -384,8 +411,9 @@ module.exports = function (app) {
 			Object.keys(transition.response.data).forEach(key => {
 				const fmt = transition.response.data[key];
 				const val = Formatter.formatObject(fmt, req.body);
-				const type = findType(theCase.model.spec, theCase.state, key);
-				theCase.data.set(key, toType(key, type, val));
+				const attr = findAttribute(theCase.model.spec, theCase.state, key);
+				validateAttribute(attr, val);
+				theCase.data.set(key, toType(key, attr.type, val));
 			});
 		} catch (err) {
 			return res.status(400).json({ error: err })

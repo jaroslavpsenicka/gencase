@@ -67,8 +67,8 @@ module.exports = {
       name: "loanAmount",
       input: true,
       notEmpty: true,
-      min: 1000,
-      max: 1000000
+      min: 100,
+      max: 10000
     }, {
       type: "Number",
       name: "clientIdentificationStatus",
@@ -82,18 +82,8 @@ module.exports = {
         key: 3, value: "Idenfification failed"
       }]
     }, {
-      type: "Number",
+      type: "Boolean",
       name: "moneyCheckStatus",
-      default: 0,
-      options: [{ 
-        key: 0, value: "Not checked"
-      }, {
-        key: 1, value: "Checked"
-      }, {
-        key: 2, value: "Check aborted"
-      }, {
-        key: 3, value: "Check failed"
-      }]
     }, {
       type: "String",
       name: "clientId"

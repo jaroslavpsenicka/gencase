@@ -56,7 +56,7 @@ Case.deleteMany({}, (err) => {
 		data: new Map([
 			['clientName', 'Jean-Luc Picard'],
 			['personalId', 'AB123456'],
-			['loanAmount', 50000]
+			['loanAmount', 5000]
 		])
 	});	
 });

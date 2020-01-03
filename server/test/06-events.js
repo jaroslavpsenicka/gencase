@@ -61,7 +61,7 @@ describe('Events', () => {
   });
 
   it('start again and complete', (done) => {
-    const contents = { result: 1 };
+    const contents = { result: true };
     request.post('http://localhost:8080/api/cases/' + caseObject.id + '/actions/check', (error, response) => {
       expect(response.statusCode).to.equal(204);
       request.post({
@@ -69,6 +69,7 @@ describe('Events', () => {
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(contents)
       }, (error, response) => {
+        console.log(response.body);
         expect(response.statusCode).to.equal(204);    
         request.get('http://localhost:8080/api/cases/' + caseObject.id + '/events', (error, response) => {
           expect(response.statusCode).to.equal(200);
