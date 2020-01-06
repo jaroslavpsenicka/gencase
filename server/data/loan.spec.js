@@ -6,14 +6,15 @@
 		| request   				| approval		| completion	 		|
 		| ------------------+-------------+---------------- |
 		| - new	<n>						- basic				- approved <f>	|
-		| - identification		- 4eyes				- rejected <f>	|
+    | - identification		- 4eyes				- rejected <f>	|
 
 		- request phase
 			- new state (initial, created via REST)
-				- unconditional transition to identification [human task] 
+        - unconditional transition to identification [human task] 
 			- identification state (triggered by event)
 				- transition to approval phase when identified [human task] 
-				- transition to completion phase when cannot be identified [email task]
+        - transition to completion phase when cannot be identified [email task]
+        - check action to verify funds (for loans over 500)
 		- approval phase
 			- basic approval state (inital)
 				- transition to 4eyes state when approved [human task]
