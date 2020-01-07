@@ -17,11 +17,17 @@ Upload model and create case
  
 Do the tasks
 - switch to BPM and take both tasks, resolve them
-- switch back to case detail, see callbacks and data mapping in event history
-- show case moved to approval phase (automatically, incl. data migration, new fields)
-- show new task being created (basic approval)
+- switch back to case detail, see task completion notification 
+- show callbacks and data mapping in event history
+- show case moved to approval phase (incl. data migration, new fields)
+- show new task created (basic approval)
 
 Model upgrade
 - split name attribute in two, deploy the model
 - observe the data migration dialog, configure migration, process
 - show case detail with new fields 
+
+### Model upgrade
+
+Migrating one field (clientName) into two (clientFirstName, clientLastName) using simple rules (clientFirstName = clientName.split(' )[0], clientLastName = clientName.split(' )[1]). Approval task requires both clientId and clientName fields to be present, mapping need to be updated within the model (concat, as part of new case spec).
+
