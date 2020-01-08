@@ -140,10 +140,12 @@ module.exports = function (app) {
 				data: data
 			}, (err, caseObject) => {
 				if (err) throw err;
+				const object = { ...caseObject.toObject(), model: model }
 				const resp = { ...caseObject.toObject(), data: Formatter.toObject(caseObject.get('data')) };
-				res.status(201).send(resp);
+				transitionService.autorunAction(object, caseObject.createdBy)
+					.then(() => res.status(201).send(resp))
+					.catch(err => res.status(400).send({ error: err }))
 			});	
-		
 		});
 	});
 
@@ -351,19 +353,11 @@ module.exports = function (app) {
 		// and submit the action-started event
 
 		const transition = theCase.model.spec.states.transitions.find(t => t.name === req.params.action);
-		request.post({
-			uri: Formatter.formatProcessUrl(theCase, transition.url), 
-			headers: { 'Content-Type': 'application/json' }, 
-			body: JSON.stringify(Formatter.formatProcessBody(theCase, transition.request)) 
-		}, err => {
-			if (err) return res.status(500).json({ error: err.message ? err.message : err });
-			const createdBy = req.auth ? req.auth.sub : undefined;
-			const eventData = { name: req.params.action };
-			eventService.submitEvent(theCase.id, 'ACTION_STARTED', createdBy, eventData).then(
-				() => res.status(204).send(),
-				err => { throw err }
-			);
-		});
+		const createdBy = req.auth ? req.auth.sub : undefined;
+		transitionService.runAction(transition, theCase, createdBy).then(
+			() => res.status(204).send(),
+			err => { throw err }
+		);		
 	};
 
 	/**

@@ -173,6 +173,18 @@ module.exports = {
         }
       } 
     }, { 
+      name: 'notify-deal', 
+      label: 'notify big deal',
+      from: 'new', 
+      to: 'new',
+      auto: true,
+      when: 'data.loanAmount > 5000',
+      url: 'http://localhost:8082/notify-deal',
+      request: {
+        caseId: '{{id}}',
+        amount: '{{data.loanAmount}}'
+      } 
+    }, { 
       name: 'toBasicApproval',
       label: 'approval',
       style: 'warning', 

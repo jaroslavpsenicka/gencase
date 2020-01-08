@@ -9,11 +9,10 @@ This is a simple data case management (DC) system. It's main purpose is to keep 
 
 Upload model and create case
 - upload a simple loan case model from IDEA,
-- show the model definition in DC UI, with statechart, phases and data model, 
-- create case from command-line (curl),
-- show the case in state "identification" (auto-run from "new"),
+- show the model definition in DC UI, with states, phases and data model, 
+- create case from command-line (curl), loan amount: 10000
 - issue the funds check
-- show event history
+- show event history, two actions (notify deal and funds check)
  
 Do the tasks
 - switch to BPM and take both tasks, resolve them

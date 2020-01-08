@@ -194,7 +194,6 @@ describe('Case', () => {
   });
 
   it('list case actions again', (done) => {
-    console.log(caseObject.id);
     request.get('http://localhost:8080/api/cases/' + caseObject.id + '/actions' , (error, response) => {
       expect(response.statusCode).to.equal(200);
       const json = JSON.parse(response.body);
@@ -236,6 +235,14 @@ describe('Case', () => {
       expect(json[1].label).to.equal('identification');
       expect(json[1].to).to.equal('identification');
       expect(json[1].cancel).to.equal(false);
+      done();
+    });
+  });
+
+  it('do not allow auto actions', (done) => {
+    request.post('http://localhost:8080/api/cases/' + caseObject.id + '/actions/notify-deal', (error, response) => {
+      expect(response.statusCode).to.equal(400);
+      expect(JSON.parse(response.body).error).to.equal("illegal action 'notify-deal'");
       done();
     });
   });

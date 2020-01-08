@@ -1,9 +1,11 @@
 const StateMachine = require('javascript-state-machine');
 const log4js = require('log4js');
 const vm = require('vm');
+const request = require('request');
 
 const config = require('../config');
 const Formatter = require('../formatters');
+const eventService = require('./event-service');
 
 const logger = log4js.getLogger('transition-service')
 
@@ -47,9 +49,11 @@ const getActions = (theCase, events) => {
     data: Formatter.toObject(theCase.data)
   });
 
-  const conformingTransitions = potentialTransitions.filter(t => {
-    return t.cancel || (t.when ? evaluate(t.when, context) : true);
-  }); 
+  const conformingTransitions = potentialTransitions
+    .filter(t => !t.auto)
+    .filter(t => {
+      return t.cancel || (t.when ? evaluate(t.when, context) : true);
+    }); 
 
   // filter out transitions which are reading or writing data
   // of already running ones
@@ -114,9 +118,60 @@ const canRunAction = (theCase, actionName) => {
   });	
 
   const transitions = sm.transitions() || [];
-  return (transitions.find(t => t === actionName));
+  if (transitions.find(t => t === actionName)) {
+    const transition = theCase.model.spec.states.transitions.find(t => t.name === actionName);
+    return transition && !transition.auto;
+  }
+
+  return false;
+}
+
+const autorunAction = (theCase, createdBy) => {
+  const sm =  new StateMachine({
+    init: theCase.state,
+    transitions: theCase.model.spec.states.transitions
+  });	
+  const transitions = sm.transitions() || [];
+  const potentialTransitions = transitions.map(tn => {
+    return theCase.model.spec.states.transitions.find(t => t.name === tn)
+  });
+
+  const context = vm.createContext({
+    id: theCase.id,
+    name: theCase.name,
+    data: Formatter.toObject(theCase.data)
+  });
+
+  const runnableTransitions = potentialTransitions
+    .filter(t => t.auto)
+    .filter(t => (t.when ? evaluate(t.when, context) : true))
+
+  if (runnableTransitions.length > 1) {
+    throw 'only one action may autorun, found ' + runnableActions
+  } else if (runnableTransitions.length == 0) {
+    return Promise.resolve();
+  }
+
+  return runAction(runnableTransitions[0], theCase, createdBy);
+}
+
+const runAction = (transition, theCase, createdBy) => {
+  logger.debug(theCase.id, 'running action', transition.name);
+  return new Promise((resolve, reject) => {
+    request.post({
+      uri: Formatter.formatProcessUrl(theCase, transition.url), 
+      headers: { 'Content-Type': 'application/json' }, 
+      body: JSON.stringify(Formatter.formatProcessBody(theCase, transition.request)) 
+    }, err => {
+      if (err) reject(err);
+      const eventData = { name: transition.name };
+      eventService.submitEvent(theCase.id, 'ACTION_STARTED', createdBy, eventData)
+        .then(() => resolve())
+        .catch(err => reject(err));
+    });
+  });
 }
 
 module.exports = {
-  getActions, canRunAction
+  getActions, canRunAction, runAction, autorunAction
 }

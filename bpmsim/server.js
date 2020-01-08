@@ -29,6 +29,11 @@ app.post('/identify', (req, res) => {
   res.status(204).send();
 });
 
+app.post('/notify-deal', (req, res) => {
+  console.log("Notify deal", req.body);
+  res.status(204).send();
+});
+
 app.use((err, req, res, next) => {
   console.log(err);
   res.status(500);
