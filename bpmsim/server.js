@@ -22,15 +22,14 @@ app.use(express.static(path.join(__dirname, '../dist')));
 app.post('/identify', (req, res) => {
   console.log("Identification", req.body);
   setTimeout(() => {
-    Axios.post(req.body.callbackUrl, {
-      cid: Math.floor(Math.random())
-    })
+    Axios.post(req.body.callbackUrl, { cid: Math.floor(Math.random()) })
   }, 5000);
   res.status(204).send();
 });
 
 app.post('/notify-deal', (req, res) => {
   console.log("Notify deal", req.body);
+  Axios.post(req.body.callbackUrl, {});
   res.status(204).send();
 });
 

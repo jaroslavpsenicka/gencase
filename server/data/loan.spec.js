@@ -147,6 +147,7 @@ module.exports = {
       request: {
         caseId: '{{id}}',
         callbackUrl: 'http://localhost:8080/api/cases/{{id}}/actions/check/callback',
+        client: '{{data.clientName}}',
         amount: '{{data.loanAmount}}'
       }, 
       response: {
@@ -164,8 +165,7 @@ module.exports = {
         caseId: '{{id}}',
         callbackUrl: 'http://localhost:8080/api/cases/{{id}}/actions/identification/callback',
         client: '{{data.clientName}}',
-        pid: '{{data.personalId}}',
-        amount: '{{data.loanAmount}}'
+        pid: '{{data.personalId}}'
       },
       response: {
         data: {
@@ -182,6 +182,7 @@ module.exports = {
       url: 'http://localhost:8082/notify-deal',
       request: {
         caseId: '{{id}}',
+        callbackUrl: 'http://localhost:8080/api/cases/{{id}}/actions/notify-deal/callback',
         amount: '{{data.loanAmount}}'
       } 
     }, { 

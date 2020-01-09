@@ -257,10 +257,9 @@ module.exports = function (app) {
 					validateCase(entity, update, caseObject.data, caseObject.phase);
 					caseObject.save(err => {
 						if (err) throw err;
-						const createdBy = req.auth ? req.auth.sub : undefined;
-						transitionService.autorunAction(caseObject, createdBy)
-							.then(() => res.status(204).send())
-							.catch(err => res.status(400).send({ error: err.message ? err.message : err }))
+						eventService.findEvents(caseObject.id, 'ACTION').then(
+							events => performAutorun(req, res, caseObject, events),
+							err => res.status(400).json({ error: error }));
 					});
 				} catch (error) {
 					return res.status(400).json({ error: error });
@@ -269,6 +268,13 @@ module.exports = function (app) {
 			});
 	});
 	
+	const performAutorun = (req, res, caseObject, events) => {
+		const createdBy = req.auth ? req.auth.sub : undefined;
+		transitionService.autorunAction(caseObject, createdBy, events)
+			.then(() => res.status(204).send())
+			.catch(err => res.status(400).send({ error: err.message ? err.message : err }))
+	}
+
 	/**
 	 * Get case overview fields.
 	 * @route GET /api/cases/{caseId}/overview
@@ -381,13 +387,13 @@ module.exports = function (app) {
 				if (!theCase) return res.status(404).send({ error: 'case not found' });
 
 				eventService.findLastEventByName(theCase.id, 'ACTION', req.params.action).then(
-					event => completeAction(theCase, event, req, res),
+					event => completeActionCallback(theCase, event, req, res),
 					err => { throw err }
 				);
 			})
 	});
 
-	const completeAction = (theCase, event, req, res) => {
+	const completeActionCallback = (theCase, event, req, res) => {
 		if (event && event.type !== 'ACTION_STARTED') {
 			return res.status(400).json({ error: 'illegal action ' + req.params.action })
 		} 
@@ -396,22 +402,24 @@ module.exports = function (app) {
 		const transition = transitions.find(t => t.name === req.params.action);
 
 		// apply response mapping to the case
-		// and case data
+		// and case data, if required (if the response is defined)
 
 		try {
-			Object.keys(transition.response).forEach(key => {
-				if (UPDATABLE_PROPERTIES.includes(key)) {
-					const fmt = transition.response[key];
-					theCase[key] = Formatter.formatObject(fmt, req.body);
-				}
-			});
-			Object.keys(transition.response.data).forEach(key => {
-				const fmt = transition.response.data[key];
-				const val = Formatter.formatObject(fmt, req.body);
-				const attr = findAttribute(theCase.model.spec, theCase.state, key);
-				validateAttribute(attr, val);
-				theCase.data.set(key, toType(key, attr.type, val));
-			});
+			if (transition.response) {
+				Object.keys(transition.response).forEach(key => {
+					if (UPDATABLE_PROPERTIES.includes(key)) {
+						const fmt = transition.response[key];
+						theCase[key] = Formatter.formatObject(fmt, req.body);
+					}
+				});
+				Object.keys(transition.response.data).forEach(key => {
+					const fmt = transition.response.data[key];
+					const val = Formatter.formatObject(fmt, req.body);
+					const attr = findAttribute(theCase.model.spec, theCase.state, key);
+					validateAttribute(attr, val);
+					theCase.data.set(key, toType(key, attr.type, val));
+				});
+			}
 		} catch (err) {
 			return res.status(400).json({ error: err })
 		}
@@ -423,10 +431,7 @@ module.exports = function (app) {
 			const eventData = { name: req.params.action };
 			eventService.submitEvent(theCase.id, 'ACTION_COMPLETED', createdBy, eventData).then(
 				event => res.status(204).send(),
-				err => { 
-					console.err('error saving event ACTION_COMPLETED for case ' + theCase.id); 
-					throw err; 
-				}
+				err => { throw err }
 			);
 		});
 	}

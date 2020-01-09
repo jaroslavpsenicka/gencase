@@ -53,7 +53,7 @@ const formatProcessUrl = (caseObject, url) => {
 
 const formatProcessBody = (caseObject, payload) => {
   const body = {};
- 	Object.keys(payload).forEach(k => body[k] = formatValue(payload[k], caseObject));
+	Object.keys(payload).forEach(k => body[k] = formatValue(payload[k], caseObject));
 	return body;
 }
 
@@ -69,7 +69,8 @@ const formatCaseDetail = (caseObject, model) => {
 }
 
 const formatValue = (format, caseObject) => {
-	return Handlebars.compile(format)({...caseObject._doc, data: toObject(caseObject.data)});
+	const data = caseObject._doc ? caseObject._doc : caseObject;
+	return Handlebars.compile(format)({...data, data: toObject(caseObject.data)});
 }
 
 const formatObject = (format, object) => {

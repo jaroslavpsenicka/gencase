@@ -23,7 +23,7 @@ describe('Action autorun', () => {
     }, (error, response, body) => {
       expect(response.statusCode).to.equal(201);
       caseObject = JSON.parse(body);
-      done();
+      setTimeout(() => done(), 100); // wait for the callback
     });
   });
 
@@ -31,10 +31,13 @@ describe('Action autorun', () => {
     request.get('http://localhost:8080/api/cases/' + caseObject.id + '/events', (error, response) => {
       expect(response.statusCode).to.equal(200);
       const json = JSON.parse(response.body);
-      expect(json.length).to.equal(1);
+      expect(json.length).to.equal(2);
       expect(json[0].class).to.equal('ACTION');
       expect(json[0].type).to.equal('ACTION_STARTED');
       expect(json[0].data).to.eql({ name: 'notify-deal' });
+      expect(json[1].class).to.equal('ACTION');
+      expect(json[1].type).to.equal('ACTION_COMPLETED');
+      expect(json[1].data).to.eql({ name: 'notify-deal' });
       done();
     }); 
   });
@@ -50,13 +53,16 @@ describe('Action autorun', () => {
       request.get('http://localhost:8080/api/cases/' + caseObject.id + '/events', (error, response) => {
         expect(response.statusCode).to.equal(200);
         const json = JSON.parse(response.body);
-        expect(json.length).to.equal(2);
+        expect(json.length).to.equal(3);
         expect(json[0].class).to.equal('ACTION');
         expect(json[0].type).to.equal('ACTION_STARTED');
         expect(json[0].data).to.eql({ name: 'notify-deal' });
         expect(json[1].class).to.equal('ACTION');
-        expect(json[1].type).to.equal('ACTION_STARTED');
+        expect(json[1].type).to.equal('ACTION_COMPLETED');
         expect(json[1].data).to.eql({ name: 'notify-deal' });
+        expect(json[2].class).to.equal('ACTION');
+        expect(json[2].type).to.equal('ACTION_STARTED');
+        expect(json[2].data).to.eql({ name: 'notify-deal' });
         done();
       }); 
     });

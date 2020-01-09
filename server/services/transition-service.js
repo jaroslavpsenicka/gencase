@@ -126,7 +126,13 @@ const canRunAction = (theCase, actionName) => {
   return false;
 }
 
-const autorunAction = (theCase, createdBy) => {
+const autorunAction = (theCase, createdBy, events=[]) => {
+  const runningActions = [];
+  events.forEach(e => {
+    if (e.type === 'ACTION_STARTED') runningActions.push(e.data.name);
+    else runningActions.splice(runningActions.indexOf(e.data.name));
+  });
+
   const sm =  new StateMachine({
     init: theCase.state,
     transitions: theCase.model.spec.states.transitions
@@ -144,6 +150,7 @@ const autorunAction = (theCase, createdBy) => {
 
   const runnableTransitions = potentialTransitions
     .filter(t => t.auto)
+    .filter(t => !runningActions.includes(t.name))
     .filter(t => (t.when ? evaluate(t.when, context) : true))
 
   if (runnableTransitions.length > 1) {
