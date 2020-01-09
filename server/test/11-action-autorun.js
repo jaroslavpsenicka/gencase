@@ -39,6 +39,29 @@ describe('Action autorun', () => {
     }); 
   });
 
+  it('even after an update', (done) => {
+    const contents = { loanAmount: 7000 };
+    request.put({
+      uri: 'http://localhost:8080/api/cases/' + caseObject.id, 
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(contents)
+    }, (error, response, body) => {
+      expect(response.statusCode).to.equal(204);
+      request.get('http://localhost:8080/api/cases/' + caseObject.id + '/events', (error, response) => {
+        expect(response.statusCode).to.equal(200);
+        const json = JSON.parse(response.body);
+        expect(json.length).to.equal(2);
+        expect(json[0].class).to.equal('ACTION');
+        expect(json[0].type).to.equal('ACTION_STARTED');
+        expect(json[0].data).to.eql({ name: 'notify-deal' });
+        expect(json[1].class).to.equal('ACTION');
+        expect(json[1].type).to.equal('ACTION_STARTED');
+        expect(json[1].data).to.eql({ name: 'notify-deal' });
+        done();
+      }); 
+    });
+  });
+
   it('create case not matching the condition', (done) => {
     const contents = { clientName: 'John Doe', personalId: 'AB123456', loanAmount: 1000 };
     request.post({

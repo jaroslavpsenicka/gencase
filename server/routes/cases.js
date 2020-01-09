@@ -257,7 +257,10 @@ module.exports = function (app) {
 					validateCase(entity, update, caseObject.data, caseObject.phase);
 					caseObject.save(err => {
 						if (err) throw err;
-						return res.status(204).send();
+						const createdBy = req.auth ? req.auth.sub : undefined;
+						transitionService.autorunAction(caseObject, createdBy)
+							.then(() => res.status(204).send())
+							.catch(err => res.status(400).send({ error: err.message ? err.message : err }))
 					});
 				} catch (error) {
 					return res.status(400).json({ error: error });
