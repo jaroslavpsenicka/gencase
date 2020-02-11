@@ -84,7 +84,6 @@ describe('Model', () => {
     request.post(file(validModel), (error, response, body) => {
       model = JSON.parse(body);
       expect(model).to.not.be.null;
-      if (response.statusCode != 201) console.log(body);
       expect(response.statusCode).to.equal(201);
       done();
     });

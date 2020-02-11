@@ -69,7 +69,6 @@ describe('Events', () => {
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(contents)
       }, (error, response) => {
-        console.log(response.body);
         expect(response.statusCode).to.equal(204);    
         request.get('http://localhost:8080/api/cases/' + caseObject.id + '/events', (error, response) => {
           expect(response.statusCode).to.equal(200);

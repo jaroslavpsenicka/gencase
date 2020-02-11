@@ -427,9 +427,8 @@ module.exports = function (app) {
 		theCase.state = transition.to;
 		theCase.save(err => {
 			if (err) throw err;
-			const createdBy = req.auth ? req.auth.sub : undefined;
 			const eventData = { name: req.params.action };
-			eventService.submitEvent(theCase.id, 'ACTION_COMPLETED', createdBy, eventData).then(
+			eventService.submitEvent(theCase, 'ACTION_COMPLETED', theCase.createdBy, eventData).then(
 				event => res.status(204).send(),
 				err => { throw err }
 			);
@@ -467,7 +466,7 @@ module.exports = function (app) {
 
 		const createdBy = req.auth ? req.auth.sub : undefined;
 		const eventData = { name: req.params.action };
-		eventService.submitEvent(theCase.id, 'ACTION_CANCELLED', createdBy, eventData).then(
+		eventService.submitEvent(theCase, 'ACTION_CANCELLED', createdBy, eventData).then(
 			() => { return res.status(204).send() },
 			err => { throw err }
 		);

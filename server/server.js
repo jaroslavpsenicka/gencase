@@ -27,26 +27,4 @@ app.use(express.static(path.join(__dirname, '../dist')));
 
 require('./routes.js')(app);
 
-app.get('*', function(req, res) {
-    console.log(path.resolve(__dirname, '../dist/index.html'));
-    res.sendFile(path.resolve(__dirname, '../dist/index.html'));                               
-});
-
-app.use((err, req, res, next) => {
-  if (err instanceof AuthError) {
-    res.status(403).json({ error: err.message });
-  } else if (err.message) {
-    logger.error('root handler', err.message);
-    const errd = config.errors[err.message];
-    if (errd) {
-      res.status(errd.status).json({ error: errd.message })
-    } else {
-      res.status(500).json({ error: err.message });
-    }
-  } else {
-    logger.error('root handler', err);
-    res.status(500).json({ error: err });
-  }
-});
-
 app.listen(process.env.PORT || 8080);

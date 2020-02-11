@@ -58,7 +58,11 @@ const getActions = (theCase, events) => {
   // filter out transitions which are reading or writing data
   // of already running ones
 
-  const lockedAttributes = collectLockedAttributes(potentialTransitions.filter(t => t.cancel));
+  logger.debug(theCase.id, 'events:', events);
+  logger.debug(theCase.id, 'running actions:', runningActions);
+  const runningTransitions = potentialTransitions.filter(t => t.cancel);
+  logger.debug(theCase.id, 'running transitions:', runningTransitions);
+  const lockedAttributes = collectLockedAttributes(runningTransitions);
   logger.debug(theCase.id, 'locked attributes:', lockedAttributes);
   return conformingTransitions.filter(t => {
     const foundAttrs = collectRequestAttributes(t).filter(a => lockedAttributes.includes(a));
@@ -172,7 +176,7 @@ const runAction = (transition, theCase, createdBy) => {
     }, err => {
       if (err) reject(err);
       const eventData = { name: transition.name };
-      eventService.submitEvent(theCase.id, 'ACTION_STARTED', createdBy, eventData)
+      eventService.submitEvent(theCase, 'ACTION_STARTED', createdBy, eventData)
         .then(() => resolve())
         .catch(err => reject(err));
     });

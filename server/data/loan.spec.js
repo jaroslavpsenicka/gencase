@@ -169,7 +169,7 @@ module.exports = {
       },
       response: {
         data: {
-          "clientId": "{{cid}}"
+          clientId: "{{cid}}"
         }
       } 
     }, { 

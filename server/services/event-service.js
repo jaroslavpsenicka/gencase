@@ -1,7 +1,11 @@
 const elasticsearch = require('elasticsearch');
 const config = require('../config');
 const log4js = require('log4js');
+const Notification = require('../model/notification');
+const ObjectId = require('mongoose').Types.ObjectId;
+const Hashids = require('hashids/cjs');
 
+const hash = new Hashids();
 const logger = log4js.getLogger('events')
 const esclient = new elasticsearch.Client({ host: config.elasticsearch.url });
 const mapping = require('./events.mapping');
@@ -49,15 +53,38 @@ const findLastEventByName = (caseId, eventClass, name) => {
   });
 }
 
-const submitEvent = (caseId, eventType, eventAuthor, data) => {
-  return esclient.index({ index: 'events', refresh: config.elasticsearch.refresh, body: {
-    case: caseId,
-    class: eventType.substring(0, eventType.indexOf('_')),
-    type: eventType,
-    createdBy: eventAuthor,
-    createdAt: new Date(),
-    data: data ? data : {}
-  }});
+const createNotification = (theCase, eventType, eventAuthor, data) => {
+  return new Promise(function(resolve, reject) {
+    if (eventType == 'ACTION_COMPLETED') {
+      logger.info('generating notification', eventType, theCase.id);
+      const notifId = new ObjectId();	
+      Notification.create({ _id: notifId, 
+        id: hash.encodeHex(notifId.toHexString()),
+        title: data.name + ' completed', 
+        subtitle: 'by ' + eventAuthor,
+        case: theCase.id,
+        sub: eventAuthor,
+        createdBy: eventAuthor,
+        createdAt: new Date(),
+      }).then(() => resolve()).catch(err => reject(err));
+    } else resolve();
+  });
+}
+
+const submitEvent = (theCase, eventType, eventAuthor, data) => {
+  logger.info('submitting event', theCase.id, eventType, eventAuthor, data);
+  return new Promise(function(resolve, reject) {
+    createNotification(theCase, eventType, eventAuthor, data).then(() => {
+      esclient.index({ index: 'events', refresh: config.elasticsearch.refresh, body: {
+        case: theCase.id,
+        class: eventType.substring(0, eventType.indexOf('_')),
+        type: eventType,
+        createdBy: eventAuthor,
+        createdAt: new Date(),
+        data: data ? data : {}
+      }}).then(() => resolve()).catch(err => reject(err));
+    });
+  });
 }
 
 module.exports = {

@@ -1,3 +1,4 @@
+const log4js = require('log4js');
 const Hashids = require('hashids/cjs');
 const ObjectId = require('mongoose').Types.ObjectId; 
 const Model = require('./model/model');
@@ -6,6 +7,9 @@ const Document = require('./model/document');
 const Comment = require('./model/comment');
 const swagger = require('express-swagger-generator');
 const config = require('./config');
+const AuthError = require('./errors').AuthError;
+
+const logger = log4js.getLogger('routes');
 
 const hash = new Hashids();
 const mortgage = new ObjectId('000000000001');	
@@ -93,17 +97,39 @@ Comment.deleteMany({}, (err) => {
  * @typedef Error
  * @property {string} error - error description
  */
-module.exports = function (app, eventService) {
+module.exports = function (app) {
 
-	require('./routes/cases.js')(app, eventService);
+	require('./routes/cases.js')(app);
 	require('./routes/models.js')(app);
 	require('./routes/documents.js')(app);
 	require('./routes/comments.js')(app);
+	require('./routes/notifications.js')(app);
 
 	swagger(app)(config.swagger);
 
 	app.get('/swagger.json', (err, res) => {
     res.status(200).json(swagger.json());
 	})
+
+	app.get('*', function(req, res) {
+    res.sendFile(path.resolve(__dirname, '../dist/index.html'));                               
+	});
+
+	app.use((err, req, res, next) => {
+		if (err instanceof AuthError) {
+			res.status(403).json({ error: err.message });
+		} else if (err.message) {
+			logger.error('root handler', err.message);
+			const errd = config.errors[err.message];
+			if (errd) {
+				res.status(errd.status).json({ error: errd.message })
+			} else {
+				res.status(500).json({ error: err.message });
+			}
+		} else {
+			logger.error('root handler', err);
+			res.status(500).json({ error: err });
+		}
+	});
 
 }	

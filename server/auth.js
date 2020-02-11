@@ -9,6 +9,7 @@ const SECRET = 'qwertyuiopasdfghjklzxcvbnm123456'; // http://jwtbuilder.jamiekur
 
 const auth = (req, resp, next) => {
   if (req.headers.authorization) {
+    logger.debug('authorization', req.headers.authorization);
 		const auth = req.headers.authorization.split(' ');
 		if (auth[0] === 'Bearer') try {
       req.auth = jwt.verify(auth[1], SECRET);
@@ -28,4 +29,8 @@ const aud = (req) => {
   return req.auth ? req.auth.aud : undefined;
 }
 
-module.exports = { auth, aud }
+const sub = (req) => {
+  return req.auth ? req.auth.sub : undefined;
+}
+
+module.exports = { auth, aud, sub }

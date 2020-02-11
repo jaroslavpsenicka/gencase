@@ -39,7 +39,7 @@ describe('Action locking', () => {
   });
 
   it('so called start first action', (done) => {
-    eventService.submitEvent(caseObject.id, 'ACTION_STARTED', undefined, { name: 'check' })
+    eventService.submitEvent(caseObject, 'ACTION_STARTED', undefined, { name: 'check' })
       .then(() => done());
   });
 
