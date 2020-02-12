@@ -41,9 +41,9 @@ module.exports = function (app) {
 	 * @returns {Error} 500 - system error
 	 */
 	app.put('/api/notifications/:id', auth, (req, res) => {
-		if (!body.seen) return res.status(400).send({ error: 'illegal parameter' })
+		if (!req.body.seen) return res.status(400).send({ error: 'illegal parameter' })
 		Notification.findOneAndUpdate({ sub: sub(req), id: req.params.id }, {
-			seen: !body.seen,
+			seen: req.body.seen,
 			updatedBy: sub(auth),
 			updatedAt: new Date()
 		}, (err, data) => {

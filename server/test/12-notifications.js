@@ -7,6 +7,7 @@ describe('Notifications', () => {
 
   var model;
   var caseObject;
+  var notification;
 
   it('find test model', done => {
     request.get('http://localhost:8080/api/models' , (error, response) => {
@@ -54,13 +55,78 @@ describe('Notifications', () => {
     }, (error, response) => {
       expect(response.statusCode).to.equal(200);
       const json = JSON.parse(response.body);
-      expect(json.length).to.gte(1);
-      const notification = json.find(e => e.case === caseObject.id)
+      notification = json.find(e => e.case === caseObject.id)
       expect(notification.title).to.equal('notify-deal completed');
       expect(notification.subtitle).to.equal('by john@doe.com');
       expect(notification.case).to.equal(caseObject.id);
       expect(notification.sub).to.equal('john@doe.com');
       expect(notification.seen).to.equal(false);
+      expect(notification.updatedAt).to.be.undefined;
+      expect(notification.updatedBy).to.be.undefined;
+      done();
+    });
+  });
+
+  it('and can be confirmed', (done) => {
+    const contents = { seen: true };
+    request.put({
+      uri: 'http://localhost:8080/api/notifications/' + notification.id,
+      headers: { Authorization: 'Bearer ' + TEST_JWT, 'Content-Type': 'application/json' },
+      body: JSON.stringify(contents)
+    }, (error, response) => {
+      expect(response.statusCode).to.equal(204);
+      request.get({
+        uri: 'http://localhost:8080/api/notifications',
+        headers: { Authorization: 'Bearer ' + TEST_JWT }
+      }, (error, response) => {
+        expect(response.statusCode).to.equal(200);
+        const json = JSON.parse(response.body);
+        const confirmed = json.find(e => e.case === caseObject.id)
+        expect(confirmed.title).to.equal('notify-deal completed');
+        expect(confirmed.subtitle).to.equal('by john@doe.com');
+        expect(confirmed.case).to.equal(caseObject.id);
+        expect(confirmed.sub).to.equal('john@doe.com');
+        expect(confirmed.seen).to.equal(true);
+        expect(confirmed.updatedAt).to.not.be.undefined;
+        expect(confirmed.updatedBy).to.not.be.undefined;
+        done();
+      });
+    });
+  });
+
+  it('valid notifications only', (done) => {
+    const contents = { seen: true };
+    request.put({
+      uri: 'http://localhost:8080/api/notifications/illegal',
+      headers: { Authorization: 'Bearer ' + TEST_JWT, 'Content-Type': 'application/json' },
+      body: JSON.stringify(contents)
+    }, (error, response) => {
+      expect(response.statusCode).to.equal(404);
+      done();
+    });
+  });
+
+  it('valid attrbutes only', (done) => {
+    const contents = { illegal: true };
+    request.put({
+      uri: 'http://localhost:8080/api/notifications/' + notification.id,
+      headers: { Authorization: 'Bearer ' + TEST_JWT, 'Content-Type': 'application/json' },
+      body: JSON.stringify(contents)
+    }, (error, response) => {
+      expect(response.statusCode).to.equal(400);
+      expect(JSON.parse(response.body).error).to.equal('illegal parameter');
+      done();
+    });
+  });
+
+  it('valid users only', (done) => {
+    const contents = { seen: true };
+    request.put({
+      uri: 'http://localhost:8080/api/notifications/' + notification.id,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(contents)
+    }, (error, response) => {
+      expect(response.statusCode).to.equal(404);
       done();
     });
   });
