@@ -4,14 +4,13 @@ import Navbar from 'react-bootstrap/Navbar';
 import { A } from 'hookrouter';
 import { faHome, faCog, faCube } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import styled from 'styled-components';
 
 import { ModelsContext  } from '../ModelsContext';
 
-import './Sidebar.css';
+const Sidebar = ({ visible }) => {  
 
-const Sidebar = (props) => {  
-
-  const [ models, setModels ] = useContext(ModelsContext);
+  const [ models ] = useContext(ModelsContext);
 
   const Cases = ({models}) => (
     <ul>
@@ -23,17 +22,30 @@ const Sidebar = (props) => {
     </ul>
   )
 
-  const CaseRow = (props) => (  
+  const CaseRow = ({ id, name }) => (  
     <li>
-      <A className="nav-link-tight" href={"http://localhost:8081/cases/"+ props.id}>{props.name}s</A>
+      <StyledA href={"http://localhost:8081/cases/"+ id}>{name}s</StyledA>
     </li>
   )
 
+  const StyledA = styled(A)`
+    color: rgba(0,0,0,.7);
+  `
+  const StyledNavbar = styled(Navbar)`
+    border-bottom: none;
+    width: 200px;
+    position: fixed;
+    padding: 25px;
+  `
+  const StyledNav = styled(Nav)`
+    flex-direction: column !important;
+  `
+
   return (
-    <Navbar className={ props.visible ? 'sidebar' : 'sidebar-hidden' }>
+    <StyledNavbar className={ visible ? '' : 'd-none' }>
       <Navbar.Collapse>
-        <Nav className="vertical">
-        <div className="mb-2">
+        <StyledNav className="vertical">
+          <div className="mb-2">
             <FontAwesomeIcon icon={faHome} className="text-secondary"/>
             <A className="pb-2 pl-2 font-weight-bold" href="/cases">DASHBOARD</A>
           </div>
@@ -46,9 +58,9 @@ const Sidebar = (props) => {
             <FontAwesomeIcon icon={faCog} className="text-secondary"/>
             <A className="pb-2 pl-2 font-weight-bold" href="/settings">SETTINGS</A>
           </div>
-        </Nav>
+        </StyledNav>
       </Navbar.Collapse>
-    </Navbar>
+    </StyledNavbar>
   ); 
 };
 

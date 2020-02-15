@@ -4,6 +4,7 @@ import loadable from '@loadable/component'
 import Axios from 'axios';
 import { ModelsProvider } from './ModelsContext';
 import { CasesProvider } from './CasesContext';
+import { NotificationsProvider } from './NotificationsContext';
 
 import './App.css';
 
@@ -49,11 +50,13 @@ const App = () => {
   return (
     <ModelsProvider>
       <CasesProvider>
-        <Header toggleSidebar={() => toggleVisible(!visible)}/>
-        <Sidebar visible={visible}/>
-        <Contents withSidebar={visible}>
-          <RouteContainer />
-        </Contents>
+        <NotificationsProvider>
+          <Header toggleSidebar={() => toggleVisible(!visible)}/>
+          <Sidebar visible={visible}/>
+          <Contents withSidebar={visible}>
+            <RouteContainer />
+          </Contents>
+        </NotificationsProvider>
       </CasesProvider>
     </ModelsProvider>
   )

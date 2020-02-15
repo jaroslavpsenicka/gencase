@@ -6,17 +6,29 @@ import { A } from 'hookrouter';
 import { faBars, faCog } from '@fortawesome/free-solid-svg-icons'
 import { faBell } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import styled from 'styled-components';
 
-import './Header.css';
 import photo from '../static/photo.jpg';
 
+const StyledNavbar = styled(Navbar)`
+  border-bottom: 1px solid lightgray;
+`
+const StyledToogle = styled.div`
+  float: left;
+  margin-left: 15px;
+  margin-right: 25px;
+  cursor: pointer;
+  font-size: 20px;
+  color: gray;
+`
+
 const Header = (props) => (
-  <Navbar bg="white" sticky="top">
-    <div className="toggle-nav" onClick={() => props.toggleSidebar()}>
+  <StyledNavbar bg="white" sticky="top">
+    <StyledToogle onClick={() => props.toggleSidebar()}>
       <div className="icon-reorder tooltips" data-original-title="Toggle" data-placement="bottom">
         <FontAwesomeIcon icon={faBars} />
       </div>
-    </div>      
+    </StyledToogle>      
     <Navbar.Brand href="/cases">DataCase</Navbar.Brand>
     <Nav className="ml-auto">
       <A href="/settings" className="mt-1 ml-4 mr-2">
@@ -26,7 +38,7 @@ const Header = (props) => (
       <A href="/profile" className="ml-4 mr-2">
         <Image src={photo} roundedCircle/></A>
     </Nav>
-  </Navbar>
+  </StyledNavbar>
 )
 
 export default Header;
