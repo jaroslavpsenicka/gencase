@@ -1,5 +1,4 @@
 import React, { useState, useContext, useRef } from 'react';
-import Container from 'react-bootstrap/Container';
 import { A } from 'hookrouter';
 import { faStar, faAngleDown, faAngleUp, faPlus, faComment } from '@fortawesome/free-solid-svg-icons'
 import { faStar as faStarOutline } from '@fortawesome/free-regular-svg-icons'
@@ -75,13 +74,13 @@ const ModelDetailPage = ({modelId}) => {
   )
 
   return (
-    <Container className="pt-4">
+    <div className="p-4">
       {
         models.loading ? <Loading text={'Loading model ' + modelId }/> : 
         models.error ? <LoadingError error = { models.error }/> :  
         models.data ? <Model model = { models.byId[modelId] }/> : <div />
       }
-    </Container>
+    </div>
   )
 }
 

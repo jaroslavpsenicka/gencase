@@ -3,7 +3,6 @@ import axios from 'axios'
 import { faStar, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { faStar as faStarOutline } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { navigate } from 'hookrouter';
@@ -78,7 +77,7 @@ const ModelsPage = () => {
   )
 
   return (  
-    <Container className="pt-4">
+    <div className="p-4">
       <input type="file" name="file" id="file" ref={inputFile} className="d-none" 
         onChange={(event) => onUpload(event)} />
       <h4 className="w-100 text-muted font-weight-light text-uppercase mb-4 mr-3">
@@ -96,7 +95,7 @@ const ModelsPage = () => {
           models.data ? <Models models = { models.data }/> : <div />
         }
       </Row>
-    </Container>
+    </div>
   )
 };
 

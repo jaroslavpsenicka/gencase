@@ -1,5 +1,4 @@
 import React, { useState, useContext, useRef } from 'react';
-import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Badge from 'react-bootstrap/Badge';
@@ -109,7 +108,7 @@ const EntityPage = ({modelId, entityName}) => {
   }
 
   return (
-    <Container className="pt-4">
+    <div className="p-4">
       {
         models.loading ? <Loading text={'Loading model ' + modelId }/> : 
         models.error ? <LoadingError error = { models.error }/> :  
@@ -117,7 +116,7 @@ const EntityPage = ({modelId, entityName}) => {
         models.data && !findEntity(models.byId[modelId], entityName) ? <NoSuchEntity /> : 
         <DataModel model={models.byId[modelId]} />
       }
-    </Container>
+    </div>
   )
 }
 

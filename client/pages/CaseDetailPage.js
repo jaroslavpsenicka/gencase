@@ -5,7 +5,6 @@ import {
   faComment as faCommentOutline, 
   faFile as faFileOutline } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Badge from 'react-bootstrap/Badge';
@@ -103,14 +102,14 @@ const CaseDetailPage = ({modelId, id}) => {
   )
 
   return (
-    <Container className="pt-4 mr-4">
+    <div className="p-4">
       {
         theCase.loading ? <Loading /> : 
         theCase.error ? <LoadingError error = { theCase.error }/> :  
         theCase.data ? <Case /> : 
         <div />
       }
-    </Container>
+    </div>
   )
 }
 

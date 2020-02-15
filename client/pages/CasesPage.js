@@ -1,6 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Badge from 'react-bootstrap/Badge';
@@ -123,7 +122,7 @@ const CasesPage = ({modelId}) => {
   }
   
   return (
-    <Container className="pt-4">
+    <div className="p-4">
       <h4 className="text-muted font-weight-light text-uppercase mb-4">
         <FontAwesomeIcon icon={faPlus} className="mr-2 float-right cursor-pointer text-success"
           onClick={() => setShowCreateCaseDialog(true)}/>
@@ -148,7 +147,7 @@ const CasesPage = ({modelId}) => {
         models.byId[modelId] && cases.data ? <Cases cases={cases.data}/> : 
         <NoCases />
       }
-    </Container>  
+    </div>  
   )
 };
 

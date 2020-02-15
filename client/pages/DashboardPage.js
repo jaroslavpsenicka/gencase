@@ -1,5 +1,4 @@
 import React, { forwardRef, useState } from 'react';
-import Container from 'react-bootstrap/Container';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -86,7 +85,7 @@ const DashboardPage = () => {
   )
 
   return (
-    <Container className="pt-4">
+    <div className="p-4">
       <h4 className="text-muted font-weight-light text-uppercase mb-4">
         <FontAwesomeIcon icon={faPlus} 
           className="mr-2 cursor-pointer text-success float-right"
@@ -103,7 +102,7 @@ const DashboardPage = () => {
         onCancel={() => setShowAddChartDialog(false)}/>
       <Search />
       { showCharts ? <Charts /> : <div />}
-    </Container>
+    </div>
   );
 
 };
