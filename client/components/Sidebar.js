@@ -6,6 +6,21 @@ import { faHome, faCog, faCube } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import styled from 'styled-components';
 
+const SERVICE_URL = process.env.REACT_APP_SERVICE_URL || '';
+
+const StyledA = styled(A)`
+  color: rgba(0,0,0,.7);
+`
+const StyledNavbar = styled(Navbar)`
+  border-bottom: none;
+  width: 200px;
+  position: fixed;
+  padding: 25px;
+`
+const StyledNav = styled(Nav)`
+  flex-direction: column !important;
+`
+
 import { ModelsContext  } from '../ModelsContext';
 
 const Sidebar = ({ visible }) => {  
@@ -24,22 +39,9 @@ const Sidebar = ({ visible }) => {
 
   const CaseRow = ({ id, name }) => (  
     <li>
-      <StyledA href={"http://localhost:8081/cases/"+ id}>{name}s</StyledA>
+      <StyledA href={SERVICE_URL + "/cases/"+ id}>{name}s</StyledA>
     </li>
   )
-
-  const StyledA = styled(A)`
-    color: rgba(0,0,0,.7);
-  `
-  const StyledNavbar = styled(Navbar)`
-    border-bottom: none;
-    width: 200px;
-    position: fixed;
-    padding: 25px;
-  `
-  const StyledNav = styled(Nav)`
-    flex-direction: column !important;
-  `
 
   return (
     <StyledNavbar className={ visible ? '' : 'd-none' }>

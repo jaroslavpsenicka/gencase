@@ -2,7 +2,7 @@ import React, { useState, createContext, useEffect } from 'react';
 import { byId } from './ContextUtils';
 import Axios from 'axios';
 
-const LOAD_INTERVAL = 5000;
+const LOAD_INTERVAL = 10000;
 const SERVICE_URL = process.env.REACT_APP_SERVICE_URL || '';
 const NotificationsContext = createContext([{}, () => {}]);
 
@@ -27,7 +27,7 @@ const NotificationsProvider = (props) => {
   }, [loadTime]);
 
   return (
-    <NotificationsContext.Provider value={[loadTime, notifications, setNotifications]}>
+    <NotificationsContext.Provider value={[notifications, setNotifications]}>
       {props.children}
     </NotificationsContext.Provider>
   );
