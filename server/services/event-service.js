@@ -63,6 +63,7 @@ const createNotification = (theCase, eventType, eventAuthor, data) => {
         title: data.name + ' completed', 
         subtitle: 'by ' + eventAuthor,
         case: theCase.id,
+        model: theCase.model.id,
         sub: eventAuthor,
         createdBy: eventAuthor,
         createdAt: new Date(),

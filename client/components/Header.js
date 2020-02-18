@@ -9,6 +9,8 @@ import { faBars, faCog } from '@fortawesome/free-solid-svg-icons'
 import { faBell } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import styled from 'styled-components';
+import VagueTime from 'vague-time';
+
 import { NotificationsContext } from '../NotificationsContext';
 
 import Loading from './Loading';
@@ -65,20 +67,25 @@ const hasNewNotifications = (notifications) => {
   return notifications.data && notifications.data.find(n => !n.seen);
 }
 
-const Notification = ({ notification }) => (
+const Notification = ({ notification, model }) => (
   <div>
     <StyledNotificationTitle>
 
-      find case modelid here and use in URL
-      cofirm ntification as seen 
+      {/* cofirm ntification as seen 
       show all unread + all today's notifications limit 10
-      show all notifications on separate page
+      show all notifications on separate page */}
 
-      <A href={'/cases/' + notification.case}>Task {notification.title}</A>
+      <A href={'/cases/' + notification.model + '/' + notification.case}>
+        Task {notification.title}
+      </A>
     </StyledNotificationTitle> 
-    <StyledNotificationSubtitle>{notification.subtitle} at {notification.createdAt}</StyledNotificationSubtitle>
+    <StyledNotificationSubtitle>
+      { VagueTime.get({to: new Date(notification.createdAt)}) } 
+      &nbsp;
+      { notification.subtitle }
+    </StyledNotificationSubtitle>
   </div>
-)
+);
 
 const Header = (props) => {
 
@@ -95,7 +102,7 @@ const Header = (props) => {
           .filter(n => !n.seen)
           .sort((a, b) => a.createdAt > b.createdAt)
           .filter((n, idx) => idx < 10)
-          .map(n => <Notification key={n.id} notification={n} />)
+          .map(n => <Notification key={n.id} notification={n}/>)
       }
       </Popover.Content>
       <Popover.Title>

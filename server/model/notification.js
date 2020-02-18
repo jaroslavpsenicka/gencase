@@ -6,6 +6,7 @@ module.exports = mongoose.model('Notification', {
 	sub:					{ type: String },
 	title: 				{ type: String, required: true },
 	subtitle: 		{ type: String },
+	model:				{ type: String },
 	case:					{ type: String },
 	createdBy:		{ type: String },
 	createdAt: 		{ type: Date },

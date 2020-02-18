@@ -5,6 +5,7 @@ const Model = require('./model/model');
 const Case = require('./model/case');
 const Document = require('./model/document');
 const Comment = require('./model/comment');
+const Notification = require('./model/notification');
 const swagger = require('express-swagger-generator');
 const config = require('./config');
 const AuthError = require('./errors').AuthError;
@@ -43,9 +44,9 @@ Model.deleteMany({}, (err) => {
 	});	
 });
 
+const case1 = new ObjectId('000000000010');	
 Case.deleteMany({}, (err) => {	
 	if (err) throw err;
-	const case1 = new ObjectId('000000000010');	
 	Case.create({ _id: case1, 
 		id: hash.encodeHex(case1.toHexString()),  
 		aud: 'doe.com',
@@ -90,6 +91,22 @@ Comment.deleteMany({}, (err) => {
 		createdBy: 'Mary Doe',
 		createdAt: new Date(),
 		case: new ObjectId('000000000010')
+	})
+});
+
+Notification.deleteMany({}, (err) => {	
+	if (err) throw err;
+	const not1 = new ObjectId('000000010000');	
+	Notification.create({ _id: not1, 
+		id: hash.encodeHex(not1.toHexString()), 
+		title: "fund check completed", 
+		subtitle: 'by john@doe.com', 
+		sub: 'john@doe.com',
+		createdBy: 'Mary Doe',
+		createdAt: new Date(),
+		seen: false,
+		model: hash.encodeHex(mortgage.toHexString()),
+		case: hash.encodeHex(case1.toHexString())
 	})
 });
 
