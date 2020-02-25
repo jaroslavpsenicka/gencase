@@ -21,6 +21,7 @@ const App = () => {
   const ModelsPage = loadable(() => import(/* webpackChunkName: "pages" */ './pages/ModelsPage'));
   const ModelDetailPage = loadable(() => import(/* webpackChunkName: "pages" */ './pages/ModelDetailPage'));
   const EntityPage = loadable(() => import(/* webpackChunkName: "pages" */ './pages/EntityPage'));
+  const NotificationsPage = loadable(() => import(/* webpackChunkName: "pages" */ './pages/NotificationsPage'));
   const NoPage = loadable(() => import(/* webpackChunkName: "pages" */ './pages/NoPage'));
 
   const routes = {
@@ -29,7 +30,8 @@ const App = () => {
     "/cases/:modelId/:id": ({modelId, id}) => <CaseDetailPage modelId={modelId} id={id} />,
     "/models": () => <ModelsPage />,
     "/models/:modelId": ({modelId}) => <ModelDetailPage modelId={modelId}/>,
-    "/models/:modelId/entity/:entityName": ({modelId, entityName}) => <EntityPage modelId={modelId} entityName={entityName} />
+    "/models/:modelId/entity/:entityName": ({modelId, entityName}) => <EntityPage modelId={modelId} entityName={entityName} />,
+    "/notifications": () => <NotificationsPage />
   };
 
   useRedirect('/', '/cases');

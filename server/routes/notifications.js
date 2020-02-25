@@ -41,7 +41,10 @@ module.exports = function (app) {
 	 * @returns {Error} 500 - system error
 	 */
 	app.put('/api/notifications/:id', auth, (req, res) => {
-		if (!req.body.seen) return res.status(400).send({ error: 'illegal parameter' })
+		const keys = Object.keys(req.body);
+		if (keys.length != 1 || keys[0] != 'seen') {
+			return res.status(400).send({ error: 'illegal parameter'});
+		}
 		Notification.findOneAndUpdate({ sub: sub(req), id: req.params.id }, {
 			seen: req.body.seen,
 			updatedBy: sub(auth),
@@ -49,7 +52,7 @@ module.exports = function (app) {
 		}, (err, data) => {
 			if (err) throw err;
 			if (!data) return res.status(404).send();
-			return res.status(204).send();
+			return res.status(200).send(data);
 		});
   });
 

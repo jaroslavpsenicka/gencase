@@ -10,6 +10,10 @@ body {
     cursor: move;
 }
 
+.cursor-default {
+    cursor: default;
+}
+
 .text-black {
     color: black;
 }

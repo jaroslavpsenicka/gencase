@@ -4,19 +4,21 @@ import Nav from 'react-bootstrap/Nav';
 import Image from 'react-bootstrap/Image';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
-import { A } from 'hookrouter';
+import { A, navigate } from 'hookrouter';
 import { faBars, faCog } from '@fortawesome/free-solid-svg-icons'
 import { faBell } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import styled from 'styled-components';
 import VagueTime from 'vague-time';
+import Axios from 'axios';
 
 import { NotificationsContext } from '../NotificationsContext';
 
 import Loading from './Loading';
 import LoadingError from './LoadingError';
-
 import photo from '../static/photo.jpg';
+
+const SERVICE_URL = process.env.REACT_APP_SERVICE_URL || '';
 
 const StyledNavbar = styled(Navbar)`
   border-bottom: 1px solid lightgray;
@@ -43,6 +45,9 @@ const StyledPopover = styled(Popover)`
   min-width: 300px !important;
   max-width: 600px !important;
 `
+const StyledNotification = styled.div`
+  cursor: pointer;
+`
 const StyledNotificationTitle = styled.div`
   font-size: 1.1em;
   font-weight: bold;
@@ -63,46 +68,52 @@ const ProfileIcon = () => (
   </A>  
 )
 
-const hasNewNotifications = (notifications) => {
-  return notifications.data && notifications.data.find(n => !n.seen);
-}
-
-const Notification = ({ notification, model }) => (
-  <div>
-    <StyledNotificationTitle>
-
-      {/* cofirm ntification as seen 
-      show all unread + all today's notifications limit 10
-      show all notifications on separate page */}
-
-      <A href={'/cases/' + notification.model + '/' + notification.case}>
-        Task {notification.title}
-      </A>
-    </StyledNotificationTitle> 
-    <StyledNotificationSubtitle>
-      { VagueTime.get({to: new Date(notification.createdAt)}) } 
-      &nbsp;
-      { notification.subtitle }
-    </StyledNotificationSubtitle>
-  </div>
-);
-
 const Header = (props) => {
 
-  const [ notifications ] = useContext(NotificationsContext);
-    
+  const [ notifications, setNotifications ] = useContext(NotificationsContext);
+
+  const clickHandler = (notification) => {
+    Axios.put(SERVICE_URL + '/api/notifications/' + notification.id, { seen: true })
+    .then(response => {
+      setNotifications(prev => { 
+        return { ...prev, data: prev.data.map(n => {
+          return n.id === notification.id ? response : n;
+        })}
+      });
+      navigate('/cases/' + notification.model + '/' + notification.case);
+    });
+  }
+
+  const hasNewNotifications = () => {
+    return notifications.data && notifications.data.find(n => !n.seen);
+  }
+  
+  /* 
+    show all notifications on separate page 
+  */
+  const Notification = ({ notification }) => (
+    <StyledNotification onClick={() => clickHandler(notification)}>
+      <StyledNotificationTitle>
+        Task {notification.title}
+      </StyledNotificationTitle> 
+      <StyledNotificationSubtitle>
+        { VagueTime.get({to: new Date(notification.createdAt)}) } { notification.subtitle }
+      </StyledNotificationSubtitle>
+    </StyledNotification>
+  )
+
   const NotificationsPopover = (
-    <StyledPopover id="popover-notifications">
+    <StyledPopover>
       <Popover.Content> 
       { 
-        notifications.loading ? <Loading /> :
-        notifications.error ? <LoadingError /> :
-        notifications.data && notifications.data.length == 0 ? <div>No new notifications.</div> :
-        notifications.data
+        hasNewNotifications() ? notifications.data
           .filter(n => !n.seen)
           .sort((a, b) => a.createdAt > b.createdAt)
           .filter((n, idx) => idx < 10)
-          .map(n => <Notification key={n.id} notification={n}/>)
+          .map(n => <Notification key={n.id} notification={n}/>) :
+        notifications.loading ? <Loading /> :
+        notifications.error ? <LoadingError error={notifications.error}/> :
+        <div>No new notifications.</div>
       }
       </Popover.Content>
       <Popover.Title>
@@ -110,13 +121,13 @@ const Header = (props) => {
       </Popover.Title>
     </StyledPopover>
   );
-  
+      
   const BellIcon = () => (
     <A href="" className="mt-1 ml-4 mr-2 position-relative">
       <OverlayTrigger trigger="click" placement="bottom" overlay={NotificationsPopover}>
         <FontAwesomeIcon icon={faBell} size="lg"/>
       </OverlayTrigger>
-      { hasNewNotifications(notifications) ? <StyledIndicator/> : <div/> }
+      { hasNewNotifications() ? <StyledIndicator/> : <div/> }
     </A>
   );
 

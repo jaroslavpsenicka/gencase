@@ -74,7 +74,7 @@ describe('Notifications', () => {
       headers: { Authorization: 'Bearer ' + TEST_JWT, 'Content-Type': 'application/json' },
       body: JSON.stringify(contents)
     }, (error, response) => {
-      expect(response.statusCode).to.equal(204);
+      expect(response.statusCode).to.equal(200);
       request.get({
         uri: 'http://localhost:8080/api/notifications',
         headers: { Authorization: 'Bearer ' + TEST_JWT }
