@@ -5,6 +5,8 @@ const hash = new Hashids();
 const auth = require('../auth').auth;
 const sub = require('../auth').sub;
 
+const PAGE_SIZE = 20;
+
 /**
  * @typedef Notification
  * @property {string} id - unique identifier
@@ -25,10 +27,16 @@ module.exports = function (app) {
 	 * @returns {Error} 500 - system error
 	 */
 	app.get('/api/notifications', auth, (req, res) => {
-		Notification.find({ sub: sub(req) }, (err, data) => {
-			if (err) throw err;
-			return res.status(200).send(data);	
-		})
+		const page = req.query.page ? Math.max(0, parseInt(req.query.page)) : 0;
+		const size = req.query.size ? Math.max(0, parseInt(req.query.size)) : PAGE_SIZE;
+		Notification.find({ sub: sub(req) })
+			.sort({ "createdAt": -1 })
+			.skip(page * size)
+			.limit(size)
+			.exec((err, data) => {
+				if (err) throw err;
+				return res.status(200).send(data);	
+			});
   });
 
 	/**

@@ -68,9 +68,9 @@ const ProfileIcon = () => (
   </A>  
 )
 
-const Header = (props) => {
+const Header = ({ toggleSidebar }) => {
 
-  const [ notifications, setNotifications ] = useContext(NotificationsContext);
+  const { notifications, setNotifications } = useContext(NotificationsContext);
 
   const clickHandler = (notification) => {
     Axios.put(SERVICE_URL + '/api/notifications/' + notification.id, { seen: true })
@@ -133,7 +133,7 @@ const Header = (props) => {
 
   return (
     <StyledNavbar bg="white" sticky="top">
-      <StyledToogle onClick={() => props.toggleSidebar()}>
+      <StyledToogle onClick={toggleSidebar}>
         <div className="icon-reorder tooltips" data-original-title="Toggle" data-placement="bottom">
           <FontAwesomeIcon icon={faBars} />
         </div>

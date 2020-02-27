@@ -67,6 +67,27 @@ describe('Notifications', () => {
     });
   });
 
+  it('and paging works', (done) => {
+    request.get({
+      uri: 'http://localhost:8080/api/notifications',
+      headers: { Authorization: 'Bearer ' + TEST_JWT }
+    }, (error, response) => {
+      expect(response.statusCode).to.equal(200);
+      const json = JSON.parse(response.body);
+      if (json.length > 1) {
+        request.get({
+          uri: 'http://localhost:8080/api/notifications?page=1&size=1',
+          headers: { Authorization: 'Bearer ' + TEST_JWT }
+        }, (error, response) => {
+          expect(response.statusCode).to.equal(200);
+          const json2 = JSON.parse(response.body);
+          expect(json2.length).to.equal(1);
+          done();
+        });
+      } else done();
+    });
+  });
+
   it('and can be confirmed', (done) => {
     const contents = { seen: true };
     request.put({

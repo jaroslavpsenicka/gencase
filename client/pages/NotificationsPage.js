@@ -3,8 +3,10 @@ import axios from 'axios'
 import { faStar, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { faStar as faStarOutline } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import Button from 'react-bootstrap/Button';
 import { navigate } from 'hookrouter';
 import VagueTime from 'vague-time';
+import styled from 'styled-components';
 
 import Loading from '../components/Loading';
 import LoadingError from '../components/LoadingError';
@@ -12,9 +14,13 @@ import { NotificationsContext } from '../NotificationsContext';
 
 const SERVICE_URL = process.env.REACT_APP_SERVICE_URL || '';
 
+const NextButton = styled(Button)`
+  margin: 20px auto;
+`
+
 const NotificationsPage = () => {
 
-  const [ notifications, setNotifications ] = useContext(NotificationsContext);
+  const { notifications, setNotifications, hasNext, next } = useContext(NotificationsContext);
   const [ filter, setFilter ] = useState({ unseen: false });
 
   const toggleSeen = (notification) => {
@@ -49,7 +55,16 @@ const NotificationsPage = () => {
       .sort((a, b) => compareBySeenAndCreated(a, b))
       .filter((n, idx) => idx < 50)
       .map(m => <Notification notification={m} key={m.id} />);
-    return filtered.length > 0 ? filtered : <NoNotifications />
+    if (notifications.data.length > 0) return (
+      <div> 
+        {filtered}
+        <div className="d-block text-center">
+          { hasNext ? <NextButton onClick={next}>Show recent notifications...</NextButton> : <div/> }
+        </div>
+      </div>
+    );
+
+    return <NoNotifications />
   }
 
   const NoNotifications = () => (
