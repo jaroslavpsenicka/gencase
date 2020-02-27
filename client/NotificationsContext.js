@@ -9,10 +9,10 @@ const NotificationsContext = createContext([{}, () => {}]);
 
 const NotificationsProvider = (props) => {
 
-  const [loadTime, setLoadTime] = useState(0);
-  const [notifications, setNotifications] = useState({ loading: true });
-  const [page, setPage] = useState(0);
-  const [hasNextPage, setHasNextPage] = useState(false);
+  const [ loadTime, setLoadTime ] = useState(0);
+  const [ notifications, setNotifications ] = useState({ loading: true });
+  const [ page, setPage ] = useState(0);
+  const [ hasNextPage, setHasNextPage ] = useState(false);
 
   const loadNotifications = () => {
     setNotifications(prev => { return { ...prev, loading: true }});
@@ -22,13 +22,9 @@ const NotificationsProvider = (props) => {
   }
 
   const setData = (prev, data) => {
+    const adata = (page > 0) ? [...prev, ...data] : data;
     setHasNextPage(data.length == PAGE_SIZE);
-    if (page > 0) {
-      const augdata = [...prev, data];
-      setNotifications({ loading: false, data: augdata, byId: byId(augdata) });
-    } else {
-      setNotifications({ loading: false, data: data, byId: byId(data) });
-    }
+    setNotifications({ loading: false, data: adata, byId: byId(adata) });
   }
 
   const hasNext = () => {

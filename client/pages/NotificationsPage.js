@@ -55,16 +55,13 @@ const NotificationsPage = () => {
       .sort((a, b) => compareBySeenAndCreated(a, b))
       .filter((n, idx) => idx < 50)
       .map(m => <Notification notification={m} key={m.id} />);
-    if (notifications.data.length > 0) return (
+    return (notifications.data.length == 0) ? <NoNotifications /> :
       <div> 
         {filtered}
         <div className="d-block text-center">
-          { hasNext ? <NextButton onClick={next}>Show recent notifications...</NextButton> : <div/> }
+          { hasNext() ? <NextButton onClick={next}>Show more...</NextButton> : <div/> }
         </div>
       </div>
-    );
-
-    return <NoNotifications />
   }
 
   const NoNotifications = () => (
