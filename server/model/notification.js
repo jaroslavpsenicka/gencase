@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 module.exports = mongoose.model('Notification', {
 	_id: 					{ type: mongoose.Schema.Types.ObjectId, required: true },
 	id: 					{ type: String, required: true },
-	sub:					{ type: String },
+	aud:					{ type: String },
 	title: 				{ type: String, required: true },
 	subtitle: 		{ type: String },
 	model:				{ type: String },

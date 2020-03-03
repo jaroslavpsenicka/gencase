@@ -7,6 +7,7 @@ const log4js = require('log4js');
 const eventService = require('../services/event-service');
 const transitionService = require('../services/transition-service');
 
+const logger = log4js.getLogger('cases')
 const config = require('../config');
 const hash = new Hashids();
 const Formatter = require('../formatters');
@@ -386,6 +387,7 @@ module.exports = function (app) {
 				if (err) throw err;
 				if (!theCase) return res.status(404).send({ error: 'case not found' });
 
+				logger.info(theCase.id, req.params.action, 'callback');	
 				eventService.findLastEventByName(theCase.id, 'ACTION', req.params.action).then(
 					event => completeActionCallback(theCase, event, req, res),
 					err => { throw err }

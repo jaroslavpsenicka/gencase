@@ -59,7 +59,7 @@ describe('Notifications', () => {
       expect(notification.title).to.equal('notify-deal completed');
       expect(notification.subtitle).to.equal('by john@doe.com');
       expect(notification.case).to.equal(caseObject.id);
-      expect(notification.sub).to.equal('john@doe.com');
+      expect(notification.aud).to.equal('doe.com');
       expect(notification.seen).to.equal(false);
       expect(notification.updatedAt).to.be.undefined;
       expect(notification.updatedBy).to.be.undefined;
@@ -107,7 +107,7 @@ describe('Notifications', () => {
         expect(confirmed.subtitle).to.equal('by john@doe.com');
         expect(confirmed.case).to.equal(caseObject.id);
         expect(confirmed.model).to.equal(model.id);
-        expect(confirmed.sub).to.equal('john@doe.com');
+        expect(confirmed.aud).to.equal('doe.com');
         expect(confirmed.seen).to.equal(true);
         expect(confirmed.updatedAt).to.not.be.undefined;
         expect(confirmed.updatedBy).to.not.be.undefined;

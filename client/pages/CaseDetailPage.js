@@ -34,18 +34,12 @@ const CaseDetailPage = ({modelId, id}) => {
     Axios.get(SERVICE_URL + '/api/cases/' + id + '/metadata')
       .then(response => setTheCase({ loading: false, data: response.data }))
       .catch(err => setTheCase({ loading: false, error: err }))
-  }, [id]);
-  useEffect(() => {
     Axios.get(SERVICE_URL + '/api/cases/' + id + '/documents')
       .then(response => setDocuments({ loading: false, data: response.data }))
       .catch(err => setDocuments({ loading: false, error: err }))
-  }, [id]);
-  useEffect(() => {
     Axios.get(SERVICE_URL + '/api/cases/' + id + '/comments')
       .then(response => setComments({ loading: false, data: response.data }))
       .catch(err => setComments({ loading: false, error: err }))
-  }, [id]);
-  useEffect(() => {
     Axios.get(SERVICE_URL + '/api/cases/' + id + '/actions')
       .then(response => setActions({ loading: false, data: response.data }))
       .catch(err => setActions({ loading: false, error: err }))

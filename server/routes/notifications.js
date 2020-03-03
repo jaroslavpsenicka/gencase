@@ -3,6 +3,7 @@ const Hashids = require('hashids/cjs');
 
 const hash = new Hashids();
 const auth = require('../auth').auth;
+const aud = require('../auth').aud;
 const sub = require('../auth').sub;
 
 const PAGE_SIZE = 20;
@@ -19,7 +20,7 @@ const PAGE_SIZE = 20;
 module.exports = function (app) {
 
 	/**
-	 * Return list of notifications for give user
+	 * Return list of notifications for given audience (aud field)
 	 * @route GET /api/notifications
 	 * @group Notifications - user alerts and completion info
    * @produces application/json
@@ -29,7 +30,7 @@ module.exports = function (app) {
 	app.get('/api/notifications', auth, (req, res) => {
 		const page = req.query.page ? Math.max(0, parseInt(req.query.page)) : 0;
 		const size = req.query.size ? Math.max(0, parseInt(req.query.size)) : PAGE_SIZE;
-		Notification.find({ sub: sub(req) })
+		Notification.find({ aud: aud(req) })
 			.sort({ "createdAt": -1 })
 			.skip(page * size)
 			.limit(size)
@@ -53,7 +54,7 @@ module.exports = function (app) {
 		if (keys.length != 1 || keys[0] != 'seen') {
 			return res.status(400).send({ error: 'illegal parameter'});
 		}
-		Notification.findOneAndUpdate({ sub: sub(req), id: req.params.id }, {
+		Notification.findOneAndUpdate({ aud: aud(req), id: req.params.id }, {
 			seen: req.body.seen,
 			updatedBy: sub(auth),
 			updatedAt: new Date()

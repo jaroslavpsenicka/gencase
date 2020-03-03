@@ -56,7 +56,7 @@ const findLastEventByName = (caseId, eventClass, name) => {
 const createNotification = (theCase, eventType, eventAuthor, data) => {
   return new Promise(function(resolve, reject) {
     if (eventType == 'ACTION_COMPLETED') {
-      logger.info('generating notification', eventType, theCase.id);
+      logger.info(theCase.id, 'generating notification', eventType, 'for', theCase.createdBy);
       const notifId = new ObjectId();	
       Notification.create({ _id: notifId, 
         id: hash.encodeHex(notifId.toHexString()),
@@ -64,7 +64,7 @@ const createNotification = (theCase, eventType, eventAuthor, data) => {
         subtitle: 'by ' + eventAuthor,
         case: theCase.id,
         model: theCase.model.id,
-        sub: eventAuthor,
+        aud: theCase.aud,
         createdBy: eventAuthor,
         createdAt: new Date(),
       }).then(() => resolve()).catch(err => reject(err));
