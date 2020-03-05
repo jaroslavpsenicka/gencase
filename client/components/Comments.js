@@ -67,7 +67,7 @@ const Comments = ({comments, commentsRef, dateFormat}) => {
           onClick={() => setShowCommentDialog(true)}/>
         Comments
       </h5>
-      <Container>
+      <div className="px-3">
         {
           comments.loading ? <Loading /> : 
           comments.error ? <LoadingError error = { comments.error }/> :  
@@ -75,7 +75,7 @@ const Comments = ({comments, commentsRef, dateFormat}) => {
           comments.data ? comments.data.map(d => <CommentRow comment={d} key={d.id}/>) : 
           <div />
         }
-      </Container>
+      </div>
     </div>
   );
 

@@ -3,18 +3,19 @@ import { faStar, faComment, faFile, faPlus, faFilePdf } from '@fortawesome/free-
 import { 
   faStar as faStarOutline, 
   faComment as faCommentOutline, 
+  faFlag as faFlagOutline,
   faFile as faFileOutline } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Badge from 'react-bootstrap/Badge';
-import Button from 'react-bootstrap/Button';
 import Axios from 'axios';
 
 import Loading from '../components/Loading';
 import LoadingError from '../components/LoadingError'
-import Documents from '../components/Documents';
+import Attachments from '../components/Attachments';
 import Comments from '../components/Comments';
+import Events from '../components/Events';
 import CaseActions from '../components/CaseActions';
 
 const SERVICE_URL = process.env.REACT_APP_SERVICE_URL || '';
@@ -26,9 +27,11 @@ const CaseDetailPage = ({modelId, id}) => {
   const [ documents, setDocuments ] = useState({ loading: true });
   const [ comments, setComments ] = useState({ loading: true });
   const [ actions, setActions ] = useState({ loading: true });
+  const [ events, setEvents ] = useState({ loading: true });
 
   const commentsRef = useRef(null);
   const documentsRef = useRef(null);
+  const eventsRef = useRef(null);
 
   useEffect(() => {
     Axios.get(SERVICE_URL + '/api/cases/' + id + '/metadata')
@@ -40,9 +43,12 @@ const CaseDetailPage = ({modelId, id}) => {
     Axios.get(SERVICE_URL + '/api/cases/' + id + '/comments')
       .then(response => setComments({ loading: false, data: response.data }))
       .catch(err => setComments({ loading: false, error: err }))
-    Axios.get(SERVICE_URL + '/api/cases/' + id + '/actions')
+      Axios.get(SERVICE_URL + '/api/cases/' + id + '/actions')
       .then(response => setActions({ loading: false, data: response.data }))
       .catch(err => setActions({ loading: false, error: err }))
+    Axios.get(SERVICE_URL + '/api/cases/' + id + '/events')
+      .then(response => setEvents({ loading: false, data: response.data }))
+      .catch(err => setEvents({ loading: false, error: err }))
   }, [id]);
 
   const toggleStarred = (toggledCase) => {
@@ -78,6 +84,9 @@ const CaseDetailPage = ({modelId, id}) => {
         <FontAwesomeIcon icon={theCase.data.documents ? faFile : faFileOutline} 
           className="ml-4 float-right cursor-pointer text-success" 
           onClick={() => scrollToRef(documentsRef)}/>
+        <FontAwesomeIcon icon={faFlagOutline} 
+          className="ml-4 float-right cursor-pointer text-success" 
+          onClick={() => scrollToRef(eventsRef)}/>
         { theCase.data.name }
       </h4>
       <h5 className="mb-4">
@@ -90,8 +99,9 @@ const CaseDetailPage = ({modelId, id}) => {
       <Row className="p-2 pl-3 mb-1 ml-0 mr-0 mt-3 bg-white text-dark">
         <CaseDetail />
       </Row>
-      <Documents caseId={id} documents={documents} setDocuments={setDocuments} documentsRef={documentsRef} />
+      <Attachments caseId={id} documents={documents} setDocuments={setDocuments} documentsRef={documentsRef} />
       <Comments caseId={id} comments={comments} setComments={setComments} commentsRef={commentsRef} />
+      <Events events={events} eventsRef={eventsRef} />
     </div>    
   )
 

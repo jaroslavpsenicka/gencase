@@ -7,8 +7,8 @@ import Col from 'react-bootstrap/Col';
 import Axios from 'axios';
 import VagueTime from 'vague-time';
 
-import Loading from '../components/Loading';
-import LoadingError from '../components/LoadingError'
+import Loading from './Loading';
+import LoadingError from './LoadingError'
 import { formatFileSize } from '../Formatters';
 
 const SERVICE_URL = process.env.REACT_APP_SERVICE_URL || '';
@@ -17,7 +17,7 @@ const vagueTime = (time) => {
   return VagueTime.get({to: new Date(time)})
 }
 
-const Documents = ({caseId, documents, setDocuments, documentsRef}) => {
+const Attachments = ({caseId, documents, setDocuments, documentsRef}) => {
 
   const inputDocumentRef = useRef(null); 
 
@@ -27,8 +27,8 @@ const Documents = ({caseId, documents, setDocuments, documentsRef}) => {
         <FontAwesomeIcon icon={faFilePdf}></FontAwesomeIcon>
         <span className="pl-2 text-primary font-weight-bold">{document.name}</span>
       </Col>
-      <Col md={4} className="text-secondary text-right text-ellipsis">{vagueTime(document.createdAt)} by {document.createdBy}</Col>
-      <Col md={2} className="text-secondary text-right pr-2">{formatFileSize(document.size, 0)}</Col>
+      <Col md={2} className="text-secondary text-right">{formatFileSize(document.size, 0)}</Col>
+      <Col md={4} className="text-secondary text-right text-ellipsis pr-2">{vagueTime(document.createdAt)} by {document.createdBy}</Col>
     </Row>
   )
 
@@ -54,9 +54,9 @@ const Documents = ({caseId, documents, setDocuments, documentsRef}) => {
         <FontAwesomeIcon icon={faPlus} className="mr-2 float-right cursor-pointer text-success"
           disabled = {documents.loading || documents.error}
           onClick = {() => inputDocumentRef.current.click()}/>
-        Documents
+        Attachments
       </h5>
-      <Container>
+      <div className="px-3">
         {
           documents.loading ? <Loading /> : 
           documents.error ? <LoadingError error = { documents.error }/> :  
@@ -64,10 +64,10 @@ const Documents = ({caseId, documents, setDocuments, documentsRef}) => {
           documents.data ? documents.data.map(d => <DocumentRow document={d} key={d.id}/>) : 
           <div />
         }
-      </Container>
+      </div>
     </div>  
   ); 
 
 }
 
-export default Documents;
+export default Attachments;

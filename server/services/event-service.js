@@ -31,9 +31,12 @@ const findEvents = (caseId, eventClass) => {
     return esclient.search({ 
       index: 'events', 
       q: 'case:' + caseId + (eventClass ? ' AND class:' + eventClass : ''), 
-      sort: 'createdAt'
+      sort: 'createdAt:desc'
     }).then(result => {
-      const events = result.hits.hits.map(hit => hit._source);
+      const events = result.hits.hits.map(hit => {
+        var hex = Buffer(hit._id).toString('hex');
+        return { ...hit._source, id: hash.encodeHex(hex) }
+      });
       resolve(events);
     }).catch(err => reject(err));
   });
