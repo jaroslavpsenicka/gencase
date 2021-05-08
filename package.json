@@ -62,7 +62,7 @@
     "file-loader": "^5.0.2",
     "font-awesome": "^4.7.0",
     "get-stream": "^5.1.0",
-    "handlebars": "^4.5.1",
+    "handlebars": "^4.7.7",
     "handlebars-dateformat": "^1.1.1",
     "hashids": "^2.0.1",
     "hookrouter": "^1.2.3",
